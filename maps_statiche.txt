@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+    <meta charset="utf-8" />
+    <title>Visualizzazione Posizione Salvata (Stile Elegante Gratuito)</title>
+    
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+            
+    <style>
+        body { 
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            background-color: #f9f9f9;
+            color: #333;
+            margin: 20px;
+        }
+        #map { 
+            height: 500px; 
+            width: 100%; 
+            border-radius: 8px; 
+            border: 1px solid #ddd;
+        }
+        #info-percorso { 
+            font-size: 1.1em; 
+            padding: 15px; 
+            border-radius: 8px; 
+            margin-bottom: 20px;
+            line-height: 1.6;
+            background-color: #e6f0ff; 
+            color: #0056b3;
+        }
+        .cost-indicator { 
+            color: #009900; 
+            font-weight: bold; 
+        }
+    </style>
+</head>
+<body>
+
+    <h2>📍 Posizione Ristorante (Visualizzazione Elegante)</h2>
+
+    <div id="info-percorso">
+        <span class="cost-indicator">Costo stimato API a pagamento: ZERO.</span>
+        <br>Mappa base fornita da CARTO (stile pulito).
+    </div>
+    
+    <div id="map"></div>
+
+    <script>
+        // --- NESSUNA API KEY NECESSARIA ---
+        
+        // 1. SIMULAZIONE RICEZIONE DATI DAL DATABASE
+        const RESTAURANT_LAT = 41.88927; // Latitudine
+        const RESTAURANT_LON = 12.49219; // Longitudine
+        const RESTAURANT_NAME = "Ristorante Salvato (Via Assisi)";
+        
+        const position = [RESTAURANT_LAT, RESTAURANT_LON];
+
+        // 2. INIZIALIZZA LA MAPPA
+        const map = L.map('map');
+        
+        // ** NUOVO TILE LAYER ELEGANTE (CARTO Positron) **
+        // Gratuito, senza chiave e con uno stile minimalista grigio chiaro.
+        L.tileLayer('https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}.png', {
+            attribution: '&copy; <a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors, &copy; <a href="https://carto.com/attributions">CARTO</a>',
+            subdomains: 'abcd',
+            maxZoom: 20
+        }).addTo(map);
+
+        // Funzione per visualizzare la posizione
+        function displaySavedPosition(lat, lon, name) {
+            
+            // Aggiungi il Marker
+            L.marker(position).addTo(map)
+                .bindPopup(`<strong>${name}</strong>`).openPopup();
+
+            // Centra la mappa sul punto esatto
+            map.setView(position, 15); // Livello di zoom 15 (vicino)
+        }
+
+        // Avvia la visualizzazione
+        displaySavedPosition(RESTAURANT_LAT, RESTAURANT_LON, RESTAURANT_NAME);
+    </script>
+
+</body>
+</html>

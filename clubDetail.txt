@@ -1,0 +1,354 @@
+import React, { useState } from 'react';
+import { 
+    MapPin, Clock, Calendar, Users, Music, Shirt, ChevronLeft, 
+    Share2, Heart, Star, Navigation, Phone, Globe, Ticket, 
+    ArrowRight, CheckCircle2, Info
+} from 'lucide-react';
+
+// --- 1. CONFIGURAZIONE & DATI MOCK (Coerenti con Edit Page) ---
+
+const HOGU_COLORS = {
+  primary: '#68B49B',
+  dark: '#1A202C',
+  lightAccent: '#E6F5F0',
+  subtleText: '#4A5568',
+};
+
+const HOGU_THEME = {
+  bg: 'bg-gray-50', // Sfondo leggero pagina
+  cardBase: 'bg-white rounded-[2rem] shadow-sm border border-gray-100',
+  fontFamily: 'font-sans',
+  buttonPrimary: `bg-[#68B49B] text-white hover:bg-[#569c85] transition-all shadow-lg shadow-[#68B49B]/20`,
+  buttonSecondary: `bg-white text-gray-700 border border-gray-200 hover:bg-gray-50 transition-all`,
+};
+
+// Dati del Club (Il "Padre")
+const clubData = {
+    id: 1,
+    title: 'Hogu Club Roma',
+    rating: 4.8,
+    reviews: 124,
+    description: "Situato nel cuore pulsante di Roma, l'Hogu Club è il punto di riferimento per la nightlife capitolina. Un ambiente esclusivo dove design moderno e storia si incontrano. Impianto audio di ultima generazione, privè riservati e una selezione artistica internazionale rendono ogni serata un'esperienza unica.",
+    city: "Roma, Lazio",
+    address: "Via del Colosseo, 1",
+    coverImage: "https://images.unsplash.com/photo-1566737236500-c8ac43014a67?auto=format&fit=crop&w=1200&q=80",
+    gallery: [
+        'https://images.unsplash.com/photo-1574391884720-385e6e288793?auto=format&fit=crop&w=800&q=80',  
+        'https://images.unsplash.com/photo-1516450360452-9312f5e86fc7?auto=format&fit=crop&w=800&q=80', 
+    ],
+    hours: "23:00 - 05:00",
+    phone: "+39 06 12345678",
+    website: "www.hoguclub.com",
+    
+    // Vibe & Info
+    crowdMixMale: 50, // 50% Uomo - 50% Donna
+    dressCode: "Smart Casual / Elegant",
+    musicGenres: ["House", "Commerciale", "Reggaeton"],
+    minAge: "21+",
+};
+
+// Eventi collegati (I "Figli")
+const linkedEvents = [
+    {
+        id: 101,
+        title: "Grand Opening Season 2024",
+        date: "Venerdì, 24 Ott",
+        time: "23:00",
+        price: 25,
+        image: "https://images.unsplash.com/photo-1470225620780-dba8ba36b745?auto=format&fit=crop&w=800&q=80",
+        status: "Selling Fast"
+    },
+    {
+        id: 102,
+        title: "Saturday Night Fever - Guest DJ",
+        date: "Sabato, 25 Ott",
+        time: "23:30",
+        price: 30,
+        image: "https://images.unsplash.com/photo-1545128485-c400e7702796?auto=format&fit=crop&w=800&q=80",
+        status: "Available"
+    },
+    {
+        id: 103,
+        title: "Halloween Horror Party",
+        date: "Giovedì, 31 Ott",
+        time: "22:00",
+        price: 40,
+        image: "https://images.unsplash.com/photo-1505236858219-8359eb29e329?auto=format&fit=crop&w=800&q=80",
+        status: "Last Tickets"
+    }
+];
+
+// --- 2. COMPONENTI UI DI SUPPORTO ---
+
+// Visualizzatore Crowd Mix (Read Only)
+const CrowdMixDisplay = ({ malePercent }) => (
+    <div className="w-full">
+        <div className="flex justify-between text-xs font-bold text-gray-500 mb-2 uppercase tracking-wide">
+            <span>Uomo {malePercent}%</span>
+            <span>Donna {100 - malePercent}%</span>
+        </div>
+        <div className="h-2 w-full rounded-full overflow-hidden flex">
+            <div style={{ width: `${malePercent}%` }} className="bg-slate-400 h-full"></div>
+            <div style={{ width: `${100 - malePercent}%` }} className={`bg-[${HOGU_COLORS.primary}] h-full`}></div>
+        </div>
+    </div>
+);
+
+// Card Evento (Orizzontale per lista)
+const EventCard = ({ event }) => (
+    <div className="group flex flex-col sm:flex-row gap-4 p-4 rounded-2xl border border-gray-100 hover:border-[#68B49B]/30 hover:shadow-md transition-all bg-white cursor-pointer">
+        {/* Immagine Evento */}
+        <div className="w-full sm:w-32 h-32 sm:h-24 rounded-xl overflow-hidden shrink-0 relative">
+            
+            <img src={event.image} alt={event.title} className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500" />
+            {event.status === "Last Tickets" && (
+                <span className="absolute top-2 left-2 bg-red-500 text-white text-[10px] font-bold px-2 py-1 rounded-md shadow-lg">
+                    Ultimi Posti
+                </span>
+            )}
+        </div>
+
+        {/* Info Evento */}
+        <div className="flex-1 flex flex-col justify-center">
+            <div className="flex items-center gap-2 text-xs font-bold text-[#68B49B] mb-1">
+                <Calendar size={14} /> {event.date} • <Clock size={14} /> {event.time}
+            </div>
+            <h4 className="font-bold text-gray-900 text-lg leading-tight mb-2 group-hover:text-[#68B49B] transition-colors">
+                {event.title}
+            </h4>
+            <div className="flex items-center justify-between mt-auto">
+                <span className="text-gray-500 text-sm">A partire da <strong className="text-gray-900">€{event.price}</strong></span>
+                <div className="w-8 h-8 rounded-full bg-gray-50 flex items-center justify-center text-gray-400 group-hover:bg-[#68B49B] group-hover:text-white transition-all">
+                    <ArrowRight size={16} />
+                </div>
+            </div>
+        </div>
+    </div>
+);
+
+// --- 3. PAGINA PRINCIPALE: CLUB DETAILS ---
+
+const ClubServiceEditPage = () => {
+    const [isFavorite, setIsFavorite] = useState(false);
+
+    return (
+        <div className={`min-h-screen ${HOGU_THEME.bg} ${HOGU_THEME.fontFamily} pb-20`}>
+            
+            {/* HERO SECTION CON COVER */}
+            <div className="relative h-[40vh] lg:h-[50vh] w-full overflow-hidden">
+                <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent z-10"></div>
+                
+                <img 
+                    src={clubData.coverImage} 
+                    alt={clubData.title} 
+                    className="w-full h-full object-cover"
+                />
+                
+                {/* Navbar flottante trasparente */}
+                <div className="absolute top-0 left-0 w-full z-20 p-4 lg:p-8 flex justify-between items-center text-white">
+                    <button className="p-2 bg-white/10 backdrop-blur-md rounded-full hover:bg-white/20 transition-all">
+                        <ChevronLeft size={24} />
+                    </button>
+                    <div className="flex gap-3">
+                        <button className="p-2 bg-white/10 backdrop-blur-md rounded-full hover:bg-white/20 transition-all">
+                            <Share2 size={20} />
+                        </button>
+                        <button 
+                            onClick={() => setIsFavorite(!isFavorite)}
+                            className={`p-2 backdrop-blur-md rounded-full transition-all ${isFavorite ? 'bg-red-500 text-white' : 'bg-white/10 hover:bg-white/20'}`}
+                        >
+                            <Heart size={20} fill={isFavorite ? "currentColor" : "none"} />
+                        </button>
+                    </div>
+                </div>
+
+                {/* Contenuto Hero Bottom */}
+                <div className="absolute bottom-0 left-0 w-full z-20 p-6 lg:p-12">
+                    <div className="max-w-7xl mx-auto flex flex-col md:flex-row md:items-end justify-between gap-4">
+                        <div>
+                            <div className="flex items-center gap-2 mb-2">
+                                <span className="bg-[#68B49B] text-white px-3 py-1 rounded-lg text-xs font-bold uppercase tracking-wider shadow-lg">
+                                    Club & Nightlife
+                                </span>
+                                <div className="flex items-center gap-1 bg-white/20 backdrop-blur-md px-2 py-1 rounded-lg text-white text-xs font-bold">
+                                    <Star size={12} fill="currentColor" className="text-yellow-400" />
+                                    {clubData.rating} ({clubData.reviews} recensioni)
+                                </div>
+                            </div>
+                            <h1 className="text-4xl md:text-6xl font-extrabold text-white mb-2 drop-shadow-md">
+                                {clubData.title}
+                            </h1>
+                            <p className="flex items-center gap-2 text-gray-200 text-lg">
+                                <MapPin size={20} className={`text-[${HOGU_COLORS.primary}]`} /> {clubData.city}
+                            </p>
+                        </div>
+                        
+                        <div className="hidden md:block">
+                            <button className="bg-white text-black px-6 py-3 rounded-xl font-bold hover:scale-105 transition-transform shadow-xl">
+                                Vedi Mappa
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            {/* MAIN CONTENT GRID */}
+            <div className="max-w-7xl mx-auto px-4 lg:px-8 -mt-8 relative z-30">
+                <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+
+                    {/* COLONNA SINISTRA (Dettagli + Eventi) */}
+                    <div className="lg:col-span-2 space-y-8">
+                        
+                        {/* 1. Descrizione & Features */}
+                        <div className={HOGU_THEME.cardBase + " p-8"}>
+                            <h2 className="text-2xl font-bold text-gray-900 mb-4">Il Club</h2>
+                            <p className="text-gray-600 leading-relaxed mb-8">
+                                {clubData.description}
+                            </p>
+
+                            <div className="grid grid-cols-1 md:grid-cols-3 gap-6 pt-6 border-t border-gray-100">
+                                {/* Dress Code */}
+                                <div className="flex items-start gap-3">
+                                    <div className={`p-3 rounded-xl bg-[${HOGU_COLORS.lightAccent}] text-[${HOGU_COLORS.primary}]`}>
+                                        <Shirt size={20} />
+                                    </div>
+                                    <div>
+                                        <h5 className="font-bold text-gray-900 text-sm">Dress Code</h5>
+                                        <p className="text-xs text-gray-500">{clubData.dressCode}</p>
+                                    </div>
+                                </div>
+
+                                {/* Music */}
+                                <div className="flex items-start gap-3">
+                                    <div className={`p-3 rounded-xl bg-[${HOGU_COLORS.lightAccent}] text-[${HOGU_COLORS.primary}]`}>
+                                        <Music size={20} />
+                                    </div>
+                                    <div>
+                                        <h5 className="font-bold text-gray-900 text-sm">Musica</h5>
+                                        <p className="text-xs text-gray-500">{clubData.musicGenres.join(", ")}</p>
+                                    </div>
+                                </div>
+
+                                {/* Age */}
+                                <div className="flex items-start gap-3">
+                                    <div className={`p-3 rounded-xl bg-[${HOGU_COLORS.lightAccent}] text-[${HOGU_COLORS.primary}]`}>
+                                        <Users size={20} />
+                                    </div>
+                                    <div>
+                                        <h5 className="font-bold text-gray-900 text-sm">Target Età</h5>
+                                        <p className="text-xs text-gray-500">Min. {clubData.minAge}</p>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            {/* Crowd Mix Visualizer */}
+                            <div className="mt-8 pt-6 border-t border-gray-100">
+                                <h5 className="font-bold text-gray-900 text-sm mb-3">Vibe & Crowd Mix</h5>
+                                <CrowdMixDisplay malePercent={clubData.crowdMixMale} />
+                            </div>
+                        </div>
+
+                        {/* 2. Lista Eventi (Children) */}
+                        <div>
+                            <div className="flex items-center justify-between mb-6">
+                                <h3 className="text-2xl font-bold text-gray-900">Prossimi Eventi</h3>
+                                <a href="#" className={`text-[${HOGU_COLORS.primary}] font-bold text-sm hover:underline`}>Vedi tutti</a>
+                            </div>
+                            
+                            <div className="space-y-4">
+                                {linkedEvents.map(event => (
+                                    <EventCard key={event.id} event={event} />
+                                ))}
+                            </div>
+                        </div>
+
+                        {/* 3. Gallery (Anteprima) */}
+                        <div className={HOGU_THEME.cardBase + " p-6 overflow-hidden"}>
+                            <h3 className="text-lg font-bold text-gray-900 mb-4">Gallery</h3>
+                            <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
+                                {clubData.gallery.map((img, idx) => (
+                                    <div key={idx} className="rounded-xl overflow-hidden aspect-square cursor-pointer hover:opacity-90 transition-opacity">
+                                        <img src={img} alt="Gallery" className="w-full h-full object-cover" />
+                                    </div>
+                                ))}
+                                <div className="rounded-xl bg-gray-100 flex flex-col items-center justify-center text-gray-400 font-bold text-xs uppercase tracking-wider aspect-square cursor-pointer hover:bg-gray-200 transition-colors">
+                                    +12 Foto
+                                </div>
+                            </div>
+                        </div>
+
+                    </div>
+
+                    {/* COLONNA DESTRA (Sticky Sidebar Info) */}
+                    <div className="lg:col-span-1">
+                        <div className="sticky top-8 space-y-6">
+                            
+                            {/* Card Info Rapide */}
+                            <div className={HOGU_THEME.cardBase + " p-6"}>
+                                <h3 className="text-lg font-bold text-gray-900 mb-4">Info Location</h3>
+                                
+                                <ul className="space-y-4">
+                                    <li className="flex items-start gap-3">
+                                        <Navigation size={20} className="text-gray-400 shrink-0 mt-1" />
+                                        <div>
+                                            <p className="text-sm font-medium text-gray-900">{clubData.address}</p>
+                                            <p className="text-xs text-gray-500">{clubData.city}</p>
+                                        </div>
+                                    </li>
+                                    <li className="flex items-start gap-3">
+                                        <Clock size={20} className="text-gray-400 shrink-0 mt-1" />
+                                        <div>
+                                            <p className="text-sm font-medium text-gray-900">Aperto Oggi</p>
+                                            <p className="text-xs text-[#68B49B] font-bold">{clubData.hours}</p>
+                                        </div>
+                                    </li>
+                                    <li className="flex items-center gap-3">
+                                        <Phone size={20} className="text-gray-400 shrink-0" />
+                                        <p className="text-sm font-medium text-gray-900">{clubData.phone}</p>
+                                    </li>
+                                    <li className="flex items-center gap-3">
+                                        <Globe size={20} className="text-gray-400 shrink-0" />
+                                        <p className="text-sm font-medium text-gray-900 truncate">{clubData.website}</p>
+                                    </li>
+                                </ul>
+
+                                <div className="mt-6 pt-6 border-t border-gray-100">
+                                    <div className="w-full h-40 bg-gray-200 rounded-xl overflow-hidden relative mb-4 group cursor-pointer">
+                                        
+                                        <img src="https://images.unsplash.com/photo-1569336415962-a4bd9f69cd83?auto=format&fit=crop&w=600&q=80" alt="Map" className="w-full h-full object-cover opacity-60 group-hover:opacity-80 transition-opacity" />
+                                        <div className="absolute inset-0 flex items-center justify-center">
+                                            <div className="bg-white px-4 py-2 rounded-lg shadow-md text-xs font-bold text-gray-800 flex items-center gap-2">
+                                                <MapPin size={14} className={`text-[${HOGU_COLORS.primary}]`} /> Vedi su Mappa
+                                            </div>
+                                        </div>
+                                    </div>
+                                    
+                                    <button className={`${HOGU_THEME.buttonSecondary} w-full py-3 rounded-xl font-bold flex items-center justify-center gap-2`}>
+                                        <Info size={18} /> Contatta Host
+                                    </button>
+                                </div>
+                            </div>
+
+                            {/* Banner Prenotazione (Call to Action generica) */}
+                            <div className="bg-slate-900 rounded-[2rem] p-6 text-white shadow-xl shadow-slate-900/20 relative overflow-hidden">
+                                <div className={`absolute top-0 right-0 w-32 h-32 bg-[${HOGU_COLORS.primary}]/20 rounded-full blur-3xl -translate-y-1/2 translate-x-1/2`}></div>
+                                
+                                <h3 className="text-xl font-bold mb-2">Organizzi una festa?</h3>
+                                <p className="text-slate-400 text-sm mb-6 leading-relaxed">
+                                    Prenota un tavolo privato o l'intera area per il tuo compleanno o evento aziendale.
+                                </p>
+                                <button className={`w-full py-3 rounded-xl font-bold bg-[${HOGU_COLORS.primary}] hover:bg-white hover:text-[${HOGU_COLORS.primary}] transition-all text-white`}>
+                                    Richiedi Preventivo
+                                </button>
+                            </div>
+
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+        </div>
+    );
+};
+
+export default ClubServiceEditPage;

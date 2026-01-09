@@ -1,0 +1,194 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+    <meta charset="utf-8" />
+    <title>Preventivo NCC Completo (TomTom API + Leaflet)</title>
+    
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+            
+    <style>
+        body { 
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            background-color: #f9f9f9;
+            color: #333;
+            margin: 20px;
+        }
+        #interfaccia {
+            background-color: #ffffff;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+            margin-bottom: 20px;
+        }
+        input[type="text"], button {
+            padding: 10px;
+            margin-right: 10px;
+            border-radius: 5px;
+            border: 1px solid #ddd;
+            font-size: 1em;
+        }
+        button {
+            background-color: #0056b3;
+            color: white;
+            cursor: pointer;
+            border: none;
+        }
+        #map { 
+            height: 500px; 
+            width: 100%; 
+            border-radius: 8px; 
+            border: 1px solid #ddd;
+        }
+        #info-percorso { 
+            font-size: 1.1em; 
+            padding: 15px; 
+            border-radius: 8px; 
+            margin-top: 20px;
+            line-height: 1.6;
+            background-color: #e6f0ff; /* Sfondo informativo */
+            color: #0056b3;
+        }
+    </style>
+</head>
+<body>
+
+    <h2>🚗 Calcolo Preventivo NCC (TomTom)</h2>
+
+    <div id="interfaccia">
+        <input type="text" id="start-address" placeholder="Indirizzo di Partenza (es: via assisi roma)">
+        <input type="text" id="end-address" placeholder="Indirizzo di Arrivo (es: piazza duomo milano)">
+        <button onclick="calculateAndDrawRoute()">Calcola Percorso</button>
+    </div>
+
+    <div id="info-percorso">Inserisci gli indirizzi e clicca su "Calcola Percorso".</div>
+    
+    <div id="map"></div>
+
+    <script>
+        // --- CONFIGURAZIONE E CHIAVI API ---
+        const TUA_API_KEY = "INSERISCI_QUI_LA_TUA_API_KEY"; // <-- INSERISCI LA TUA CHIAVE!
+        const SEARCH_API_URL = "https://api.tomtom.com/search/2/search/";
+        const ROUTING_API_URL = "https://api.tomtom.com/routing/1/calculateRoute/";
+        const INFO_BOX = document.getElementById('info-percorso');
+
+        // Controlla la chiave API
+        if (TUA_API_KEY === "INSERISCI_QUI_LA_TUA_API_KEY") {
+            INFO_BOX.innerHTML = "<strong>ERRORE:</strong> Inserisci la tua API Key di TomTom nel codice JavaScript per continuare.";
+        }
+
+        // 1. INIZIALIZZA LA MAPPA (con stile TomTom in Italiano)
+        const map = L.map('map');
+        const tileUrl = `https://api.tomtom.com/map/1/tile/basic/main/{z}/{x}/{y}.png?language=it-IT&key=${TUA_API_KEY}`;
+        
+        L.tileLayer(tileUrl, {
+            attribution: '&copy; <a href="https://www.tomtom.com/">TomTom</a>',
+            maxZoom: 22
+        }).addTo(map);
+        map.setView([41.9028, 12.4964], 5); // Vista iniziale sull'Italia
+
+        // Variabile per tenere traccia del percorso attuale sulla mappa
+        let currentRoute = null;
+        let startMarker = null;
+        let endMarker = null;
+
+        // --- FUNZIONE DI GEOCÓDING (Passaggio 1) ---
+        // Converte l'indirizzo testuale in coordinate
+        async function getCoordinates(address) {
+            const encodedAddress = encodeURIComponent(address);
+            const url = `${SEARCH_API_URL}${encodedAddress}.json?key=${TUA_API_KEY}`;
+            
+            INFO_BOX.innerHTML += `<br>🔎 Ricerca indirizzo per: ${address}...`;
+
+            try {
+                const response = await fetch(url);
+                const data = await response.json();
+
+                if (data.results && data.results.length > 0) {
+                    const position = data.results[0].position;
+                    INFO_BOX.innerHTML += `<br>✅ Trovato: ${data.results[0].address.freeformAddress}`;
+                    return `${position.lat},${position.lon}`; // Restituisce "lat,lon"
+                } else {
+                    INFO_BOX.innerHTML = `<strong>ERRORE:</strong> Indirizzo non trovato per "${address}".`;
+                    return null;
+                }
+            } catch (error) {
+                INFO_BOX.innerHTML = `<strong>ERRORE CRITICO:</strong> Errore nella chiamata Geocoding: ${error.message}`;
+                return null;
+            }
+        }
+
+        // --- FUNZIONE DI CALCOLO E DISEGNO PERCORSO (Passaggio 2) ---
+        async function calculateAndDrawRoute() {
+            const startAddress = document.getElementById('start-address').value;
+            const endAddress = document.getElementById('end-address').value;
+            
+            INFO_BOX.innerHTML = "Inizio calcolo percorso...";
+
+            // Geocoding dei due indirizzi
+            const startCoords = await getCoordinates(startAddress);
+            const endCoords = await getCoordinates(endAddress);
+
+            if (!startCoords || !endCoords) return;
+
+            // Chiamata all'API di Routing
+            const routingUrl = `${ROUTING_API_URL}${startCoords}:${endCoords}/json?key=${TUA_API_KEY}`;
+            
+            INFO_BOX.innerHTML += "<br>🧭 Calcolo percorso in corso...";
+
+            try {
+                const response = await fetch(routingUrl);
+                const data = await response.json();
+
+                if (data.routes && data.routes.length > 0) {
+                    const routeData = data.routes[0];
+                    const summary = routeData.summary;
+                    const points = routeData.legs[0].points;
+
+                    // 3. ESTRAZIONE E VISUALIZZAZIONE DATI
+                    const distanzaKm = (summary.lengthInMeters / 1000).toFixed(1);
+                    const durataMinuti = Math.round(summary.travelTimeInSeconds / 60);
+                    const durataOre = Math.floor(durataMinuti / 60);
+                    const minutiRimanenti = durataMinuti % 60;
+
+                    // Aggiorna l'area informativa
+                    INFO_BOX.innerHTML = 
+                        `<strong>✅ PERCORSO TROVATO (3 API CALLS)</strong><br>` +
+                        `<strong>Distanza:</strong> ${distanzaKm} km <br>` +
+                        `<strong>Durata Stimata:</strong> ${durataOre} ore e ${minutiRimanenti} minuti`;
+
+                    // Pulisci i tracciati precedenti
+                    if (currentRoute) map.removeLayer(currentRoute);
+                    if (startMarker) map.removeLayer(startMarker);
+                    if (endMarker) map.removeLayer(endMarker);
+
+                    // 4. TRASFORMA I PUNTI E DISEGNA
+                    const latLngs = points.map(point => [point.latitude, point.longitude]);
+                    
+                    currentRoute = L.polyline(latLngs, { 
+                        color: '#0056b3', // Blu professionale
+                        weight: 5
+                    }).addTo(map);
+
+                    // Aggiungi i Marker
+                    startMarker = L.marker(latLngs[0]).addTo(map).bindPopup('<strong>Partenza</strong>').openPopup();
+                    endMarker = L.marker(latLngs[latLngs.length - 1]).addTo(map).bindPopup('<strong>Arrivo</strong>');
+
+                    // Centra la mappa sul percorso
+                    map.fitBounds(currentRoute.getBounds(), { padding: [50, 50] });
+
+                } else {
+                    INFO_BOX.innerHTML = "<strong>ERRORE:</strong> Nessun percorso trovato tra i due indirizzi.";
+                }
+            } catch (error) {
+                INFO_BOX.innerHTML = `<strong>ERRORE CRITICO:</strong> Errore nella chiamata Routing: ${error.message}`;
+            }
+        }
+    </script>
+
+</body>
+</html>
+```"
+
+
+UTILIZZARE API STADIA MAPS PER CALCOLO KM E APERTURA MAPPE

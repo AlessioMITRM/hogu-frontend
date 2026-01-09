@@ -1,0 +1,41 @@
+export const HOGU_COLORS = {
+  primary: '#68B49B', 
+  primaryEmphasis: '#4A8A75', 
+  primaryHeroCTA: '#0F172A', 
+  dark: '#1A202C',
+  lightAccent: '#E6F5F0',
+  subtleText: '#4A5568', 
+  success: '#009900', 
+  lightGray: '#E9EBF1',   
+  widgetDark: '#1E293B',
+  error: '#EF4444',    
+  lightError: '#FEF2F2', 
+  grayBg: '#F8FAFC', 
+  border: '#E2E8F0',
+  primaryDark: '#33594C',
+  bgLight: '#F0FDF9',
+  textMain: '#1A202C',
+  purpleLight: '#F3E8FF',
+  purpleText: '#7E22CE',
+  slateDark: '#0F172A',
+  emeraldLight: '#D1FAE5',
+  emeraldText: '#047857',
+  warning: '#F59E0B',
+  subtleText: '#64748B',
+};
+
+export const HOGU_THEME = {
+  bg: 'bg-white',
+  text: `text-[${HOGU_COLORS.dark}]`,
+  primary: `bg-[${HOGU_COLORS.primary}] hover:bg-opacity-90`,
+  primaryText: 'text-white',
+  tag: `bg-[${HOGU_COLORS.lightAccent}] text-[${HOGU_COLORS.primary}]`,
+  focusRing: `focus:ring-[${HOGU_COLORS.primary}]`,
+  fontFamily: 'font-inter',
+  shadowCard: 'shadow-[0_4px_20px_-4px_rgba(0,0,0,0.05)]',
+  shadowFloat: 'shadow-[0_8px_30px_rgba(0,0,0,0.04)]',
+  inputStyle: 'w-full px-4 py-3.5 rounded-xl border border-gray-200 bg-gray-50 text-gray-800 font-medium outline-none focus:bg-white focus:ring-2 focus:ring-[#68B49B]/20 focus:border-[#68B49B] transition-all placeholder:text-gray-400',
+  cardBase: 'bg-white rounded-[2rem] border border-gray-100 shadow-[0_8px_30px_rgba(0,0,0,0.04)]',
+  inputBase: `w-full bg-gray-50 border-2 border-transparent focus:bg-white focus:border-[${HOGU_COLORS.primary}] focus:ring-0 rounded-xl transition-all font-medium text-gray-700 outline-none py-3 px-4`
+
+};

@@ -1,0 +1,840 @@
+{
+  "selector": {
+    "title": "Select Language"
+  },
+  "nav": {
+    "restaurants": "Restaurants",
+    "bnb": "B&B",
+    "club": "Clubs",
+    "ncc": "Chauffeur",
+    "luggage": "Luggage"
+  },
+  "auth": {
+    "login": "Login",
+    "register": "Register",
+    "dashboard": "Dashboard",
+    "logout": "Logout"
+  },
+  "mobile": {
+    "go_to_dashboard": "Go to Dashboard",
+    "language_title": "Language"
+  },
+  "cookie": {
+    "banner": {
+      "title": "We use cookies to improve HOGU",
+      "description_part1": "We use technical and profiling cookies to offer you a personalized experience.",
+      "manage_preferences": "Manage preferences",
+      "customize": "Customize",
+      "accept_all": "Accept all"
+    },
+    "modal": {
+      "title": "Cookie Preferences",
+      "description": "Manage how HOGU uses cookies to improve your experience.",
+      "close": "Close",
+      "reject_optional": "Reject optional",
+      "save_preferences": "Save preferences"
+    },
+    "categories": {
+      "necessary": {
+        "title": "Strictly Necessary",
+        "description": "These cookies are essential for the site's operation (e.g., login, security) and cannot be disabled."
+      },
+      "analytics": {
+        "title": "Analytics & Performance",
+        "description": "They help us understand how users interact with HOGU, allowing us to improve functionality."
+      },
+      "marketing": {
+        "title": "Marketing & Profiling",
+        "description": "Used to display ads relevant to your interests and measure campaign effectiveness."
+      }
+    }
+  },
+  "ncc_listing": {
+    "header": {
+      "subtitle": "HOGU Mobility",
+      "title_part1": "Travel in style",
+      "title_part2": "arrive relaxed.",
+      "description": "Professional drivers, luxury cars, and guaranteed punctuality. The bespoke chauffeur service for you."
+    },
+    "search": {
+      "one_way": "One Way",
+      "round_trip": "Round Trip",
+      "departure_point": "Departure Point",
+      "departure_placeholder": "Airport, Hotel, or Address...",
+      "destination_point": "Destination",
+      "destination_placeholder": "Where do you need to go?",
+      "date_out": "Outbound Date",
+      "date_return": "Return Date",
+      "time": "Time",
+      "passengers": "Passengers",
+      "search_button": "Search",
+      "search_car_mobile": "Search Car",
+      "not_found_citys": "No city found"
+    },
+    "popular_routes": {
+      "title": "Popular routes from the airport",
+      "to": "to {{destination}}",
+      "from": "from"
+    },
+    "results": {
+      "available_vehicles": "available vehicles",
+      "not_found": "Vehicles not found"
+    },
+    "card": {
+      "tag_executive": "Executive",
+      "img_alt_fallback": "Car",
+      "max_pax": "Max Pax",
+      "luggage": "{{count}} Luggage",
+      "sanitized": "Sanitized",
+      "cancellation_policy": "Free cancellation up to 24h",
+      "estimated_rate": "Estimated Rate",
+      "details_button": "Details",
+      "book_button": "Book"
+    }
+  },
+  "breadcrumbs": {
+    "account": "Account",
+    "home": "Home",
+    "luggage": "Luggage",
+    "ncc": "NCC",
+    "restaurant": "Restaurant",
+    "bnb": "B&B",
+    "club": "Club"
+  },
+  "luggage_listing": {
+    "service_type": "Luggage Storage",
+    "header": {
+      "subtitle": "HOGU Services",
+      "title_part1": "Travel light",
+      "title_part2": "explore freely.",
+      "description": "Verified secure storage points. Leave your bags and enjoy the city worry-free."
+    },
+    "search": {
+      "where_are_you": "Where are you?",
+      "location_placeholder": "City, Station, or Address...",
+      "deposit": "Deposit",
+      "pickup": "Pickup",
+      "luggage_label": "Luggage",
+      "search_button": "Search Storage",
+      "not_found_citys": "No city found"
+    },
+    "luggage_selector": {
+      "size_s_label": "Carry-on",
+      "size_s_desc": "Max 5kg",
+      "size_m_label": "Medium",
+      "size_m_desc": "Max 15kg",
+      "size_l_label": "XXL",
+      "size_l_desc": "> 15kg"
+    },
+    "results": {
+      "available_deposits": "available storage points",
+      "no_deposits_found": "No storage points found matching these criteria."
+    },
+    "card": {
+      "img_fallback": "HOGU",
+      "feature_insurance": "Insurance incl.",
+      "feature_cancellation": "Free cancellation",
+      "estimated_total": "Estimated Total",
+      "per_day": "/day",
+      "view_details": "View Details"
+    }
+  },
+  "restaurant_listing": {
+    "service_type_label": "Restaurant",
+    "header": {
+      "subtitle": "HOGU Dining",
+      "title_part1": "Savour the moment",
+      "title_part2": "taste life.",
+      "description": "From hidden bistros to Michelin stars. Book the perfect table for every occasion."
+    },
+    "search": {
+      "location_label": "Where do you want to eat?",
+      "location_placeholder": "City, Area, or Address...",
+      "cuisine_label": "What are you in the mood for?",
+      "cuisine_placeholder": "Sushi, Pizza, Restaurant name...",
+      "date_label": "When?",
+      "time_label": "At what time?",
+      "search_mobile_text": "Search",
+      "not_found": "No Restaurant found",
+      "not_found_citys": "No city found"
+    },
+    "popular": {
+      "title": "Recommended",
+      "italian_cuisine": "Italian",
+      "japanese_cuisine": "Japanese",
+      "french_cuisine": "French",
+      "mexican_cuisine": "Mexican",
+      "roma_center": "Rome Center",
+      "milano_brera": "Milan Brera",
+      "firenze": "Florence",
+      "napoli": "Naples"
+    },
+    "results": {
+      "found": "restaurants found",
+      "no_restaurants": "No restaurants found"
+    },
+    "card": {
+      "img_fallback_popular": "Food",
+      "img_fallback_search": "Restaurant",
+      "feature_outdoor": "Outdoor seating",
+      "feature_vegan": "Vegan options",
+      "menu_button": "Menu",
+      "book_table_button": "Book Table"
+    }
+  },
+  "bnb_listing": {
+    "header": {
+      "subtitle": "HOGU Stays",
+      "title_part1": "Feel at home",
+      "title_part2": "wherever you go.",
+      "description": "Discover unique B&Bs, vacation rentals, and boutique hotels selected to guarantee you an unforgettable stay."
+    },
+    "search": {
+      "location_label": "Where do you want to go?",
+      "location_placeholder": "City, region, or property...",
+      "check_in": "Check-in",
+      "check_out": "Check-out",
+      "who_travels": "Who is traveling?",
+      "search_button": "Search",
+      "guest_summary": "{{adults}} Adults, {{children}} Children",
+      "room_summary": "{{rooms}} Rooms",
+      "not_found_citys": "No city found"
+    },
+    "modal": {
+      "title": "Configure Guests",
+      "close_button": "CLOSE",
+      "adults_label": "Adults",
+      "children_label": "Children",
+      "rooms_label": "Rooms"
+    },
+    "inspiration": {
+      "title": "Get inspired"
+    },
+    "destinations": {
+      "rome": "Rome",
+      "florence": "Florence",
+      "venice": "Venice",
+      "milan": "Milan",
+      "italy": "Italy"
+    },
+    "search_results": {
+      "available_accommodations": "available accommodations",
+      "sort_by": "Sort by",
+      "recommended": "Recommended",
+      "no_results_title": "No results found",
+      "no_results_description": "Try modifying the dates or destination.",
+      "service_type_label": "B&B",
+      "roma_center": "Rome, Historic Center",
+      "roma_trastevere": "Rome, Trastevere",
+      "roma_vaticano": "Rome, Vatican"
+    },
+    "card": {
+      "exclusive_tag": "Exclusive",
+      "reviews": "{{count}} reviews",
+      "feature_cancellation": "Free Cancellation",
+      "feature_breakfast": "Breakfast Included",
+      "feature_wifi": "Ultra Fast Wi-Fi",
+      "last_room_warning": "Last room remaining!",
+      "currency": "$",
+      "per_night": "/ night",
+      "taxes_included": "Taxes and fees included"
+    }
+  },
+  "club_listing": {
+    "header": {
+      "subtitle": "HOGU Nightlife",
+      "title_part1": "Live the night",
+      "title_part2": "without limits.",
+      "description": "Book entry, tables, and private areas at the most exclusive clubs. Skip the line and enjoy the party."
+    },
+    "search": {
+      "event_type_label": "What kind of evening?",
+      "select_type": "Select type...",
+      "type_djset": "DJ Set & Disco",
+      "type_live_concert": "Live Concert",
+      "type_private_event": "Private Event",
+      "type_aperitif": "Lounge Aperitif",
+      "when_label": "When?",
+      "guests_label": "How many guests?",
+      "guests_placeholder": "E.g. 4",
+      "table_label": "Table",
+      "table_premium": "Premium Table",
+      "entry_only": "Standard Entry",
+      "search_button": "Search",
+      "not_found_citys": "No city found"
+    },
+    "events_today": {
+      "title": "Tonight in the city"
+    },
+    "events": {
+      "dj_set": "Exclusive DJ Set",
+      "jazz_concert": "Live Jazz Concert",
+      "private_party": "Private Party"
+    },
+    "mock": {
+      "roma_center": "Rome Center",
+      "milano_navigli": "Milan Navigli",
+      "napoli_vomero": "Naples Vomero",
+      "torino": "Turin"
+    },
+    "results": {
+      "found": "events found",
+      "no_events": "No events found"
+    },
+    "card": {
+      "img_fallback_event": "Party",
+      "img_fallback_search": "Club",
+      "live_tag": "LIVE",
+      "today": "Today",
+      "type_tag": "Nightlife",
+      "feature_dress_code": "Dress Code: Smart",
+      "feature_music_genre": "House / Techno",
+      "book_table_button": "Book Table",
+      "book_entry_button": "Book Entry"
+    }
+  },
+  "hero": {
+    "tag": "EXCLUSIVE B2B Platform",
+    "title_part1": "Earn more",
+    "title_part2": "pay less commission",
+    "title_brand": "Welcome to Hogu.",
+    "subtitle_line1": "Connect Hosts, Chauffeurs, Restaurants, and services in one hub.",
+    "subtitle_line2": "Fixed commissions at {{commission}}, algorithm priority, and premium visibility.",
+    "subtitle_footer": "Waiting List registration is free.",
+    "cta_primary": "Sign up for free",
+    "cta_secondary": "Discover the benefits",
+    "trust_message": "More than 500 partners already on the waiting list."
+  },
+  "search_bar": {
+    "search_button": "Search",
+    "tab_restaurants": "Restaurants",
+    "tab_bnb": "B&B",
+    "tab_ncc": "Chauffeur",
+    "tab_club": "Clubs",
+    "tab_luggage": "Luggage",
+    "restaurant": {
+      "location_label": "Where do you want to eat?",
+      "location_placeholder": "City, area, or name...",
+      "cuisine_label": "What do you fancy?",
+      "cuisine_placeholder": "Sushi, Pizza, Poke...",
+      "when_label": "When?",
+      "time_label": "Time"
+    },
+    "bnb": {
+      "location_label": "Where do you want to go?",
+      "location_placeholder": "Destination or property...",
+      "check_in_label": "Check-in",
+      "check_out_label": "Check-out",
+      "guests_label": "Who is traveling?",
+      "guests_placeholder": "2 Adults, 0 Children"
+    },
+    "club": {
+      "event_type_label": "What kind of evening?",
+      "type_djset": "DJ Set & Disco",
+      "type_live_concert": "Live Concert",
+      "type_private_event": "Private Event",
+      "type_aperitif": "Lounge Aperitif",
+      "when_label": "When?",
+      "guests_label": "Guests",
+      "guests_placeholder": "4",
+      "table_label": "Table",
+      "table_option": "Table",
+      "entry_option": "Entry"
+    },
+    "luggage": {
+      "location_label": "Where are you?",
+      "location_placeholder": "City, Station, or Address...",
+      "deposit_label": "Deposit",
+      "pickup_label": "Pickup",
+      "luggage_label": "Luggage",
+      "size_hand": "Carry-on",
+      "size_medium": "Medium",
+      "size_xxl": "XXL",
+      "search_button": "Search Storage"
+    },
+    "ncc": {
+      "one_way": "One Way",
+      "round_trip": "Round Trip",
+      "departure_label": "Departure Point",
+      "departure_placeholder": "Airport, Hotel, or Address...",
+      "destination_label": "Destination",
+      "destination_placeholder": "Where do you need to go?",
+      "date_out_label": "Outbound Date",
+      "date_return_label": "Return Date",
+      "time_label": "Time",
+      "passengers_label": "Passengers"
+    }
+  },
+  "carousel": {
+    "main_title": "HOGU Exclusive Services",
+    "main_description": "Explore premium categories selected to offer you maximum comfort and quality.",
+    "discover": "Discover",
+    "restaurants": {
+      "title": "Restaurants",
+      "description": "Book unique and refined culinary experiences."
+    },
+    "bnb": {
+      "title": "B&B",
+      "description": "Luxury stays and authenticity in exclusive locations."
+    },
+    "club": {
+      "title": "Clubs",
+      "description": "Reserved and exclusive access to the best events in the city."
+    },
+    "ncc": {
+      "title": "Chauffeur",
+      "description": "Chauffeur-driven rental for discreet and comfortable travel."
+    },
+    "luggage": {
+      "title": "Luggage",
+      "description": "Luggage management service for worry-free travel."
+    }
+  },
+  "how_it_works": {
+    "main_title": "How HOGU Works",
+    "step1_title": "Discover",
+    "step1_desc": "Browse exclusive and luxury services, filtered according to your needs.",
+    "step2_title": "Book",
+    "step2_desc": "Confirm your experience with a click, using secure payments (Stripe/PayPal).",
+    "step3_title": "Experience",
+    "step3_desc": "Enjoy the HOGU premium experience with no hidden commissions on your bill."
+  },
+  "earnings": {
+    "main_title": "How much you earn with Hogu",
+    "main_description": "Annual examples with Hogu commissions at 8% vs other portals at 18% (indicative, many portals fluctuate 15–18%).",
+    "host_title": "Host (B&B)",
+    "host_metric": "20 nights/month · €120/night · 12 months",
+    "ncc_title": "Chauffeur (NCC)",
+    "ncc_metric": "2 rides/day · €45/ride · 365 days",
+    "restaurant_title": "Restaurants",
+    "restaurant_metric": "2 tables x 4 people/day · €40/cover · 365 days"
+  },
+  "homepage": {
+    "cta_final": "Become an HOGU Provider"
+  },
+  "ncc_edit": {
+    "nav": {
+      "dashboard": "Dashboard",
+      "fleet": "NCC Fleet",
+      "edit_profile": "Edit Profile"
+    },
+    "status_tag": "Elite Partner",
+    "save_success_message": "NCC Profile updated successfully!",
+    "profile": {
+      "company_name_label": "Company / Brand Name",
+      "base_location_label": "Operating Base (City)",
+      "description_label": "Service & Quality Description"
+    },
+    "fleet": {
+      "title": "Your Fleet",
+      "description": "Define vehicle categories and rates.",
+      "total_classes_label": "Total Classes",
+      "add_class_button": "Add Class"
+    },
+    "vehicle": {
+      "min_one_vehicle_error": "You must have at least one vehicle.",
+      "default_category_name": "New Category",
+      "category_name_placeholder": "Category Name",
+      "model_placeholder": "Models e.g. Mercedes E-Class",
+      "pax_label": "Pax",
+      "luggage_label": "Bag",
+      "rate_label": "Base Rate (€/km)",
+      "delete_button": "Remove vehicle"
+    },
+    "amenities": {
+      "title": "On-Board Amenities",
+      "wifi_label": "4G/5G Wi-Fi",
+      "driver_language_label": "English Speaking Driver",
+      "meet_greet_label": "Meet & Greet (Airport)",
+      "water_label": "Water & Sweets",
+      "suit_label": "Suit-Wearing Driver",
+      "child_seat_label": "Child Seat (On request)"
+    },
+    "photos": {
+      "title": "Vehicle Photos",
+      "upload_button": "Upload"
+    },
+    "image_alt": "NCC vehicle image",
+    "image_remove_title": "Remove photo",
+    "image_cover_label": "Cover",
+    "status": {
+      "title": "Service Status",
+      "min_rate_label": "Min. Base Rate",
+      "min_rate_value": "€ 2.50 / km",
+      "availability_label": "Availability",
+      "status_available": "Bookable",
+      "status_unavailable": "Unavailable",
+      "saving_button": "Saving...",
+      "save_button": "Save Fleet"
+    },
+    "help": {
+      "title": "Hogu Algorithm",
+      "description": "The rates entered are 'Base'. The system will automatically calculate the final price for the client by adding estimated tolls and traffic."
+    }
+  },
+  "unauthorizedPage": {
+    "breadcrumbs": {
+      "home": "Home",
+      "security": "Sicurezza"
+    },
+    "expired": {
+      "title": "Accesso Negato",
+      "message": "Accesso negato. La tua sessione è scaduta o non disponi dei privilegi necessari per accedere a questa pagina.",
+      "action": "Accedi di nuovo"
+    },
+    "common": {
+      "errorCode": "Codice Errore",
+      "backHome": "Torna alla Home",
+      "footerBrand": "Hogu Security System"
+    }
+  },
+  "privacy": {
+    "headerTitle": "Privacy Policy",
+    "headerDescription": "Your privacy is fundamental to Hogu. Here we clearly explain how we collect, use, and protect your personal data.",
+    "lastUpdate": "Last updated",
+    "sections": {
+      "controller": {
+        "title": "1. Data Controller",
+        "description": "The data controller is Hogu Services Corporation, with registered office at 1200 Brickell Avenue, Suite 310, 33131 Miami FL."
+      },
+      "collectedData": {
+        "title": "2. Types of Data Collected",
+        "userData": "User Data: name, surname, VAT number or Tax Code, phone, date of birth, email, encrypted/hashed password, and last login information.",
+        "bookingData": "Booking Data: information related to booked services (Restaurant, B&B, Club, NCC, Luggage).",
+        "paymentData": "Payment Data: transaction data managed by Stripe or PayPal. Hogu does not store full card details.",
+        "geoData": "Geolocation Data: address provided by the user, used to calculate an approximate location via external APIs. No GPS tracking without consent."
+      },
+      "purposes": {
+        "title": "3. Purpose of Processing",
+        "serviceManagement": "Provision of services and management of bookings",
+        "accountCommunication": "Operational communications regarding account and bookings",
+        "legalCompliance": "Fulfillment of legal and tax obligations",
+        "security": "Security, fraud prevention, and account protection",
+        "ageRestriction": "The service is intended exclusively for adult users."
+      },
+      "legalBasis": {
+        "title": "Legal Basis of Processing",
+        "contract": "Performance of a contract (art. 6.1.b GDPR)",
+        "legalObligation": "Legal obligations (art. 6.1.c GDPR)",
+        "legitimateInterest": "Legitimate interest for security and fraud prevention (art. 6.1.f GDPR)"
+      },
+      "dataSharing": {
+        "title": "4. Data Sharing",
+        "description": "Data may be shared with service providers (e.g., restaurants, NCC), site administrators, and third-party processors appointed as Data Processors."
+      },
+      "extraEU": {
+        "title": "Transfers Outside the EU",
+        "description": "Some providers (Stripe, PayPal, email services, Cloudflare) may process data outside the EU. Transfers are made via Standard Contractual Clauses."
+      },
+      "dataRetention": {
+        "title": "5. Data Retention",
+        "accountData": "Account data: until deletion or suspension",
+        "bookingData": "Booking data: 24 months",
+        "taxData": "Tax data: 10 years",
+        "securityLogs": "Security logs: until account deletion"
+      },
+      "userRights": {
+        "title": "6. User Rights",
+        "access": "Access",
+        "rectification": "Rectification",
+        "deletion": "Deletion",
+        "restriction": "Restriction",
+        "objection": "Objection",
+        "portability": "Portability"
+      },
+      "cookies": {
+        "title": "7. Cookie Policy",
+        "description": "The site only uses technical cookies necessary for functionality and access."
+      },
+      "contact": {
+        "title": "Privacy Contacts:",
+        "complaint": "Complaints can be submitted to"
+      }
+    }
+  },
+  "terms": {
+    "header": {
+      "backButton": "Go back",
+      "title": "Terms and Conditions",
+      "description": "These Terms govern the use of the Hogu platform by consumers and Providers.",
+      "effectiveDate": "Effective date: January 1, 2026"
+    },
+    "sections": {
+      "acceptance": {
+        "title": "1. Acceptance of Terms",
+        "description": "By using the Hogu platform, the user declares to have read, understood, and fully accepted these Terms and Conditions. The Terms apply to both consumers and professional users, as well as Providers using the platform.",
+        "additional": "Any changes to the Terms will be communicated via email. If the user does not wish to accept them, they may stop using the service and delete their account."
+      },
+      "platformRole": {
+        "title": "2. Platform Role",
+        "description": "Hogu acts as a technological and commercial intermediary between users and third-party service providers (“Providers”), such as restaurants, clubs, NCCs, lodging, and luggage services.",
+        "additional": "The contract for the final service is concluded directly between the user and the Provider. Hogu is not a party to the service contract."
+      },
+      "account": {
+        "title": "3. Account and Security",
+        "description": "The user is responsible for the correct management of their account and access credentials.",
+        "additional": "Hogu may suspend or close the account, even without notice, in case of Terms violations, fraudulent use, or illegal activities. In such cases, the user will receive an email specifying the reasons."
+      },
+      "bookingPayment": {
+        "title": "4. Bookings, Payments, and Withdrawal",
+        "description": "Payments made by the user finalize the booking. Hogu collects payments on behalf of the Providers and transfers the amounts due net of applicable commissions.",
+        "recession": "Pursuant to art. 59 of the Consumer Code, the right of withdrawal is excluded for services with a specific execution date or period, such as restaurants, transport, events, NCC services, luggage, and lodging.",
+        "cancellation": "Cancellation or refund requests are governed solely by the Provider's policies and will only be accepted with their approval, except in cases of serious anomalies or failures attributable to the Provider."
+      },
+      "billing": {
+        "title": "5. Billing and Commissions",
+        "description": "Billing varies depending on the booked service:",
+        "list": [
+          "For restaurant services, Hogu issues an invoice exclusively to the Provider for the commissions due, calculated as a fixed amount per booked cover;",
+          "For Club, B&B, NCC, and Luggage services, Hogu issues an invoice directly to the end user for the purchased service and to the Provider for the applied commissions, equal to 8% of the total booking value."
+        ]
+      },
+      "liability": {
+        "title": "6. Limitation of Liability",
+        "description": "Hogu is not responsible for non-performance, quality, or proper execution of services provided by Providers. Hogu’s liability remains unaffected in cases of fraud, gross negligence, or for the non-derogable rights granted to consumers by law."
+      },
+      "availability": {
+        "title": "7. Service Availability",
+        "description": "Hogu does not guarantee continuous platform availability, which may be temporarily suspended for maintenance, updates, or urgent technical interventions."
+      },
+      "law": {
+        "title": "8. Applicable Law and Language",
+        "description": "These Terms are governed by Italian law. In case of translations or versions in other languages, the Italian version prevails."
+      }
+    }
+  },
+  "footer": {
+    "slogan": "Exclusive platform for hospitality and luxury services.",
+    "servicesTitle": "Services",
+    "services": [
+      "Restaurants",
+      "B&B",
+      "NCC",
+      "Club & Events",
+      "Luggage"
+    ],
+    "hoguTitle": "Hogu",
+    "hoguLinks": [
+      "About Us",
+      "Careers",
+      "Blog",
+      "Become a Provider"
+    ],
+    "contactTitle": "Contact",
+    "company": {
+      "name": "Hogu Services Corporation",
+      "address": "Registered office: 1200 Brickell Avenue, Suite 310, 33131 Miami FL"
+    },
+    "rights": "All rights reserved.",
+    "legalLinks": [
+      {
+        "label": "Privacy Policy",
+        "path": "/legal/privacy-policy"
+      },
+      {
+        "label": "Terms & Conditions",
+        "path": "/legal/terms"
+      }
+    ],
+    "credits": "Created by"
+  },
+  "header": {
+    "nav": {
+      "restaurants": "Restaurants",
+      "bnb": "B&B",
+      "club": "Clubs & Events",
+      "ncc": "NCC",
+      "luggage": "Luggage"
+    },
+    "auth": {
+      "login": "Login",
+      "register": "Register",
+      "dashboard": "Dashboard",
+      "logout": "Logout"
+    },
+    "mobile": {
+      "go_to_dashboard": "Go to Dashboard",
+      "language_title": "Language"
+    },
+    "languages": {
+      "italian": "Italian",
+      "english": "English",
+      "french": "French",
+      "german": "German",
+      "spanish": "Spanish"
+    },
+    "language_selector": {
+      "title": "Select language"
+    }
+  },
+  "payment": {
+    "title": "Payment",
+    "confirmed": "Confirmed",
+    "secure_transaction": "Secure Transaction",
+    "all_done": "All Done!",
+    "success_message": "Thank you, your booking has been successfully recorded.",
+    "booking_code": "Booking Code",
+    "copy_code": "Copy Code",
+    "copied": "Copied!",
+    "service": "Service",
+    "date": "Date",
+    "total_paid": "Total Paid",
+    "view_details": "View Booking Details",
+    "back_home": "Back to Home",
+    "confirmation_email": "A confirmation email has been sent to your account email address.",
+    "homepage": "HOGU Homepage",
+    "simulate_payment": "Simulate New Payment",
+    "booking_details": "Booking Details",
+    "back": "Back",
+    "failed_title": "Result",
+    "payment": "Payment",
+    "failed_message": "Payment Failed",
+    "failed_submessage": "Sorry, we could not process your payment. No amount has been charged.",
+    "failed_reason": "Reason: Insufficient funds or card declined by the bank.",
+    "retry": "Retry Payment",
+    "cancel": "Cancel and go back",
+    "contact_support": "If the problem persists, contact your bank or HOGU support."
+  },
+  "payment_summary": {
+    "summary": "Summary",
+    "booking": "Booking",
+    "secure_checkout": "Secure and encrypted checkout",
+    "billing_data": "Billing Information",
+    "first_name": "First Name",
+    "first_name_placeholder": "John",
+    "last_name": "Last Name",
+    "last_name_placeholder": "Doe",
+    "email": "Email",
+    "email_placeholder": "john.doe@example.com",
+    "address": "Full Address",
+    "address_placeholder": "123 Main St, City, Country",
+    "tax_code": "Tax Code",
+    "tax_code_placeholder": "ABC12345X",
+    "vat": "VAT",
+    "vat_placeholder": "Optional for individuals",
+    "company_name": "Company Name",
+    "company_name_placeholder": "Optional (if Company)",
+    "payment_method": "Payment Method",
+    "credit_card": "Credit Card",
+    "secure_ssl": "Secure SSL Transaction",
+    "payment_info": "By clicking \"Proceed to Payment\" you will be redirected to the secure platform to complete the transaction. We do not store your card details."
+  },
+  "password_reset": {
+      "forgot_password": "Forgot Password?",
+      "request_description": "No worries. Enter your email and we'll send you instructions to reset it.",
+      "email_placeholder": "Your Email",
+      "send_reset_code": "Send Reset Code",
+      "sending": "Sending...",
+      "remember_password": "Remembered your password?",
+      "login": "Login",
+      "create_new_password": "Create New Password",
+      "code_sent_to": "Code sent to",
+      "otp_code": "Verification Code",
+      "new_password": "New Password",
+      "confirm_password": "Confirm Password",
+      "reset_password": "Reset Password",
+      "updating": "Updating...",
+      "did_not_receive_code": "Didn't receive the code?",
+      "resend_in": "Resend in {{seconds}}s",
+      "password_updated": "Password Updated!",
+      "password_updated_message": "Your password has been successfully reset. You can now log in with your new credentials.",
+      "go_to_login": "Go to Login",
+      "invalid_email": "Please enter a valid email address.",
+      "reset_code_error": "Unable to send code. Check the email.",
+      "otp_length": "OTP code must be 6 digits.",
+      "password_min": "Password must be at least 8 characters.",
+      "password_mismatch": "Passwords do not match.",
+      "reset_failed": "Invalid or expired code, or invalid password.",
+      "resend_error": "Error resending code."
+    },
+    "not_found": {
+      "title": "Page not found",
+      "description": "The link you followed may be broken, or the page has been removed. There’s nothing to see here.",
+      "back_button": "Go back",
+      "home_button": "Go to Home",
+      "error_code": "Error code:"
+    },
+      "eventServiceEdit": {
+    "title": "Edit Club Event",
+    "subtitle": "Manage venue information, events and pricing.",
+    "infoService": "Service Info",
+    "publishing": "Publishing",
+    "visibility": "Visibility",
+    "online": "Online",
+    "hidden": "Hidden",
+    "saveChanges": "Save Changes",
+    "saving": "Saving...",
+    "musicTheme": {
+      "title": "Music Theme & Genre",
+      "subtitle": "Select the main music genres of your event",
+      "house": "House",
+      "techno": "Techno",
+      "dnb": "Drum & Bass",
+      "hiphop": "Hip Hop",
+      "latin": "Latin",
+      "commercial": "Commercial",
+      "selectAll": "Select all",
+      "clearAll": "Clear all",
+      "customTheme": "Custom theme",
+      "customPlaceholder": "E.g., Disco / Funk / Soul"
+    }
+  },
+   "EventServiceEditPage": {
+    "title": "Modifica Club",
+    "subtitle": "Gestisci le informazioni del locale, le serate e il listino prezzi.",
+    "serviceLabel": "Servizio Evento Club",
+    "name": "Nome Locale / Evento",
+    "city": "Città",
+    "address": "Indirizzo",
+    "open": "Apertura",
+    "close": "Chiusura",
+    "description": "Descrizione Serata",
+    "musicTitle": "Tema Musicale & Genere",
+    "musicSub": "Seleziona il genere principale della serata.",
+    "atmosphere": "Atmosfera & Selezione",
+    "dressCode": "Dress Code",
+    "pricing": "Listino & Prezzi",
+    "enableGenderPrices": "Attiva prezzi diversi per uomo/donna",
+    "enableGenderPricesSub": "Permetti di impostare importi separati per ciascun sesso",
+    "vipTable": "Tavolo VIP",
+    "minSpending": "Min. Spending",
+    "maxGuests": "Max Ospiti per tavolo",
+    "ticketStandard": "Ingresso in Lista",
+    "ticketGender": "Ingressi in Lista",
+    "male": "Uomo",
+    "female": "Donna",
+    "maleShort": "U",
+    "femaleShort": "D",
+    "crowdMixLabel": "Crowd Mix (Target Uomo/Donna)",
+    "galleryTitle": "Media Gallery",
+    "upload": "Carica",
+    "cover": "Copertina",
+    "new": "Nuova",
+    "infoService": "Info Servizio",
+    "bookings": "Prenotazioni",
+    "bookingsDesc": "Descrizione",
+    "payments": "Pagamenti",
+    "paymentsDesc": "Descrizione pagamenti",
+    "commissions": "Commissioni",
+    "commissionsDesc": "Descrizione commissioni",
+    "publish": "Pubblicazione",
+    "visibility": "Visibilità",
+    "online": "Online",
+    "hidden": "Nascosto",
+    "saveBtn": "Salva Modifiche",
+    "saving": "Salvataggio...",
+    "venueType": "Tip Locale",
+    "venueDesc": "Assicurati che la tua descrizione e l'indirizzo siano aggiornati. Le informazioni accurate migliorano il tasso di conversione delle prenotazioni.",
+    "successTitle": "Evento Salvato",
+    "successMsg": "L'Evento è stato salvato correttamente",
+    "saveErr": "Si è verificato un errore durante il salvataggio.",
+    "val_title": "Nome evento è obbligatorio",
+    "val_desc": "Descrizione è obbligatoria",
+    "val_city": "Città è obbligatoria",
+    "val_addr": "Indirizzo è obbligatorio",
+    "val_hours": "Orari apertura e chiusura sono obbligatori",
+    "val_theme": "Tema musicale è obbligatorio",
+    "val_img": "Almeno un'immagine è obbligatoria",
+    "price": "Prezzo"
+  }
+}

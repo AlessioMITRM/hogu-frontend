@@ -1,0 +1,34 @@
+/* Google Fonts - Inter (DEVE ESSERE IN CIMA) */
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* Icone - Lucide React */
+/*.lucide {
+  display: inline-block;
+  stroke-width: 2;
+  vertical-align: middle;
+}*/
+
+body {
+  font-family: 'Inter', sans-serif;
+}
+
+
+/* Applica lo zoom SOLO se la larghezza è maggiore di 1024px (Desktop/Laptop) */
+@media screen and (min-width: 1024px) {
+  body {
+    /* Questa proprietà è supportata da Chrome, Edge e Safari */
+    zoom: 0.88; 
+    
+    /* FIX PER FIREFOX (che non supporta 'zoom') */
+    -moz-transform: scale(0.9);
+    -moz-transform-origin: top center;
+    
+    /* Assicura che non ci siano barre di scorrimento orizzontali indesiderate */
+    overflow-x: hidden;
+    width: 100%;
+  }
+}

@@ -813,7 +813,7 @@ const ClubDashboard = () => {
                         const filename = ev.images[0];
                         imgUrl = filename.startsWith('http') 
                             ? filename 
-                            : `${import.meta.env.VITE_API_BASE_URL || 'http://localhost:8080'}/uploads/${filename}`;
+                            : `/files/club/${clubId}/event/${ev.id}/${filename}`;
                     } else if (ev.image) {
                         imgUrl = ev.image;
                     }

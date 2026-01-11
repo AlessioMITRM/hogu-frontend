@@ -4,6 +4,7 @@
     "provinces": [
       {
         "name": "Chieti",
+        "provinceId": 1,
         "cities": [
           "Altino",
           "Archi",
@@ -113,6 +114,7 @@
       },
       {
         "name": "L'Aquila",
+        "provinceId": 2,
         "cities": [
           "Acciano",
           "Aielli",
@@ -226,6 +228,7 @@
       },
       {
         "name": "Pescara",
+        "provinceId": 3,
         "cities": [
           "Abbateggio",
           "Alanno",
@@ -277,6 +280,7 @@
       },
       {
         "name": "Teramo",
+        "provinceId": 4,
         "cities": [
           "Alba Adriatica",
           "Ancarano",
@@ -334,6 +338,7 @@
     "provinces": [
       {
         "name": "Matera",
+        "provinceId": 5,
         "cities": [
           "Accettura",
           "Aliano",
@@ -370,6 +375,7 @@
       },
       {
         "name": "Potenza",
+        "provinceId": 6,
         "cities": [
           "Abriola",
           "Acerenza",
@@ -480,6 +486,7 @@
     "provinces": [
       {
         "name": "Catanzaro",
+        "provinceId": 7,
         "cities": [
           "Albi",
           "Amaroni",
@@ -565,6 +572,7 @@
       },
       {
         "name": "Cosenza",
+        "provinceId": 8,
         "cities": [
           "Acquaformosa",
           "Acquappesa",
@@ -720,6 +728,7 @@
       },
       {
         "name": "Crotone",
+        "provinceId": 9,
         "cities": [
           "Belvedere di Spinello",
           "Caccuri",
@@ -752,6 +761,7 @@
       },
       {
         "name": "Reggio Calabria",
+        "provinceId": 10,
         "cities": [
           "Africo",
           "Agnana Calabra",
@@ -854,6 +864,7 @@
       },
       {
         "name": "Vibo Valentia",
+        "provinceId": 11,
         "cities": [
           "Acquaro",
           "Arena",
@@ -914,6 +925,7 @@
     "provinces": [
       {
         "name": "Avellino",
+        "provinceId": 12,
         "cities": [
           "Aiello del Sabato",
           "Altavilla Irpina",
@@ -1037,6 +1049,7 @@
       },
       {
         "name": "Benevento",
+        "provinceId": 13,
         "cities": [
           "Airola",
           "Amorosi",
@@ -1120,6 +1133,7 @@
       },
       {
         "name": "Caserta",
+        "provinceId": 14,
         "cities": [
           "Ailano",
           "Alife",
@@ -1229,6 +1243,7 @@
       },
       {
         "name": "Napoli",
+        "provinceId": 15,
         "cities": [
           "Acerra",
           "Afragola",
@@ -1326,6 +1341,7 @@
       },
       {
         "name": "Salerno",
+        "provinceId": 16,
         "cities": [
           "Acerno",
           "Agropoli",
@@ -1494,6 +1510,7 @@
     "provinces": [
       {
         "name": "Bologna",
+        "provinceId": 17,
         "cities": [
           "Alto Reno Terme",
           "Anzola dell'Emilia",
@@ -1554,6 +1571,7 @@
       },
       {
         "name": "Ferrara",
+        "provinceId": 18,
         "cities": [
           "Argenta",
           "Bondeno",
@@ -1580,6 +1598,7 @@
       },
       {
         "name": "Forlì-Cesena",
+        "provinceId": 19,
         "cities": [
           "Bagno di Romagna",
           "Bertinoro",
@@ -1615,6 +1634,7 @@
       },
       {
         "name": "Modena",
+        "provinceId": 20,
         "cities": [
           "Bastiglia",
           "Bomporto",
@@ -1667,6 +1687,7 @@
       },
       {
         "name": "Parma",
+        "provinceId": 21,
         "cities": [
           "Albareto",
           "Bardi",
@@ -1716,6 +1737,7 @@
       },
       {
         "name": "Piacenza",
+        "provinceId": 22,
         "cities": [
           "Agazzano",
           "Alseno",
@@ -1767,6 +1789,7 @@
       },
       {
         "name": "Ravenna",
+        "provinceId": 23,
         "cities": [
           "Alfonsine",
           "Bagnacavallo",
@@ -1790,6 +1813,7 @@
       },
       {
         "name": "Reggio nell'Emilia",
+        "provinceId": 24,
         "cities": [
           "Albinea",
           "Bagnolo in Piano",
@@ -1837,6 +1861,7 @@
       },
       {
         "name": "Rimini",
+        "provinceId": 25,
         "cities": [
           "Bellaria-Igea Marina",
           "Casteldelci",
@@ -1874,6 +1899,7 @@
     "provinces": [
       {
         "name": "Gorizia",
+        "provinceId": 26,
         "cities": [
           "Capriva del Friuli",
           "Cormons",
@@ -1904,6 +1930,7 @@
       },
       {
         "name": "Pordenone",
+        "provinceId": 27,
         "cities": [
           "Andreis",
           "Arba",
@@ -1959,6 +1986,7 @@
       },
       {
         "name": "Trieste",
+        "provinceId": 28,
         "cities": [
           "Duino Aurisina",
           "Monrupino",
@@ -1970,6 +1998,7 @@
       },
       {
         "name": "Udine",
+        "provinceId": 29,
         "cities": [
           "Aiello del Friuli",
           "Amaro",
@@ -2114,6 +2143,7 @@
     "provinces": [
       {
         "name": "Frosinone",
+        "provinceId": 30,
         "cities": [
           "Acquafondata",
           "Acuto",
@@ -2210,6 +2240,7 @@
       },
       {
         "name": "Latina",
+        "provinceId": 31,
         "cities": [
           "Aprilia",
           "Bassiano",
@@ -2248,6 +2279,7 @@
       },
       {
         "name": "Rieti",
+        "provinceId": 32,
         "cities": [
           "Accumoli",
           "Amatrice",
@@ -2326,6 +2358,7 @@
       },
       {
         "name": "Roma",
+        "provinceId": 33,
         "cities": [
           "Affile",
           "Agosta",
@@ -2452,6 +2485,7 @@
       },
       {
         "name": "Viterbo",
+        "provinceId": 34,
         "cities": [
           "Acquapendente",
           "Arlena di Castro",
@@ -2522,6 +2556,7 @@
     "provinces": [
       {
         "name": "Genova",
+        "provinceId": 35,
         "cities": [
           "Arenzano",
           "Avegno",
@@ -2594,6 +2629,7 @@
       },
       {
         "name": "Imperia",
+        "provinceId": 36,
         "cities": [
           "Airole",
           "Apricale",
@@ -2665,6 +2701,7 @@
       },
       {
         "name": "La Spezia",
+        "provinceId": 37,
         "cities": [
           "Ameglia",
           "Arcola",
@@ -2702,6 +2739,7 @@
       },
       {
         "name": "Savona",
+        "provinceId": 38,
         "cities": [
           "Alassio",
           "Albenga",
@@ -2781,6 +2819,7 @@
     "provinces": [
       {
         "name": "Bergamo",
+        "provinceId": 39,
         "cities": [
           "Adrara San Martino",
           "Adrara San Rocco",
@@ -3029,6 +3068,7 @@
       },
       {
         "name": "Brescia",
+        "provinceId": 40,
         "cities": [
           "Acquafredda",
           "Adro",
@@ -3239,6 +3279,7 @@
       },
       {
         "name": "Como",
+        "provinceId": 41,
         "cities": [
           "Albavilla",
           "Albese con Cassano",
@@ -3391,6 +3432,7 @@
       },
       {
         "name": "Cremona",
+        "provinceId": 42,
         "cities": [
           "Acquanegra Cremonese",
           "Agnadello",
@@ -3509,6 +3551,7 @@
       },
       {
         "name": "Lecco",
+        "provinceId": 43,
         "cities": [
           "Abbadia Lariana",
           "Airuno",
@@ -3598,6 +3641,7 @@
       },
       {
         "name": "Lodi",
+        "provinceId": 44,
         "cities": [
           "Abbadia Cerreto",
           "Bertonico",
@@ -3663,6 +3707,7 @@
       },
       {
         "name": "Mantova",
+        "provinceId": 45,
         "cities": [
           "Acquanegra sul Chiese",
           "Asola",
@@ -3732,6 +3777,7 @@
       },
       {
         "name": "Milano",
+        "provinceId": 46,
         "cities": [
           "Abbiategrasso",
           "Albairate",
@@ -3870,6 +3916,7 @@
       },
       {
         "name": "Monza e della Brianza",
+        "provinceId": 47,
         "cities": [
           "Agrate Brianza",
           "Aicurzio",
@@ -3930,6 +3977,7 @@
       },
       {
         "name": "Pavia",
+        "provinceId": 48,
         "cities": [
           "Alagna",
           "Albonese",
@@ -4120,6 +4168,7 @@
       },
       {
         "name": "Sondrio",
+        "provinceId": 49,
         "cities": [
           "Albaredo per San Marco",
           "Albosaggia",
@@ -4202,6 +4251,7 @@
       },
       {
         "name": "Varese",
+        "provinceId": 50,
         "cities": [
           "Agra",
           "Albizzate",
@@ -4348,6 +4398,7 @@
     "provinces": [
       {
         "name": "Ancona",
+        "provinceId": 51,
         "cities": [
           "Agugliano",
           "Ancona",
@@ -4400,6 +4451,7 @@
       },
       {
         "name": "Ascoli Piceno",
+        "provinceId": 52,
         "cities": [
           "Acquasanta Terme",
           "Acquaviva Picena",
@@ -4438,6 +4490,7 @@
       },
       {
         "name": "Fermo",
+        "provinceId": 53,
         "cities": [
           "Altidona",
           "Amandola",
@@ -4483,6 +4536,7 @@
       },
       {
         "name": "Macerata",
+        "provinceId": 54,
         "cities": [
           "Apiro",
           "Appignano",
@@ -4543,6 +4597,7 @@
       },
       {
         "name": "Pesaro e Urbino",
+        "provinceId": 55,
         "cities": [
           "Acqualagna",
           "Apecchio",
@@ -4603,6 +4658,7 @@
     "provinces": [
       {
         "name": "Campobasso",
+        "provinceId": 56,
         "cities": [
           "Acquaviva Collecroce",
           "Baranello",
@@ -4692,6 +4748,7 @@
       },
       {
         "name": "Isernia",
+        "provinceId": 57,
         "cities": [
           "Acquaviva d'Isernia",
           "Agnone",
@@ -4754,6 +4811,7 @@
     "provinces": [
       {
         "name": "Alessandria",
+        "provinceId": 58,
         "cities": [
           "Acqui Terme",
           "Albera Ligure",
@@ -4946,6 +5004,7 @@
       },
       {
         "name": "Asti",
+        "provinceId": 59,
         "cities": [
           "Agliano Terme",
           "Albugnano",
@@ -5068,6 +5127,7 @@
       },
       {
         "name": "Biella",
+        "provinceId": 60,
         "cities": [
           "Ailoche",
           "Andorno Micca",
@@ -5147,6 +5207,7 @@
       },
       {
         "name": "Cuneo",
+        "provinceId": 61,
         "cities": [
           "Acceglio",
           "Aisone",
@@ -5399,6 +5460,7 @@
       },
       {
         "name": "Novara",
+        "provinceId": 62,
         "cities": [
           "Agrate Conturbia",
           "Ameno",
@@ -5491,6 +5553,7 @@
       },
       {
         "name": "Torino",
+        "provinceId": 63,
         "cities": [
           "Agliè",
           "Airasca",
@@ -5807,6 +5870,7 @@
       },
       {
         "name": "Verbano-Cusio-Ossola",
+        "provinceId": 64,
         "cities": [
           "Antrona Schieranco",
           "Anzola d'Ossola",
@@ -5886,6 +5950,7 @@
       },
       {
         "name": "Vercelli",
+        "provinceId": 65,
         "cities": [
           "Alagna Valsesia",
           "Albano Vercellese",
@@ -5978,6 +6043,7 @@
     "provinces": [
       {
         "name": "Bari",
+        "provinceId": 66,
         "cities": [
           "Acquaviva delle Fonti",
           "Adelfia",
@@ -6024,6 +6090,7 @@
       },
       {
         "name": "Barletta-Andria-Trani",
+        "provinceId": 67,
         "cities": [
           "Andria",
           "Barletta",
@@ -6039,6 +6106,7 @@
       },
       {
         "name": "Brindisi",
+        "provinceId": 68,
         "cities": [
           "Brindisi",
           "Carovigno",
@@ -6064,6 +6132,7 @@
       },
       {
         "name": "Foggia",
+        "provinceId": 69,
         "cities": [
           "Accadia",
           "Alberona",
@@ -6130,6 +6199,7 @@
       },
       {
         "name": "Lecce",
+        "provinceId": 70,
         "cities": [
           "Alessano",
           "Alezio",
@@ -6231,6 +6301,7 @@
       },
       {
         "name": "Taranto",
+        "provinceId": 71,
         "cities": [
           "Avetrana",
           "Carosino",
@@ -6270,6 +6341,7 @@
     "provinces": [
       {
         "name": "Cagliari",
+        "provinceId": 72,
         "cities": [
           "Assemini",
           "Cagliari",
@@ -6292,6 +6364,7 @@
       },
       {
         "name": "Nuoro",
+        "provinceId": 73,
         "cities": [
           "Aritzo",
           "Arzana",
@@ -6371,6 +6444,7 @@
       },
       {
         "name": "Oristano",
+        "provinceId": 74,
         "cities": [
           "Abbasanta",
           "Aidomaggiore",
@@ -6463,6 +6537,7 @@
       },
       {
         "name": "Sassari",
+        "provinceId": 75,
         "cities": [
           "Aggius",
           "Aglientu",
@@ -6560,6 +6635,7 @@
       },
       {
         "name": "Sud Sardegna",
+        "provinceId": 76,
         "cities": [
           "Arbus",
           "Armungia",
@@ -6677,6 +6753,7 @@
     "provinces": [
       {
         "name": "Agrigento",
+        "provinceId": 77,
         "cities": [
           "Agrigento",
           "Alessandria della Rocca",
@@ -6725,6 +6802,7 @@
       },
       {
         "name": "Caltanissetta",
+        "provinceId": 78,
         "cities": [
           "Acquaviva Platani",
           "Bompensiere",
@@ -6752,6 +6830,7 @@
       },
       {
         "name": "Catania",
+        "provinceId": 79,
         "cities": [
           "Aci Bonaccorsi",
           "Aci Castello",
@@ -6815,6 +6894,7 @@
       },
       {
         "name": "Enna",
+        "provinceId": 80,
         "cities": [
           "Agira",
           "Aidone",
@@ -6840,6 +6920,7 @@
       },
       {
         "name": "Messina",
+        "provinceId": 81,
         "cities": [
           "Acquedolci",
           "Alcara li Fusi",
@@ -6953,6 +7034,7 @@
       },
       {
         "name": "Palermo",
+        "provinceId": 82,
         "cities": [
           "Alia",
           "Alimena",
@@ -7040,6 +7122,7 @@
       },
       {
         "name": "Ragusa",
+        "provinceId": 83,
         "cities": [
           "Acate",
           "Chiaramonte Gulfi",
@@ -7057,6 +7140,7 @@
       },
       {
         "name": "Siracusa",
+        "provinceId": 84,
         "cities": [
           "Augusta",
           "Avola",
@@ -7083,6 +7167,7 @@
       },
       {
         "name": "Trapani",
+        "provinceId": 85,
         "cities": [
           "Alcamo",
           "Buseto Palizzolo",
@@ -7113,339 +7198,12 @@
       }
     ]
   },
-  {
-    "region": "Toscana",
-    "provinces": [
-      {
-        "name": "Arezzo",
-        "cities": [
-          "Anghiari",
-          "Arezzo",
-          "Badia Tedalda",
-          "Bibbiena",
-          "Bucine",
-          "Capolona",
-          "Caprese Michelangelo",
-          "Castel Focognano",
-          "Castel San Niccolò",
-          "Castelfranco Piandiscò",
-          "Castiglion Fibocchi",
-          "Castiglion Fiorentino",
-          "Cavriglia",
-          "Chitignano",
-          "Chiusi della Verna",
-          "Civitella in Val di Chiana",
-          "Cortona",
-          "Foiano della Chiana",
-          "Laterina Pergine Valdarno",
-          "Loro Ciuffenna",
-          "Lucignano",
-          "Marciano della Chiana",
-          "Monte San Savino",
-          "Montemignaio",
-          "Monterchi",
-          "Montevarchi",
-          "Ortignano Raggiolo",
-          "Pieve Santo Stefano",
-          "Poppi",
-          "Pratovecchio Stia",
-          "San Giovanni Valdarno",
-          "Sansepolcro",
-          "Sestino",
-          "Subbiano",
-          "Talla",
-          "Terranuova Bracciolini"
-        ]
-      },
-      {
-        "name": "Firenze",
-        "cities": [
-          "Bagno a Ripoli",
-          "Barberino Tavarnelle",
-          "Barberino di Mugello",
-          "Borgo San Lorenzo",
-          "Calenzano",
-          "Campi Bisenzio",
-          "Capraia e Limite",
-          "Castelfiorentino",
-          "Cerreto Guidi",
-          "Certaldo",
-          "Dicomano",
-          "Empoli",
-          "Fiesole",
-          "Figline e Incisa Valdarno",
-          "Firenze",
-          "Firenzuola",
-          "Fucecchio",
-          "Gambassi Terme",
-          "Greve in Chianti",
-          "Impruneta",
-          "Lastra a Signa",
-          "Londa",
-          "Marradi",
-          "Montaione",
-          "Montelupo Fiorentino",
-          "Montespertoli",
-          "Palazzuolo sul Senio",
-          "Pelago",
-          "Pontassieve",
-          "Reggello",
-          "Rignano sull'Arno",
-          "Rufina",
-          "San Casciano in Val di Pesa",
-          "San Godenzo",
-          "Scandicci",
-          "Scarperia e San Piero",
-          "Sesto Fiorentino",
-          "Signa",
-          "Vaglia",
-          "Vicchio",
-          "Vinci"
-        ]
-      },
-      {
-        "name": "Grosseto",
-        "cities": [
-          "Arcidosso",
-          "Campagnatico",
-          "Capalbio",
-          "Castel del Piano",
-          "Castell'Azzara",
-          "Castiglione della Pescaia",
-          "Cinigiano",
-          "Civitella Paganico",
-          "Follonica",
-          "Gavorrano",
-          "Grosseto",
-          "Isola del Giglio",
-          "Magliano in Toscana",
-          "Manciano",
-          "Massa Marittima",
-          "Monte Argentario",
-          "Monterotondo Marittimo",
-          "Montieri",
-          "Orbetello",
-          "Pitigliano",
-          "Roccalbegna",
-          "Roccastrada",
-          "Santa Fiora",
-          "Scansano",
-          "Scarlino",
-          "Seggiano",
-          "Semproniano",
-          "Sorano"
-        ]
-      },
-      {
-        "name": "Livorno",
-        "cities": [
-          "Bibbona",
-          "Campiglia Marittima",
-          "Campo nell'Elba",
-          "Capoliveri",
-          "Capraia Isola",
-          "Castagneto Carducci",
-          "Cecina",
-          "Collesalvetti",
-          "Livorno",
-          "Marciana",
-          "Marciana Marina",
-          "Piombino",
-          "Porto Azzurro",
-          "Portoferraio",
-          "Rio",
-          "Rosignano Marittimo",
-          "San Vincenzo",
-          "Sassetta",
-          "Suvereto"
-        ]
-      },
-      {
-        "name": "Lucca",
-        "cities": [
-          "Altopascio",
-          "Bagni di Lucca",
-          "Barga",
-          "Borgo a Mozzano",
-          "Camaiore",
-          "Camporgiano",
-          "Capannori",
-          "Careggine",
-          "Castelnuovo di Garfagnana",
-          "Castiglione di Garfagnana",
-          "Coreglia Antelminelli",
-          "Fabbriche di Vergemoli",
-          "Forte dei Marmi",
-          "Fosciandora",
-          "Gallicano",
-          "Lucca",
-          "Massarosa",
-          "Minucciano",
-          "Molazzana",
-          "Montecarlo",
-          "Pescaglia",
-          "Piazza al Serchio",
-          "Pietrasanta",
-          "Pieve Fosciana",
-          "Porcari",
-          "San Romano in Garfagnana",
-          "Seravezza",
-          "Sillano Giuncugnano",
-          "Stazzema",
-          "Vagli Sotto",
-          "Viareggio",
-          "Villa Basilica",
-          "Villa Collemandina"
-        ]
-      },
-      {
-        "name": "Massa-Carrara",
-        "cities": [
-          "Aulla",
-          "Bagnone",
-          "Carrara",
-          "Casola in Lunigiana",
-          "Comano",
-          "Filattiera",
-          "Fivizzano",
-          "Fosdinovo",
-          "Licciana Nardi",
-          "Massa",
-          "Montignoso",
-          "Mulazzo",
-          "Podenzana",
-          "Pontremoli",
-          "Tresana",
-          "Villafranca in Lunigiana",
-          "Zeri"
-        ]
-      },
-      {
-        "name": "Pisa",
-        "cities": [
-          "Bientina",
-          "Buti",
-          "Calci",
-          "Calcinaia",
-          "Capannoli",
-          "Casale Marittimo",
-          "Casciana Terme Lari",
-          "Cascina",
-          "Castelfranco di Sotto",
-          "Castellina Marittima",
-          "Castelnuovo di Val di Cecina",
-          "Chianni",
-          "Crespina Lorenzana",
-          "Fauglia",
-          "Guardistallo",
-          "Lajatico",
-          "Montecatini Val di Cecina",
-          "Montescudaio",
-          "Monteverdi Marittimo",
-          "Montopoli in Val d'Arno",
-          "Orciano Pisano",
-          "Palaia",
-          "Peccioli",
-          "Pisa",
-          "Pomarance",
-          "Ponsacco",
-          "Pontedera",
-          "Riparbella",
-          "San Giuliano Terme",
-          "San Miniato",
-          "Santa Croce sull'Arno",
-          "Santa Luce",
-          "Santa Maria a Monte",
-          "Terricciola",
-          "Vecchiano",
-          "Vicopisano",
-          "Volterra"
-        ]
-      },
-      {
-        "name": "Pistoia",
-        "cities": [
-          "Abetone Cutigliano",
-          "Agliana",
-          "Buggiano",
-          "Chiesina Uzzanese",
-          "Lamporecchio",
-          "Larciano",
-          "Marliana",
-          "Massa e Cozzile",
-          "Monsummano Terme",
-          "Montale",
-          "Montecatini-Terme",
-          "Pescia",
-          "Pieve a Nievole",
-          "Pistoia",
-          "Ponte Buggianese",
-          "Quarrata",
-          "Sambuca Pistoiese",
-          "San Marcello Piteglio",
-          "Serravalle Pistoiese",
-          "Uzzano"
-        ]
-      },
-      {
-        "name": "Prato",
-        "cities": [
-          "Cantagallo",
-          "Carmignano",
-          "Montemurlo",
-          "Poggio a Caiano",
-          "Prato",
-          "Vaiano",
-          "Vernio"
-        ]
-      },
-      {
-        "name": "Siena",
-        "cities": [
-          "Abbadia San Salvatore",
-          "Asciano",
-          "Buonconvento",
-          "Casole d'Elsa",
-          "Castellina in Chianti",
-          "Castelnuovo Berardenga",
-          "Castiglione d'Orcia",
-          "Cetona",
-          "Chianciano Terme",
-          "Chiusdino",
-          "Chiusi",
-          "Colle di Val d'Elsa",
-          "Gaiole in Chianti",
-          "Montalcino",
-          "Montepulciano",
-          "Monteriggioni",
-          "Monteroni d'Arbia",
-          "Monticiano",
-          "Murlo",
-          "Piancastagnaio",
-          "Pienza",
-          "Poggibonsi",
-          "Radda in Chianti",
-          "Radicofani",
-          "Radicondoli",
-          "Rapolano Terme",
-          "San Casciano dei Bagni",
-          "San Gimignano",
-          "San Quirico d'Orcia",
-          "Sarteano",
-          "Siena",
-          "Sinalunga",
-          "Sovicille",
-          "Torrita di Siena",
-          "Trequanda"
-        ]
-      }
-    ]
-  },
-  {
+    {
     "region": "Trentino-Alto Adige/Südtirol",
     "provinces": [
       {
         "name": "Bolzano/Bozen",
+        "provinceId": 86,
         "cities": [
           "Aldino",
           "Andriano",
@@ -7567,6 +7325,7 @@
       },
       {
         "name": "Trento",
+        "provinceId": 87,
         "cities": [
           "Ala",
           "Albiano",
@@ -7739,10 +7498,349 @@
     ]
   },
   {
+    "region": "Toscana",
+    "provinces": [
+      {
+        "name": "Arezzo",
+        "provinceId": 88,
+        "cities": [
+          "Anghiari",
+          "Arezzo",
+          "Badia Tedalda",
+          "Bibbiena",
+          "Bucine",
+          "Capolona",
+          "Caprese Michelangelo",
+          "Castel Focognano",
+          "Castel San Niccolò",
+          "Castelfranco Piandiscò",
+          "Castiglion Fibocchi",
+          "Castiglion Fiorentino",
+          "Cavriglia",
+          "Chitignano",
+          "Chiusi della Verna",
+          "Civitella in Val di Chiana",
+          "Cortona",
+          "Foiano della Chiana",
+          "Laterina Pergine Valdarno",
+          "Loro Ciuffenna",
+          "Lucignano",
+          "Marciano della Chiana",
+          "Monte San Savino",
+          "Montemignaio",
+          "Monterchi",
+          "Montevarchi",
+          "Ortignano Raggiolo",
+          "Pieve Santo Stefano",
+          "Poppi",
+          "Pratovecchio Stia",
+          "San Giovanni Valdarno",
+          "Sansepolcro",
+          "Sestino",
+          "Subbiano",
+          "Talla",
+          "Terranuova Bracciolini"
+        ]
+      },
+      {
+        "name": "Firenze",
+        "provinceId": 89,
+        "cities": [
+          "Bagno a Ripoli",
+          "Barberino Tavarnelle",
+          "Barberino di Mugello",
+          "Borgo San Lorenzo",
+          "Calenzano",
+          "Campi Bisenzio",
+          "Capraia e Limite",
+          "Castelfiorentino",
+          "Cerreto Guidi",
+          "Certaldo",
+          "Dicomano",
+          "Empoli",
+          "Fiesole",
+          "Figline e Incisa Valdarno",
+          "Firenze",
+          "Firenzuola",
+          "Fucecchio",
+          "Gambassi Terme",
+          "Greve in Chianti",
+          "Impruneta",
+          "Lastra a Signa",
+          "Londa",
+          "Marradi",
+          "Montaione",
+          "Montelupo Fiorentino",
+          "Montespertoli",
+          "Palazzuolo sul Senio",
+          "Pelago",
+          "Pontassieve",
+          "Reggello",
+          "Rignano sull'Arno",
+          "Rufina",
+          "San Casciano in Val di Pesa",
+          "San Godenzo",
+          "Scandicci",
+          "Scarperia e San Piero",
+          "Sesto Fiorentino",
+          "Signa",
+          "Vaglia",
+          "Vicchio",
+          "Vinci"
+        ]
+      },
+      {
+        "name": "Grosseto",
+        "provinceId": 90,
+        "cities": [
+          "Arcidosso",
+          "Campagnatico",
+          "Capalbio",
+          "Castel del Piano",
+          "Castell'Azzara",
+          "Castiglione della Pescaia",
+          "Cinigiano",
+          "Civitella Paganico",
+          "Follonica",
+          "Gavorrano",
+          "Grosseto",
+          "Isola del Giglio",
+          "Magliano in Toscana",
+          "Manciano",
+          "Massa Marittima",
+          "Monte Argentario",
+          "Monterotondo Marittimo",
+          "Montieri",
+          "Orbetello",
+          "Pitigliano",
+          "Roccalbegna",
+          "Roccastrada",
+          "Santa Fiora",
+          "Scansano",
+          "Scarlino",
+          "Seggiano",
+          "Semproniano",
+          "Sorano"
+        ]
+      },
+      {
+        "name": "Livorno",
+        "provinceId": 91,
+        "cities": [
+          "Bibbona",
+          "Campiglia Marittima",
+          "Campo nell'Elba",
+          "Capoliveri",
+          "Capraia Isola",
+          "Castagneto Carducci",
+          "Cecina",
+          "Collesalvetti",
+          "Livorno",
+          "Marciana",
+          "Marciana Marina",
+          "Piombino",
+          "Porto Azzurro",
+          "Portoferraio",
+          "Rio",
+          "Rosignano Marittimo",
+          "San Vincenzo",
+          "Sassetta",
+          "Suvereto"
+        ]
+      },
+      {
+        "name": "Lucca",
+        "provinceId": 92,
+        "cities": [
+          "Altopascio",
+          "Bagni di Lucca",
+          "Barga",
+          "Borgo a Mozzano",
+          "Camaiore",
+          "Camporgiano",
+          "Capannori",
+          "Careggine",
+          "Castelnuovo di Garfagnana",
+          "Castiglione di Garfagnana",
+          "Coreglia Antelminelli",
+          "Fabbriche di Vergemoli",
+          "Forte dei Marmi",
+          "Fosciandora",
+          "Gallicano",
+          "Lucca",
+          "Massarosa",
+          "Minucciano",
+          "Molazzana",
+          "Montecarlo",
+          "Pescaglia",
+          "Piazza al Serchio",
+          "Pietrasanta",
+          "Pieve Fosciana",
+          "Porcari",
+          "San Romano in Garfagnana",
+          "Seravezza",
+          "Sillano Giuncugnano",
+          "Stazzema",
+          "Vagli Sotto",
+          "Viareggio",
+          "Villa Basilica",
+          "Villa Collemandina"
+        ]
+      },
+      {
+        "name": "Massa-Carrara",
+        "provinceId": 93,
+        "cities": [
+          "Aulla",
+          "Bagnone",
+          "Carrara",
+          "Casola in Lunigiana",
+          "Comano",
+          "Filattiera",
+          "Fivizzano",
+          "Fosdinovo",
+          "Licciana Nardi",
+          "Massa",
+          "Montignoso",
+          "Mulazzo",
+          "Podenzana",
+          "Pontremoli",
+          "Tresana",
+          "Villafranca in Lunigiana",
+          "Zeri"
+        ]
+      },
+      {
+        "name": "Pisa",
+        "provinceId": 94,
+        "cities": [
+          "Bientina",
+          "Buti",
+          "Calci",
+          "Calcinaia",
+          "Capannoli",
+          "Casale Marittimo",
+          "Casciana Terme Lari",
+          "Cascina",
+          "Castelfranco di Sotto",
+          "Castellina Marittima",
+          "Castelnuovo di Val di Cecina",
+          "Chianni",
+          "Crespina Lorenzana",
+          "Fauglia",
+          "Guardistallo",
+          "Lajatico",
+          "Montecatini Val di Cecina",
+          "Montescudaio",
+          "Monteverdi Marittimo",
+          "Montopoli in Val d'Arno",
+          "Orciano Pisano",
+          "Palaia",
+          "Peccioli",
+          "Pisa",
+          "Pomarance",
+          "Ponsacco",
+          "Pontedera",
+          "Riparbella",
+          "San Giuliano Terme",
+          "San Miniato",
+          "Santa Croce sull'Arno",
+          "Santa Luce",
+          "Santa Maria a Monte",
+          "Terricciola",
+          "Vecchiano",
+          "Vicopisano",
+          "Volterra"
+        ]
+      },
+      {
+        "name": "Pistoia",
+        "provinceId": 95,
+        "cities": [
+          "Abetone Cutigliano",
+          "Agliana",
+          "Buggiano",
+          "Chiesina Uzzanese",
+          "Lamporecchio",
+          "Larciano",
+          "Marliana",
+          "Massa e Cozzile",
+          "Monsummano Terme",
+          "Montale",
+          "Montecatini-Terme",
+          "Pescia",
+          "Pieve a Nievole",
+          "Pistoia",
+          "Ponte Buggianese",
+          "Quarrata",
+          "Sambuca Pistoiese",
+          "San Marcello Piteglio",
+          "Serravalle Pistoiese",
+          "Uzzano"
+        ]
+      },
+      {
+        "name": "Prato",
+        "provinceId": 96,
+        "cities": [
+          "Cantagallo",
+          "Carmignano",
+          "Montemurlo",
+          "Poggio a Caiano",
+          "Prato",
+          "Vaiano",
+          "Vernio"
+        ]
+      },
+      {
+        "name": "Siena",
+        "provinceId": 97,
+        "cities": [
+          "Abbadia San Salvatore",
+          "Asciano",
+          "Buonconvento",
+          "Casole d'Elsa",
+          "Castellina in Chianti",
+          "Castelnuovo Berardenga",
+          "Castiglione d'Orcia",
+          "Cetona",
+          "Chianciano Terme",
+          "Chiusdino",
+          "Chiusi",
+          "Colle di Val d'Elsa",
+          "Gaiole in Chianti",
+          "Montalcino",
+          "Montepulciano",
+          "Monteriggioni",
+          "Monteroni d'Arbia",
+          "Monticiano",
+          "Murlo",
+          "Piancastagnaio",
+          "Pienza",
+          "Poggibonsi",
+          "Radda in Chianti",
+          "Radicofani",
+          "Radicondoli",
+          "Rapolano Terme",
+          "San Casciano dei Bagni",
+          "San Gimignano",
+          "San Quirico d'Orcia",
+          "Sarteano",
+          "Siena",
+          "Sinalunga",
+          "Sovicille",
+          "Torrita di Siena",
+          "Trequanda"
+        ]
+      }
+    ]
+  },
+  {
     "region": "Umbria",
     "provinces": [
       {
         "name": "Perugia",
+        "provinceId": 98,
         "cities": [
           "Assisi",
           "Bastia Umbra",
@@ -7807,6 +7905,7 @@
       },
       {
         "name": "Terni",
+        "provinceId": 99,
         "cities": [
           "Acquasparta",
           "Allerona",
@@ -7850,6 +7949,7 @@
     "provinces": [
       {
         "name": "Valle d'Aosta/Vallée d'Aoste",
+        "provinceId": 100,
         "cities": [
           "Allein",
           "Antey-Saint-André",
@@ -7934,6 +8034,7 @@
     "provinces": [
       {
         "name": "Belluno",
+        "provinceId": 101,
         "cities": [
           "Agordo",
           "Alleghe",
@@ -7999,6 +8100,7 @@
       },
       {
         "name": "Padova",
+        "provinceId": 102,
         "cities": [
           "Abano Terme",
           "Agna",
@@ -8105,6 +8207,7 @@
       },
       {
         "name": "Rovigo",
+        "provinceId": 103,
         "cities": [
           "Adria",
           "Ariano nel Polesine",
@@ -8160,6 +8263,7 @@
       },
       {
         "name": "Treviso",
+        "provinceId": 104,
         "cities": [
           "Altivole",
           "Arcade",
@@ -8259,6 +8363,7 @@
       },
       {
         "name": "Venezia",
+        "provinceId": 105,
         "cities": [
           "Annone Veneto",
           "Campagna Lupia",
@@ -8308,6 +8413,7 @@
       },
       {
         "name": "Verona",
+        "provinceId": 106,
         "cities": [
           "Affi",
           "Albaredo d'Adige",
@@ -8411,6 +8517,7 @@
       },
       {
         "name": "Vicenza",
+        "provinceId": 107,
         "cities": [
           "Agugliaro",
           "Albettone",

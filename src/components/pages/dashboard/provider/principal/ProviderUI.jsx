@@ -82,9 +82,6 @@ export const StatsSummary = ({ activeCategory }) => {
                 <div className="relative z-10">
                     <p className="text-slate-400 text-xs font-bold uppercase tracking-widest mb-1">Fatturato {label}</p>
                     <h3 className="text-3xl font-extrabold mb-4">€ --.--<span className="text-slate-500 text-lg">,00</span></h3>
-                    <div className="inline-flex items-center gap-2 bg-emerald-500/20 text-emerald-400 px-3 py-1 rounded-full text-xs font-bold border border-emerald-500/30">
-                        <TrendingUp size={14} /> +12% vs mese scorso
-                    </div>
                 </div>
             </div>
             <div className="bg-white p-6 rounded-[2rem] border border-slate-100 shadow-sm flex flex-col justify-center relative overflow-hidden group hover:border-[#68B49B]/30 hover:shadow-lg transition-all">

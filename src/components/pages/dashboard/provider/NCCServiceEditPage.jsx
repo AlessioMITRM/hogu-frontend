@@ -1,14 +1,20 @@
 import React, { useState, useMemo, useEffect, useRef } from 'react';
+import { useParams } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { 
     MapPin, Info, Car, Briefcase, Users,
     Save, Upload, Trash2, Plus, Euro, Eye, EyeOff, Navigation,
     CalendarCheck, CreditCard, FileText, ChevronDown
 } from 'lucide-react';
+import CurrencyInput from 'react-currency-input-field';
 
 import { HOGU_COLORS, HOGU_THEME } from '../../../../config/theme.js';
 import { withAuthProtection } from './../../auth/withAuthProtection.jsx'; 
 import { Breadcrumbs } from '../../../../components/ui/Breadcrumbs.jsx'; 
+import { nccService } from '../../../../api/apiClient.js';
+import SuccessModal from '../../../ui/SuccessModal.jsx';
+import ErrorModal from '../../../ui/ErrorModal.jsx';
+import LoadingScreen from '../../../ui/LoadingScreen.jsx';
 
 import italianLocationsData from '../../../../assets/data/italian_locations.json'; 
 import englishLocationsData from '../../../../assets/data/english_locations.json'; 
@@ -21,13 +27,12 @@ const processLocations = (data) => {
     data.forEach(region => {
         region.provinces.forEach(province => {
             province.cities.forEach(city => {
-                const mapFriendlyString = `${city}, ${province.name}, ${region.region}`;
                 flatLocations.push({
                     city: city,
                     province: province.name,
                     region: region.region,
-                    fullLabel: mapFriendlyString,
-                    searchString: mapFriendlyString.toLowerCase()
+                    fullLabel: `${city}, ${region.region}`,
+                    searchString: `${city}, ${province.name}, ${region.region}`.toLowerCase()
                 });
             });
         });
@@ -37,8 +42,7 @@ const processLocations = (data) => {
 
 // --- BREADCRUMBS CONFIGURATION ---
 const breadcrumbsItems = [
-    { labelKey: 'ncc_edit.nav.dashboard', href: '#' },
-    { labelKey: 'ncc_edit.nav.fleet', href: '#' },
+    { labelKey: 'ncc_edit.nav.dashboard', href: '/provider/dashboard' },
     { labelKey: 'ncc_edit.nav.edit_profile', href: '#' }
 ];
 
@@ -78,7 +82,7 @@ const InfoAccordionItem = ({ icon: Icon, title, description, colorClass }) => {
 };
 
 // --- COMPONENTE AUTOCOMPLETE CITTA' ---
-const CityAutocomplete = ({ label, value, onChange, icon: Icon }) => {
+const CityAutocomplete = ({ label, value, onChange, icon: Icon, required = false }) => {
     const { i18n, t } = useTranslation();
     const [suggestions, setSuggestions] = useState([]);
     const [showSuggestions, setShowSuggestions] = useState(false);
@@ -137,7 +141,7 @@ const CityAutocomplete = ({ label, value, onChange, icon: Icon }) => {
 
     return (
         <div className="group relative" ref={wrapperRef}>
-            {label && <label className="block text-xs font-bold text-gray-400 uppercase tracking-wider mb-1.5 ml-1">{label}</label>}
+            {label && <label className="block text-xs font-bold text-gray-400 uppercase tracking-wider mb-1.5 ml-1">{label} {required && <span className="text-red-500">*</span>}</label>}
             <div className="relative">
                 {Icon && <Icon className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400" size={20} />}
                 <input 
@@ -174,9 +178,9 @@ const CityAutocomplete = ({ label, value, onChange, icon: Icon }) => {
 };
 
 // --- COMPONENTI UI DI SUPPORTO ---
-const EditableInput = ({ label, value, onChange, type = "text", className = "", large = false, placeholder = "", icon: Icon }) => (
+const EditableInput = ({ label, value, onChange, type = "text", className = "", large = false, placeholder = "", icon: Icon, required = false }) => (
     <div className={`group ${className}`}>
-        {label && <label className="block text-xs font-bold text-gray-400 uppercase tracking-wider mb-1.5 ml-1">{label}</label>}
+        {label && <label className="block text-xs font-bold text-gray-400 uppercase tracking-wider mb-1.5 ml-1">{label} {required && <span className="text-red-500">*</span>}</label>}
         <div className="relative">
             {Icon && <Icon className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400" size={20} />}
             <input 
@@ -190,9 +194,9 @@ const EditableInput = ({ label, value, onChange, type = "text", className = "", 
     </div>
 );
 
-const EditableTextarea = ({ label, value, onChange, rows = 4 }) => (
+const EditableTextarea = ({ label, value, onChange, rows = 4, required = false }) => (
     <div className="group">
-        {label && <label className="block text-xs font-bold text-gray-400 uppercase tracking-wider mb-1.5 ml-1">{label}</label>}
+        {label && <label className="block text-xs font-bold text-gray-400 uppercase tracking-wider mb-1.5 ml-1">{label} {required && <span className="text-red-500">*</span>}</label>}
         <textarea 
             value={value}
             onChange={(e) => onChange(e.target.value)}
@@ -218,65 +222,117 @@ const ImageUploadCard = ({ src, onDelete, isMain = false }) => {
 
 const VehicleEditorCard = ({ vehicle, onChange, onDelete, canDelete }) => {
     const { t } = useTranslation("home");
+    
+    const inputClasses = "w-full border border-gray-200 rounded-lg px-3 py-2 text-sm focus:border-[#68B49B] focus:ring-1 focus:ring-[#68B49B] outline-none transition-all bg-gray-50 focus:bg-white text-gray-800 placeholder:text-gray-400";
+    const labelClasses = "block text-xs font-bold text-gray-500 uppercase tracking-wider mb-1.5";
+
     return (
-    <div className="bg-white rounded-2xl p-5 border border-gray-200 shadow-sm relative group hover:border-[#68B49B] transition-all">
-        <div className="flex justify-between items-start mb-4 border-b border-gray-100 pb-3">
+    <div className="bg-white rounded-2xl p-6 border border-gray-200 shadow-sm relative group hover:border-[#68B49B] transition-all">
+        {/* Header / Title */}
+        <div className="flex justify-between items-center mb-6 border-b border-gray-100 pb-4">
             <div className="flex items-center gap-3">
-                <div className="bg-slate-100 p-2 rounded-xl text-slate-700">
+                <div className="bg-[#E6F4F1] p-2.5 rounded-xl text-[#33594C]">
                     <Car size={24} />
                 </div>
+                <span className="font-bold text-gray-900 text-lg">
+                    {vehicle.name || t('ncc_edit.vehicle.default_title', 'Veicolo')}
+                </span>
+            </div>
+            {canDelete && (
+                <button 
+                    onClick={() => onDelete(vehicle.id)} 
+                    className="p-2 text-gray-400 hover:text-red-500 hover:bg-red-50 rounded-full transition-all"
+                    title={t('common.delete', 'Elimina')}
+                >
+                    <Trash2 size={20} />
+                </button>
+            )}
+        </div>
+
+        <div className="space-y-5">
+            {/* Row 1: Type & Model */}
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div>
+                    <label className={labelClasses}>{t('ncc_edit.vehicle.category_name_placeholder', "Tipo (es. Van)")} <span className="text-red-500">*</span></label>
                     <input 
                         type="text" 
                         value={vehicle.name}
                         onChange={(e) => onChange(vehicle.id, 'name', e.target.value)}
-                        className="font-bold text-gray-900 bg-transparent focus:outline-none border-b border-transparent focus:border-[#68B49B] w-40 sm:w-auto"
-                        placeholder={t('ncc_edit.vehicle.category_name_placeholder')}
+                        className={inputClasses}
+                        placeholder="Es. Mercedes V-Class"
                     />
+                </div>
+                <div>
+                    <label className={labelClasses}>{t('ncc_edit.vehicle.model_placeholder', "Modello")} <span className="text-red-500">*</span></label>
                     <input 
                         type="text" 
                         value={vehicle.model}
                         onChange={(e) => onChange(vehicle.id, 'model', e.target.value)}
-                        className="text-xs text-gray-500 bg-transparent focus:outline-none block mt-0.5 w-full"
-                        placeholder={t('ncc_edit.vehicle.model_placeholder')}
+                        className={inputClasses}
+                        placeholder="Es. Long Version"
                     />
                 </div>
             </div>
-            {canDelete && (
-                <button onClick={() => onDelete(vehicle.id)} className="text-gray-300 hover:text-red-500 transition-colors">
-                    <Trash2 size={18} />
-                </button>
-            )}
-        </div>
-        <div className="grid grid-cols-2 gap-4 mb-4">
-            <div className="bg-gray-50 p-2 rounded-xl flex items-center justify-between">
-                <div className="flex items-center gap-2 text-gray-500"><Users size={16} /> <span className="text-xs font-bold">{t('ncc_edit.vehicle.pax_label')}</span></div>
+
+            {/* Row 2: Plate */}
+            <div>
+                <label className={labelClasses}>Targa <span className="text-red-500">*</span></label>
                 <input 
-                    type="number" 
-                    value={vehicle.pax}
-                    onChange={(e) => onChange(vehicle.id, 'pax', parseInt(e.target.value))}
-                    className="w-10 text-center bg-transparent font-bold text-gray-900 focus:outline-none"
+                    type="text" 
+                    value={vehicle.plateNumber || ''}
+                    onChange={(e) => onChange(vehicle.id, 'plateNumber', e.target.value)}
+                    className={`${inputClasses} uppercase tracking-widest font-mono`}
+                    placeholder="AA 000 AA"
                 />
             </div>
-            <div className="bg-gray-50 p-2 rounded-xl flex items-center justify-between">
-                <div className="flex items-center gap-2 text-gray-500"><Briefcase size={16} /> <span className="text-xs font-bold">{t('ncc_edit.vehicle.luggage_label')}</span></div>
-                <input 
-                    type="number" 
-                    value={vehicle.luggage}
-                    onChange={(e) => onChange(vehicle.id, 'luggage', parseInt(e.target.value))}
-                    className="w-10 text-center bg-transparent font-bold text-gray-900 focus:outline-none"
-                />
-            </div>
-        </div>
-        <div className="bg-[#F0FDF9] p-3 rounded-xl border border-[#68B49B]/30">
-            <label className="text-[10px] font-bold text-[#33594C] uppercase mb-1 block">{t('ncc_edit.vehicle.rate_label')}</label>
-            <div className="flex items-center gap-2">
-                <Euro size={16} className="text-[#68B49B]" />
-                <input 
-                    type="number" step="0.10" value={vehicle.pricePerKm}
-                    onChange={(e) => onChange(vehicle.id, 'pricePerKm', parseFloat(e.target.value))}
-                    className="w-full bg-transparent font-bold text-lg text-[#33594C] focus:outline-none"
-                />
+
+            {/* Row 3: Capacity & Price */}
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                {/* Pax */}
+                <div className="col-span-1">
+                    <label className={labelClasses}>{t('ncc_edit.vehicle.pax_label', "Passeggeri")} <span className="text-red-500">*</span></label>
+                    <div className="relative">
+                        <Users size={16} className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" />
+                        <input 
+                            type="number" 
+                            value={vehicle.pax}
+                            onChange={(e) => onChange(vehicle.id, 'pax', parseInt(e.target.value))}
+                            className={`${inputClasses} pl-9`}
+                        />
+                    </div>
+                </div>
+                
+                {/* Luggage */}
+                <div className="col-span-1">
+                    <label className={labelClasses}>{t('ncc_edit.vehicle.luggage_label', "Bagagli")} <span className="text-red-500">*</span></label>
+                    <div className="relative">
+                        <Briefcase size={16} className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" />
+                        <input 
+                            type="number" 
+                            value={vehicle.luggage}
+                            onChange={(e) => onChange(vehicle.id, 'luggage', parseInt(e.target.value))}
+                            className={`${inputClasses} pl-9`}
+                        />
+                    </div>
+                </div>
+
+                {/* Price */}
+                 <div className="col-span-1">
+                    <label className={`${labelClasses} text-[#33594C]`}>{t('ncc_edit.vehicle.rate_label', "Prezzo per Km")} <span className="text-red-500">*</span></label>
+                    <div className="relative">
+                         <CurrencyInput
+                            id={`price-${vehicle.id}`}
+                            name="pricePerKm"
+                            placeholder="0,00"
+                            value={vehicle.pricePerKm}
+                            decimalsLimit={2}
+                            decimalScale={2}
+                            onValueChange={(value) => onChange(vehicle.id, 'pricePerKm', value ? parseFloat(value) : 0)}
+                            className={`${inputClasses} font-bold text-[#33594C] bg-[#F0FDF9] border-[#68B49B]/30 focus:border-[#68B49B]`}
+                            intlConfig={{ locale: 'it-IT', currency: 'EUR' }}
+                        />
+                    </div>
+                </div>
             </div>
         </div>
     </div>
@@ -285,26 +341,120 @@ const VehicleEditorCard = ({ vehicle, onChange, onDelete, canDelete }) => {
 // --- COMPONENTE PRINCIPALE: NCC EDIT ---
 
 export const NCCServiceEditPageBase = () => {
-    const { t } = useTranslation("home");
+    const { t, i18n } = useTranslation("home");
+    const { id } = useParams();
+    
+    // --- STATO ---
     const [isLoading, setIsLoading] = useState(false);
+    const [successMessage, setSuccessMessage] = useState(null);
+    const [errorMessage, setErrorMessage] = useState(null);
     
     const [formData, setFormData] = useState({
-        providerName: "Elite Drivers Milano",
-        description: "Siamo un punto di riferimento per la mobilità di lusso...",
-        baseLocation: "Milano, Milano, Lombardia",
-        address: "Via Montenapoleone, 12",
+        providerName: "",
+        description: "",
+        baseLocation: "",
+        address: "",
         isActive: true,
-        features: ['wifi', 'water', 'english', 'suit'],
-        fleet: [
-            { id: 1, name: 'Business Sedan', model: 'Mercedes E-Class', pax: 3, luggage: 2, pricePerKm: 2.50 }
-        ]
+        features: [],
+        fleet: []
     });
 
-    const [images, setImages] = useState([
-        "https://images.unsplash.com/photo-1552519507-da3b142c6e3d?auto=format&fit=crop&w=800&q=80",
-        "https://images.unsplash.com/photo-1617788138017-80ad40651399?auto=format&fit=crop&w=800&q=80",
-        "https://images.unsplash.com/photo-1449965408869-eaa3f722e40d?auto=format&fit=crop&w=800&q=80"
-    ]);
+    const [images, setImages] = useState([]);
+
+    const fileInputRef = useRef(null);
+
+    // --- INIT ---
+    useEffect(() => {
+        const loadData = async () => {
+            if (!id) return;
+            setIsLoading(true);
+            try {
+                const data = await nccService.getNccProvider(id);
+                if (data) {
+                    // Helper per formattare la città con supporto cross-language
+                    const getFormattedCity = (locale) => {
+                        if (!locale || !locale.city) return '';
+                        
+                        const isItalian = !i18n.language || i18n.language.startsWith('it');
+                        const targetDataset = isItalian ? italianLocationsData : (englishLocationsData || italianLocationsData);
+                        const otherDataset = isItalian ? (englishLocationsData || italianLocationsData) : italianLocationsData;
+
+                        const normalizedCity = locale.city.toLowerCase().trim();
+                        
+                        // 1. Cerca nel dataset della lingua corrente
+                        for (const region of targetDataset) {
+                            for (const province of region.provinces) {
+                                const foundCity = province.cities.find(c => c.toLowerCase() === normalizedCity);
+                                if (foundCity) {
+                                    return `${foundCity}, ${region.region}`;
+                                }
+                            }
+                        }
+
+                        // 2. Se non trovato, cerca nell'altro dataset e mappa
+                        if (otherDataset) {
+                            for (const region of otherDataset) {
+                                for (const province of region.provinces) {
+                                    // Cerca l'indice della città
+                                    const cityIndex = province.cities.findIndex(c => c.toLowerCase() === normalizedCity);
+                                    if (cityIndex !== -1) {
+                                        // Trovata! Cerchiamo la provincia corrispondente nel dataset target
+                                        const pId = province.provinceId;
+                                        
+                                        // Trova la regione/provincia target
+                                        for (const tRegion of targetDataset) {
+                                            const tProvince = tRegion.provinces.find(p => p.provinceId === pId);
+                                            if (tProvince) {
+                                                // Proviamo a prendere la città allo stesso indice
+                                                // Assumiamo che gli array cities siano ordinati parallelamente
+                                                const tCity = tProvince.cities[cityIndex] || locale.city;
+                                                return `${tCity}, ${tRegion.region}`;
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                        }
+
+                        // 3. Fallback
+                        return locale.state ? `${locale.city}, ${locale.state}` : locale.city;
+                    };
+ 
+                    const localeString = getFormattedCity(data.locale);
+  
+                    setFormData({
+                        providerName: data.name || "",
+                        description: data.description || "",
+                        baseLocation: localeString,
+                        address: data.locale?.address || "",
+                        isActive: data.publicationStatus !== false,
+                        features: [], 
+                        fleet: data.vehicle ? [{
+                            id: data.vehicle.id,
+                            name: data.vehicle.type || "Standard", 
+                            model: data.vehicle.model || "",
+                            plateNumber: data.vehicle.plateNumber || "",
+                            pax: data.vehicle.numberOfSeats || 4,
+                            luggage: 2, 
+                            pricePerKm: data.basePrice || 0
+                        }] : []
+                    });
+                    
+                    const loadedImages = (data.images || []).map(filename => ({
+                        url: `/files/ncc/${id}/${filename}`,
+                        file: null
+                    }));
+                    setImages(loadedImages);
+                }
+            } catch (error) {
+                console.error("Errore caricamento servizio:", error);
+                setErrorMessage("Impossibile caricare i dati del servizio.");
+            } finally {
+                setIsLoading(false);
+            }
+        };
+        loadData();
+    }, [id, i18n.language]);
 
     const handleInputChange = (field, value) => {
         setFormData(prev => ({ ...prev, [field]: value }));
@@ -320,23 +470,198 @@ export const NCCServiceEditPageBase = () => {
     };
 
     const addVehicle = () => {
-        const newId = Math.max(...formData.fleet.map(v => v.id), 0) + 1;
-        setFormData(prev => ({ ...prev, fleet: [...prev.fleet, { id: newId, name: t('ncc_edit.vehicle.default_category_name'), model: '', pax: 4, luggage: 2, pricePerKm: 2.00 }] }));
+        const newId = formData.fleet.length > 0 ? Math.max(...formData.fleet.map(v => v.id)) + 1 : 1;
+        setFormData(prev => ({ ...prev, fleet: [...prev.fleet, { id: newId, name: t('ncc_edit.vehicle.default_category_name'), model: '', plateNumber: '', pax: 4, luggage: 2, pricePerKm: 2.00 }] }));
     };
     
     const removeImage = (indexToRemove) => setImages(images.filter((_, index) => index !== indexToRemove));
 
-    const handleSave = () => {
+    const handleImageUpload = (event) => {
+        const files = event.target.files;
+        if (files && files.length > 0) {
+            Array.from(files).forEach(file => {
+                const reader = new FileReader();
+                reader.onloadend = () => {
+                    setImages(prev => [...prev, { url: reader.result, file: file }]);
+                };
+                reader.readAsDataURL(file);
+            });
+        }
+        event.target.value = '';
+    };
+
+    const validate = () => {
+        const errors = [];
+        if (!formData.providerName.trim()) errors.push(t('ncc_edit.validation.company_name_required', "Il nome della compagnia è obbligatorio."));
+        if (!formData.baseLocation.trim()) errors.push(t('ncc_edit.validation.city_required', "La città base è obbligatoria."));
+        if (!formData.address.trim()) errors.push(t('ncc_edit.validation.address_required', "L'indirizzo è obbligatorio."));
+        if (!formData.description.trim()) errors.push(t('ncc_edit.validation.description_required', "La descrizione è obbligatoria."));
+        
+        if (formData.fleet.length === 0) {
+            errors.push(t('ncc_edit.validation.min_one_vehicle', "Devi inserire almeno un veicolo."));
+        } else {
+            formData.fleet.forEach((vehicle, index) => {
+                if (!vehicle.name.trim()) errors.push(t('ncc_edit.validation.vehicle_type_required', "Veicolo {{number}}: Il tipo è obbligatorio.", { number: index + 1 }));
+                if (!vehicle.model.trim()) errors.push(t('ncc_edit.validation.vehicle_model_required', "Veicolo {{number}}: Il modello è obbligatorio.", { number: index + 1 }));
+                if (!vehicle.plateNumber || !vehicle.plateNumber.trim()) errors.push(t('ncc_edit.validation.vehicle_plate_required', "Veicolo {{number}}: La targa è obbligatoria.", { number: index + 1 }));
+                if (!vehicle.pax || vehicle.pax < 1) errors.push(t('ncc_edit.validation.vehicle_pax_min', "Veicolo {{number}}: Passeggeri deve essere almeno 1.", { number: index + 1 }));
+                if (!vehicle.pricePerKm || vehicle.pricePerKm <= 0) errors.push(t('ncc_edit.validation.vehicle_price_min', "Veicolo {{number}}: Il prezzo per Km deve essere maggiore di 0.", { number: index + 1 }));
+            });
+        }
+
+        if (images.length < 6) {
+            errors.push(t('ncc_edit.validation.min_images', "Devi caricare almeno 6 immagini (attuali: {{count}}).", { count: images.length }));
+        }
+
+        return errors;
+    };
+
+    const handleSave = async () => {
+        const validationErrors = validate();
+        if (validationErrors.length > 0) {
+            setErrorMessage(validationErrors.join("\n"));
+            return;
+        }
+
         setIsLoading(true);
-        console.log("Saving Data:", formData);
-        setTimeout(() => {
+        try {
+            const dataToSend = new FormData();
+            
+            // Parsing location
+            const locationParts = formData.baseLocation.split(',').map(s => s.trim());
+            const city = locationParts[0] || "";
+            const state = locationParts[1] || "";
+
+            // --- LOGIC FIND LOCATION (Like LuggageServiceEditPage.jsx) ---
+            let locales = [];
+            let foundProvinceId = null;
+            let foundSourceLang = null;
+
+            const findLocation = (dataset, cityName, regionName) => {
+                if (!dataset) return null;
+                for (const r of dataset) {
+                    if (r.region && r.region.toLowerCase() === regionName.toLowerCase()) {
+                        for (const p of r.provinces) {
+                            if (p.cities && p.cities.some(c => c.toLowerCase() === cityName.toLowerCase())) {
+                                return { region: r, province: p, city: cityName };
+                            }
+                        }
+                    }
+                }
+                return null;
+            };
+
+            // 1. Prova a trovare nel DB Italiano
+            let match = findLocation(italianLocationsData, city, state);
+            if (match) {
+                foundProvinceId = match.province.provinceId;
+                foundSourceLang = 'it';
+            } else {
+                // 2. Prova Inglese
+                match = findLocation(englishLocationsData, city, state);
+                if (match) {
+                    foundProvinceId = match.province.provinceId;
+                    foundSourceLang = 'en';
+                }
+            }
+
+            if (foundProvinceId) {
+                // Lingua sorgente
+                locales.push({
+                    serviceType: "NCC",
+                    language: foundSourceLang,
+                    country: foundSourceLang === 'it' ? 'Italia' : 'Italy',
+                    state: state,
+                    city: city,
+                    address: formData.address
+                });
+
+                // Lingua opposta
+                const targetLang = foundSourceLang === 'it' ? 'en' : 'it';
+                const targetDataset = foundSourceLang === 'it' ? englishLocationsData : italianLocationsData;
+                
+                let targetMatch = null;
+                for (const r of targetDataset) {
+                    for (const p of r.provinces) {
+                        if (p.provinceId === foundProvinceId) {
+                            targetMatch = {
+                                region: r.region,
+                                province: p.name,
+                                city: city 
+                            };
+                            if (match.city.toLowerCase() === match.province.name.toLowerCase()) {
+                                 targetMatch.city = p.name;
+                            }
+                            break;
+                        }
+                    }
+                    if (targetMatch) break;
+                }
+
+                if (targetMatch) {
+                    locales.push({
+                        serviceType: "NCC",
+                        language: targetLang,
+                        country: targetLang === 'it' ? 'Italia' : 'Italy',
+                        state: targetMatch.region,
+                        city: targetMatch.city,
+                        address: formData.address
+                    });
+                }
+            } else {
+                // Fallback standard
+                const isEnglish = i18n.language && i18n.language.startsWith('en');
+                const country = isEnglish ? 'Italy' : 'Italia';
+                const lang = isEnglish ? 'en' : 'it';
+                locales.push({
+                    serviceType: "NCC",
+                    language: lang,
+                    country: country,
+                    state: state,
+                    city: city,
+                    address: formData.address
+                });
+            }
+
+            const payload = {
+                name: formData.providerName,
+                description: formData.description,
+                basePrice: formData.fleet.length > 0 ? formData.fleet[0].pricePerKm : 0,
+                publicationStatus: formData.isActive,
+                locales: locales,
+                vehicle: formData.fleet.length > 0 ? {
+                    id: formData.fleet[0].id,
+                    numberOfSeats: formData.fleet[0].pax,
+                    plateNumber: formData.fleet[0].plateNumber,
+                    model: formData.fleet[0].model,
+                    type: formData.fleet[0].name
+                } : null,
+                images: images.filter(img => !img.file).map(img => img.url)
+            };
+            
+            dataToSend.append('service', new Blob([JSON.stringify(payload)], { type: 'application/json' }));
+
+            images.forEach(img => {
+                if (img.file) {
+                    dataToSend.append('images', img.file);
+                }
+            });
+            
+            await nccService.updateNccProvider(id, dataToSend);
+            setSuccessMessage(t('ncc_edit.save_success_message', "Profilo aggiornato con successo!"));
+        } catch (error) {
+            console.error("Errore salvataggio:", error);
+            setErrorMessage("Errore durante il salvataggio delle modifiche.");
+        } finally {
             setIsLoading(false);
-            alert(t('ncc_edit.save_success_message'));
-        }, 1000);
+        }
     };
 
     return (
         <div className={`min-h-screen bg-[#F8FAFC] pb-20 ${HOGU_THEME.fontFamily}`}>
+            <LoadingScreen isLoading={isLoading} />
+            <SuccessModal isOpen={!!successMessage} onClose={() => setSuccessMessage(null)} message={successMessage} />
+            {errorMessage && <ErrorModal onClose={() => setErrorMessage(null)} message={errorMessage} />}
             
             {/* --- HEADER --- */}
             <div className="bg-white pt-12 pb-24 px-4 lg:px-8 relative overflow-hidden">
@@ -375,6 +700,7 @@ export const NCCServiceEditPageBase = () => {
                                     onChange={(val) => handleInputChange('providerName', val)}
                                     large={true}
                                     className="mb-6"
+                                    required={true}
                                 />
                                 
                                 <CityAutocomplete 
@@ -382,6 +708,7 @@ export const NCCServiceEditPageBase = () => {
                                     value={formData.baseLocation} 
                                     onChange={(val) => handleInputChange('baseLocation', val)}
                                     icon={MapPin}
+                                    required={true}
                                 />
 
                                 <EditableInput 
@@ -391,6 +718,7 @@ export const NCCServiceEditPageBase = () => {
                                     placeholder={t('ncc_edit.profile.address_placeholder', 'Es. Via Roma, 10')}
                                     icon={Navigation}
                                     className="mt-4"
+                                    required={true}
                                 />
 
                             </div>
@@ -399,6 +727,7 @@ export const NCCServiceEditPageBase = () => {
                                 value={formData.description}
                                 onChange={(val) => handleInputChange('description', val)}
                                 rows={4}
+                                required={true}
                             />
                         </section>
 
@@ -431,17 +760,32 @@ export const NCCServiceEditPageBase = () => {
                         <section className="bg-white rounded-[2rem] p-8 shadow-[0_8px_30px_rgb(0,0,0,0.04)] border border-gray-100/50">
                             <div className="flex justify-between items-center mb-6">
                                 <h3 className="text-xl font-bold text-gray-900">{t('ncc_edit.photos.title')}</h3>
-                                <button className={`text-[${HOGU_COLORS.primary}] font-bold text-sm flex items-center gap-2 hover:underline`}>
+                                <button 
+                                    onClick={() => fileInputRef.current?.click()}
+                                    className={`text-[${HOGU_COLORS.primary}] font-bold text-sm flex items-center gap-2 hover:underline`}
+                                >
                                     <Upload size={18} /> {t('ncc_edit.photos.upload_button')}
                                 </button>
                             </div>
                             <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
                                 {images.map((img, idx) => (
-                                    <ImageUploadCard key={idx} src={img} isMain={idx === 0} onDelete={() => removeImage(idx)} />
+                                    <ImageUploadCard key={idx} src={img.url} isMain={idx === 0} onDelete={() => removeImage(idx)} />
                                 ))}
-                                <div className="aspect-[4/3] rounded-2xl border-2 border-dashed border-gray-200 hover:border-[#68B49B] bg-gray-50 flex flex-col items-center justify-center text-gray-400 hover:text-[#68B49B] cursor-pointer transition-all group">
+                                <div 
+                                    onClick={() => fileInputRef.current?.click()}
+                                    className="aspect-[4/3] rounded-2xl border-2 border-dashed border-gray-200 hover:border-[#68B49B] bg-gray-50 flex flex-col items-center justify-center text-gray-400 hover:text-[#68B49B] cursor-pointer transition-all group"
+                                >
                                     <Plus size={24} className="group-hover:scale-110 transition-transform" />
+                                    <span className="text-xs font-bold mt-2 text-gray-400 group-hover:text-[#68B49B] transition-colors">{t('ncc_edit.photos.add_button', 'Aggiungi')}</span>
                                 </div>
+                                <input 
+                                    type="file" 
+                                    ref={fileInputRef}
+                                    onChange={handleImageUpload}
+                                    className="hidden" 
+                                    accept="image/*"
+                                    multiple
+                                />
                             </div>
                         </section>
                     </div>

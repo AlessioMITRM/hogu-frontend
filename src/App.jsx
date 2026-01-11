@@ -43,7 +43,6 @@ import ServiceDetailPageBnB from "./components/pages/detail/ServiceDetailPageBnB
 
 // Provider Dashboard
 import { CoreDashboard } from "./components/pages/dashboard/provider/principal/CoreDashboard.jsx";
-import { RestaurantServiceEditPage } from "./components/pages/dashboard/provider/RestaurantServiceEditPage.jsx";
 import ClubServiceEditPage from "./components/pages/dashboard/provider/ClubServiceEditPage.jsx";
 import EventServiceEditPage from "./components/pages/dashboard/provider/EventServiceEditPage.jsx";
 import { LuggageServiceEditPage } from "./components/pages/dashboard/provider/LuggageServiceEditPage.jsx";
@@ -64,6 +63,7 @@ import { PrivacyPolicyPage } from "./components/pages/legal/PrivacyPolicyPage.js
 import { TermsPage } from "./components/pages/legal/TermsPage.jsx";
 
 import { slugify } from "./utils/slugify.js";
+import RestaurantServiceEditPage from "./components/pages/dashboard/provider/RestaurantServiceEditPage.jsx";
 
 export const App = () => (
   <I18nextProvider i18n={i18n}>

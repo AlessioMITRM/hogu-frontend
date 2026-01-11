@@ -1,19 +1,15 @@
-# React + Vite
+# AVVIO REACT + VITE
+    Per avviare l'applicativo lato front
+    1. Aprire il terminale
+    2. Navigare fino alla directory del progetto
+    3. Esegui il comando `npm install` per installare le dipendenze
+    4. Esegui il comando `npm run dev` per avviare l'applicativo
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+# AVVIARE DOCKER 
+    Per l'utilizzo di ngix
 
-Currently, two official plugins are available:
-
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Babel](https://babeljs.io/) (or [oxc](https://oxc.rs) when used in [rolldown-vite](https://vite.dev/guide/rolldown)) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
-
-## React Compiler
-
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
-
-## Expanding the ESLint configuration
-
-If you are developing a production application, we recommend using TypeScript with type-aware lint rules enabled. Check out the [TS template](https://github.com/vitejs/vite/tree/main/packages/create-vite/template-react-ts) for information on how to integrate TypeScript and [`typescript-eslint`](https://typescript-eslint.io) in your project.
+## LIBRERIRE UTILIZZATE
+    react-currency-input-field ** Per importi decimali pensati per i valori monetari
 
 ## COMPONENTI UTILI PER SVILUPPI FUTURI
     SEZIONE SERVIZI:
@@ -33,3 +29,11 @@ If you are developing a production application, we recommend using TypeScript wi
                 <AmenityToggle icon={Car} label="Valet Parking" active={formData.features.includes('valet')} onClick={() => toggleFeature('valet')} />
             </div>
         </section>
+
+## TRASPORTO DOCKER PRODUZIONE:
+    docker run -d --name my-nginx \
+    -p 80:80 \
+    -v C:/storage/build:/usr/share/nginx/html/build:ro \
+    -v C:/storage:/usr/share/nginx/html:ro \
+    -v C:/storage/nginx-conf/nginx.conf:/etc/nginx/nginx.conf:ro \
+    nginx:latest

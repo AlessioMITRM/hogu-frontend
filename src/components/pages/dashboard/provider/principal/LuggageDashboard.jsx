@@ -1,109 +1,88 @@
-import React, { useState, useRef, useEffect } from 'react';
-import { 
-    // Icone Generali
-    Calendar, Clock, ChevronLeft, ChevronRight, Eye, MoreVertical, 
+import React, { useState, useRef, useEffect, useCallback } from 'react';
+import {
+    Calendar, Clock, ChevronLeft, ChevronRight, Eye, MoreVertical,
     AlertTriangle, Ban, BellRing, Edit2, CheckCircle, XCircle,
-    User, Wallet, TrendingUp, Activity, Sparkles, Timer, ScanLine,
+    User, Wallet, Activity, ScanLine,
     Phone, ListTodo, RefreshCw, Send, ChevronUp, X,
-    
-    // Icone Specifiche
-    Utensils, BedDouble, Car, Luggage, PartyPopper, PackageCheck,
-    
-    // Icone Dashboard
-    Settings, History, QrCode, ArrowRight, Box
+    Luggage, PackageCheck,
+    Settings, History, QrCode, ArrowRight, Box, Loader2
 } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { HOGU_COLORS, HOGU_THEME } from '../../../../../config/theme.js';
+import { luggageService } from '../../../../../api/apiClient.js';
 
 // =================================================================================
 // 1. CONFIGURAZIONE & COSTANTI
 // =================================================================================
-
 const SERVICE_CATEGORIES = {
-    RESTAURANT: { id: 'restaurant', label: 'Ristorante', icon: Utensils, unit: 'Coperti' },
-    BEB: { id: 'beb', label: 'B&B / Hotel', icon: BedDouble, unit: 'Notti' },
-    CLUB: { id: 'club', label: 'Club / Eventi', icon: PartyPopper, unit: 'Ingressi' },
-    NCC: { id: 'ncc', label: 'NCC / Trasporti', icon: Car, unit: 'Passeggeri' },
     STORAGE: { id: 'storage', label: 'Depositi', icon: Luggage, unit: 'Bagagli' }
 };
 
-// --- MOCK DATA SPECIFICI PER DEPOSITO BAGAGLI ---
-const STORAGE_BOOKINGS = [
-    { 
-        id: 501, 
-        customerName: "Sarah Connor", 
-        serviceName: "Deposito Standard (x2)", 
-        date: "22 Nov 2025", 
-        time: "10:00 - 18:00", 
-        status: "pending", 
-        price: 12, 
-        quantity: 2, 
-        guests: 1, 
-        category: 'storage',
-        // Dettagli specifici per il modale
-        dropoffTime: "22 Nov, 10:00",
-        pickupTime: "22 Nov, 18:00",
-        baggageDetails: { small: 0, medium: 2, large: 0 },
-        image: "https://images.unsplash.com/photo-1553531384-cc64ac80f931?auto=format&fit=crop&q=80&w=300" 
-    },
-    { 
-        id: 502, 
-        customerName: "John Wick", 
-        serviceName: "Armadietto Blindato", 
-        date: "22 Nov 2025", 
-        time: "14:00 - 20:00", 
-        status: "confirmed", 
-        price: 25, 
-        quantity: 1, 
-        guests: 1, 
-        category: 'storage',
-        dropoffTime: "22 Nov, 14:00",
-        pickupTime: "22 Nov, 20:00",
-        baggageDetails: { small: 1, medium: 0, large: 0 }, // Valigetta importante
-        image: "https://images.unsplash.com/photo-1584824486509-112e4181ff6b?auto=format&fit=crop&q=80&w=300" 
-    },
-    { 
-        id: 503, 
-        customerName: "Famiglia Rossi", 
-        serviceName: "Deposito XL Group", 
-        date: "23 Nov 2025", 
-        time: "09:00 - 12:00", 
-        status: "waiting_customer", 
-        price: 40, 
-        oldPrice: 35,
-        quantity: 6, 
-        guests: 4, 
-        category: 'storage',
-        dropoffTime: "23 Nov, 09:00",
-        pickupTime: "23 Nov, 12:00",
-        baggageDetails: { small: 2, medium: 2, large: 2 },
-        image: "https://images.unsplash.com/photo-1565514020176-dbf2277026a3?auto=format&fit=crop&q=80&w=300" 
-    },
-    { 
-        id: 504, 
-        customerName: "Backpacker Joe", 
-        serviceName: "Zaino Trekking", 
-        date: "24 Nov 2025", 
-        time: "08:00 - 22:00", 
-        status: "pending", 
-        price: 15, 
-        quantity: 1, 
-        guests: 1, 
-        category: 'storage',
-        dropoffTime: "24 Nov, 08:00",
-        pickupTime: "24 Nov, 22:00",
-        baggageDetails: { small: 0, medium: 0, large: 1 },
-        image: "https://images.unsplash.com/photo-1523456839352-7667d46c4f36?auto=format&fit=crop&q=80&w=300" 
-    }
-];
+// =================================================================================
+// 2. COMPONENTI UI CONDIVISI
+// =================================================================================
+const LoadingComponent = () => (
+    <div className="flex justify-center items-center py-10">
+        <Loader2 size={32} className="animate-spin text-slate-400" />
+    </div>
+);
 
-// =================================================================================
-// 2. COMPONENTI UI CONDIVISI (ProviderUI)
-// =================================================================================
+const FullModalBackdrop = ({ children, onClose }) => {
+    useEffect(() => {
+        const originalOverflow = document.body.style.overflow;
+        const originalPosition = document.body.style.position;
+        const originalWidth = document.body.style.width;
+        const originalTop = document.body.style.top;
+        document.body.style.overflow = 'hidden';
+        document.body.style.position = 'fixed';
+        document.body.style.width = '100%';
+        document.body.style.top = '0';
+        document.documentElement.style.overflow = 'hidden';
+        return () => {
+            document.body.style.overflow = originalOverflow;
+            document.body.style.position = originalPosition;
+            document.body.style.width = originalWidth;
+            document.body.style.top = originalTop;
+            document.documentElement.style.overflow = '';
+        };
+    }, []);
+    return (
+        <div
+            style={{
+                position: 'fixed',
+                top: 0,
+                left: 0,
+                right: 0,
+                bottom: 0,
+                zIndex: 9999,
+                backgroundColor: 'rgba(15, 23, 42, 0.6)',
+                backdropFilter: 'blur(8px)',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                padding: '1rem',
+                margin: 0
+            }}
+            onClick={onClose}
+        >
+            <div
+                className="bg-white p-8 rounded-[2.5rem] w-full max-w-2xl shadow-2xl shadow-black/20 transform animate-in zoom-in-95 duration-200"
+                style={{ maxHeight: '90vh', overflowY: 'auto' }}
+                onClick={e => e.stopPropagation()}
+            >
+                {children}
+            </div>
+        </div>
+    );
+};
 
 const ModalBackdrop = ({ children, onClose }) => (
-    <div className={`fixed inset-0 bg-[${HOGU_COLORS.dark}]/60 backdrop-blur-sm z-[100] flex items-center justify-center p-4 animate-in fade-in duration-200`} onClick={onClose}>
-        <div className="bg-white p-8 rounded-[2.5rem] w-full max-w-2xl shadow-2xl shadow-black/20 transform animate-in zoom-in-95 duration-200" onClick={e => e.stopPropagation()}>
+    <div
+        className={`fixed inset-0 bg-[${HOGU_COLORS.dark}]/60 backdrop-blur-sm flex items-center justify-center p-4 animate-in fade-in duration-200 h-screen`}
+        style={{ zIndex: 999 }}
+        onClick={onClose}
+    >
+        <div className="bg-white p-8 rounded-[2.5rem] w-full max-w-2xl shadow-2xl shadow-black/20 transform animate-in zoom-in-95 duration-200 mx-4" onClick={e => e.stopPropagation()}>
             {children}
         </div>
     </div>
@@ -124,12 +103,12 @@ const PaginationControls = ({ currentPage, totalPages, onNext, onPrev, darkBg = 
 };
 
 const StatusBadge = ({ status }) => {
-    const styles = { 
-        confirmed: { bg: 'bg-emerald-50', text: 'text-emerald-700', border: 'border-emerald-100', label: 'Confermata' }, 
-        pending: { bg: 'bg-amber-50', text: 'text-amber-700', border: 'border-amber-100', label: 'In Attesa' }, 
+    const styles = {
+        confirmed: { bg: 'bg-emerald-50', text: 'text-emerald-700', border: 'border-emerald-100', label: 'Confermata' },
+        pending: { bg: 'bg-amber-50', text: 'text-amber-700', border: 'border-amber-100', label: 'In Attesa' },
         waiting_customer: { bg: 'bg-blue-50', text: 'text-blue-700', border: 'border-blue-100', label: 'Attesa Cliente' },
-        completed: { bg: 'bg-slate-100', text: 'text-slate-600', border: 'border-slate-200', label: 'Completata' }, 
-        cancelled: { bg: 'bg-red-100', text: 'text-red-700', border: 'border-red-200', label: 'Cancellata' } 
+        completed: { bg: 'bg-slate-100', text: 'text-slate-600', border: 'border-slate-200', label: 'Completata' },
+        cancelled: { bg: 'bg-red-100', text: 'text-red-700', border: 'border-red-200', label: 'Cancellata' }
     };
     const style = styles[status] || styles.completed;
     return (
@@ -141,53 +120,46 @@ const StatusBadge = ({ status }) => {
 
 const CategorySpecificDetails = ({ booking, category }) => {
     const catKey = category?.toUpperCase();
-    const config = SERVICE_CATEGORIES[catKey] || SERVICE_CATEGORIES.RESTAURANT;
+    const config = SERVICE_CATEGORIES[catKey] || SERVICE_CATEGORIES.STORAGE;
     const Icon = config.icon;
-    
-    let detailText = `${booking.guests} Ospiti`;
-    
-    if (category === 'beb') detailText = `${booking.guests} Ospiti • ${booking.quantity || 1} Notti`;
-    else if (category === 'storage') detailText = `${booking.quantity || 1} Bagagli • ${booking.time || 'Durata definita'}`;
-    else if (category === 'ncc') detailText = `${booking.guests} Pax • ${booking.location ? (booking.location.length > 20 ? booking.location.substring(0, 20) + '...' : booking.location) : 'Transfer'}`;
-    else if (category === 'restaurant') detailText = `${booking.guests} Coperti • ${booking.area || 'Sala Interna'}`;
-
+    let detailText = `${booking.quantity || 1} Bagagli • ${booking.time || 'Durata definita'}`;
     return (
         <div className="flex items-center gap-1.5 text-[10px] text-slate-400 font-medium">
-            <Icon size={12}/> {detailText}
+            <Icon size={12} /> {detailText}
         </div>
     );
 };
 
-const StatsSummary = ({ activeCategory }) => {
+const StatsSummary = ({ activeCategory, revenue = 0, count = 0 }) => {
     const label = SERVICE_CATEGORIES[activeCategory?.toUpperCase()]?.label || 'Attività';
+    const formattedRevenue = new Intl.NumberFormat('it-IT', { style: 'currency', currency: 'EUR' }).format(revenue || 0);
+    const [intPart, decPart] = formattedRevenue.replace('€', '').trim().split(',');
     return (
         <div className="grid grid-cols-1 md:grid-cols-3 gap-5 mb-8">
             <div className={`md:col-span-1 bg-[${HOGU_COLORS.dark}] rounded-[2rem] p-6 text-white relative overflow-hidden shadow-xl shadow-slate-900/10 group`}>
                 <div className="absolute top-0 right-0 p-4 opacity-10 group-hover:scale-110 transition-transform duration-500"><Wallet size={100} /></div>
                 <div className="relative z-10">
                     <p className="text-slate-400 text-xs font-bold uppercase tracking-widest mb-1">Fatturato {label}</p>
-                    <h3 className="text-3xl font-extrabold mb-4">€ --.--<span className="text-slate-500 text-lg">,00</span></h3>
+                    <h3 className="text-3xl font-extrabold mb-4">€ {intPart}<span className="text-slate-500 text-lg">,{decPart || '00'}</span></h3>
                 </div>
             </div>
             <div className={`bg-white p-6 rounded-[2rem] border border-slate-100 shadow-sm flex flex-col justify-center relative overflow-hidden group hover:border-[${HOGU_COLORS.primary}]/30 hover:shadow-lg transition-all`}>
-                 <div className={`absolute -right-4 -bottom-4 text-slate-50 opacity-50 group-hover:text-[${HOGU_COLORS.primary}]/10 transition-colors`}><Activity size={100} /></div>
+                <div className={`absolute -right-4 -bottom-4 text-slate-50 opacity-50 group-hover:text-[${HOGU_COLORS.primary}]/10 transition-colors`}><Activity size={100} /></div>
                 <div className="flex items-center gap-2 text-slate-400 mb-2">
                     <Activity size={18} /> <span className="text-xs font-bold uppercase">Prenotazioni</span>
                 </div>
-                <span className={`text-4xl font-black text-slate-800 group-hover:text-[${HOGU_COLORS.primary}] transition-colors`}>--</span>
+                <span className={`text-4xl font-black text-slate-800 group-hover:text-[${HOGU_COLORS.primary}] transition-colors`}>{count}</span>
                 <p className="text-xs text-slate-400 mt-2 font-medium">Totali questo mese</p>
             </div>
         </div>
     );
 };
 
-// --- COMPONENTI MOBILE DEDICATI ---
-
 const MobileStickyTrigger = ({ count, onClick }) => {
     if (count === 0) return null;
     return (
         <div className="fixed bottom-6 left-4 right-4 z-40 md:hidden animate-in fade-in slide-in-from-bottom-4 duration-500">
-            <button 
+            <button
                 onClick={onClick}
                 className={`w-full bg-[${HOGU_COLORS.dark}] text-white p-4 rounded-2xl shadow-2xl shadow-slate-900/40 flex items-center justify-between border border-slate-700/50 backdrop-blur-md active:scale-95 transition-transform`}
             >
@@ -215,14 +187,12 @@ const MobileStickyTrigger = ({ count, onClick }) => {
 
 const MobilePendingFullPage = ({ isOpen, onClose, pendingList, onAccept, onReject, onRectify, onOpenDetails }) => {
     useEffect(() => {
-        if (isOpen) { document.body.style.overflow = 'hidden'; } 
+        if (isOpen) { document.body.style.overflow = 'hidden'; }
         else { document.body.style.overflow = 'unset'; }
         return () => { document.body.style.overflow = 'unset'; };
     }, [isOpen]);
-
     return (
         <div className={`fixed inset-0 z-[100] bg-[#f8f9fc] flex flex-col md:hidden transition-transform duration-300 ease-out ${isOpen ? 'translate-y-0' : 'translate-y-[110%]'}`}>
-            {/* Header Overlay */}
             <div className={`bg-[${HOGU_COLORS.dark}] text-white pt-12 pb-6 px-6 rounded-b-[2.5rem] shadow-xl shrink-0 relative z-20`}>
                 <div className="flex items-start justify-between">
                     <div>
@@ -234,16 +204,14 @@ const MobilePendingFullPage = ({ isOpen, onClose, pendingList, onAccept, onRejec
                     </button>
                 </div>
             </div>
-
-            {/* Lista Scrollabile */}
             <div className="flex-1 overflow-y-auto p-4 space-y-4 pb-24">
                 {pendingList.length > 0 ? (
                     pendingList.map(b => (
-                        <PendingRequestCard 
-                            key={b.id} 
-                            booking={b} 
+                        <PendingRequestCard
+                            key={b.id}
+                            booking={b}
                             activeCategory="storage"
-                            onAccept={(id) => { onAccept(id); if(pendingList.length === 1) onClose(); }}
+                            onAccept={(id) => { onAccept(id); if (pendingList.length === 1) onClose(); }}
                             onReject={onReject}
                             onRectify={onRectify}
                             onOpenDetails={onOpenDetails}
@@ -251,60 +219,57 @@ const MobilePendingFullPage = ({ isOpen, onClose, pendingList, onAccept, onRejec
                     ))
                 ) : (
                     <div className="h-full flex flex-col items-center justify-center text-slate-400">
-                        <CheckCircle size={48} className="mb-4 text-emerald-500 opacity-50"/>
+                        <CheckCircle size={48} className="mb-4 text-emerald-500 opacity-50" />
                         <p className="font-bold text-slate-500">Tutto Tranquillo!</p>
                         <p className="text-xs mt-1">Nessuna richiesta di deposito in attesa.</p>
                         <button onClick={onClose} className="mt-6 text-emerald-600 font-bold text-sm bg-emerald-50 px-6 py-3 rounded-xl">Torna alla Dashboard</button>
                     </div>
                 )}
             </div>
-            
             <div className="absolute bottom-0 left-0 right-0 h-12 bg-gradient-to-t from-[#f8f9fc] to-transparent pointer-events-none"></div>
         </div>
     );
 };
 
-// --- CARDS ---
-
 const PendingRequestCard = ({ booking, onAccept, onReject, onRectify, onOpenDetails, activeCategory }) => {
     const isWaitingCustomer = booking.status === 'waiting_customer';
     return (
-        <div className={`group bg-white rounded-3xl p-5 border shadow-[0_2px_15px_-3px_rgba(0,0,0,0.05)] hover:shadow-[0_8px_25px_-5px_rgba(104,180,155,0.15)] transition-all duration-300 flex flex-col relative overflow-hidden h-full 
+        <div className={`group bg-white rounded-3xl p-5 border shadow-[0_2px_15px_-3px_rgba(0,0,0,0.05)] hover:shadow-[0_8px_25px_-5px_rgba(104,180,155,0.15)] transition-all duration-300 flex flex-col relative overflow-hidden h-full
         ${isWaitingCustomer ? 'border-blue-100 bg-blue-50/30' : `border-slate-100 hover:border-[${HOGU_COLORS.primary}]/30`}`}>
-        <div className={`absolute left-0 top-0 bottom-0 w-1.5 opacity-80 ${isWaitingCustomer ? 'bg-blue-400' : 'bg-gradient-to-b from-amber-300 to-amber-500'}`}></div>
-        <div className="flex items-start justify-between gap-4 mb-5 pl-2">
-            <div className="flex gap-4">
-                <div className="relative shrink-0">
-                    <img src={booking.image} alt="" className="w-14 h-14 rounded-2xl object-cover shadow-sm ring-2 ring-white" />
-                    {!isWaitingCustomer && (<div className="absolute -bottom-2 -right-1 bg-amber-400 text-white text-[9px] font-black px-1.5 py-0.5 rounded-full border-2 border-white shadow-sm tracking-wide">NEW</div>)}
+            <div className={`absolute left-0 top-0 bottom-0 w-1.5 opacity-80 ${isWaitingCustomer ? 'bg-blue-400' : 'bg-gradient-to-b from-amber-300 to-amber-500'}`}></div>
+            <div className="flex items-start justify-between gap-4 mb-5 pl-2">
+                <div className="flex gap-4">
+                    <div className="relative shrink-0">
+                        <img src={booking.image} alt="" className="w-14 h-14 rounded-2xl object-cover shadow-sm ring-2 ring-white" />
+                        {!isWaitingCustomer && (<div className="absolute -bottom-2 -right-1 bg-amber-400 text-white text-[9px] font-black px-1.5 py-0.5 rounded-full border-2 border-white shadow-sm tracking-wide">NEW</div>)}
+                    </div>
+                    <div>
+                        <h4 className={`font-bold text-[${HOGU_COLORS.dark}] text-lg leading-tight mb-0.5`}>{booking.customerName}</h4>
+                        <p className={`text-xs text-[${HOGU_COLORS.primary}] font-bold uppercase tracking-wide mb-1`}>{booking.serviceName}</p>
+                        <CategorySpecificDetails booking={booking} category={activeCategory} />
+                    </div>
                 </div>
-                <div>
-                    <h4 className={`font-bold text-[${HOGU_COLORS.dark}] text-lg leading-tight mb-0.5`}>{booking.customerName}</h4>
-                    <p className={`text-xs text-[${HOGU_COLORS.primary}] font-bold uppercase tracking-wide mb-1`}>{booking.serviceName}</p>
-                    <CategorySpecificDetails booking={booking} category={activeCategory} />
+                <div className="text-right">
+                    <span className={`block font-extrabold text-lg ${isWaitingCustomer ? 'text-blue-600' : `text-[${HOGU_COLORS.dark}]`}`}>€ {booking.price}</span>
+                    {booking.oldPrice && <span className="text-xs text-slate-400 line-through">€ {booking.oldPrice}</span>}
                 </div>
             </div>
-            <div className="text-right">
-                <span className={`block font-extrabold text-lg ${isWaitingCustomer ? 'text-blue-600' : `text-[${HOGU_COLORS.dark}]`}`}>€ {booking.price}</span>
-                {booking.oldPrice && <span className="text-xs text-slate-400 line-through">€ {booking.oldPrice}</span>}
+            <div className="grid grid-cols-2 gap-3 mb-5 pl-2">
+                <div className="bg-slate-50 p-2 rounded-xl border border-slate-100"><span className="text-[9px] text-slate-400 font-bold uppercase tracking-wider block mb-1">Data</span><div className="flex items-center gap-2 text-slate-700 font-bold text-sm"><Calendar size={14} className={`text-[${HOGU_COLORS.primary}]`} />{booking.date}</div></div>
+                <div className="bg-slate-50 p-2 rounded-xl border border-slate-100"><span className="text-[9px] text-slate-400 font-bold uppercase tracking-wider block mb-1">Orario</span><div className="flex items-center gap-2 text-slate-700 font-bold text-sm"><Clock size={14} className={`text-[${HOGU_COLORS.primary}]`} />{booking.time}</div></div>
             </div>
-        </div>
-        <div className="grid grid-cols-2 gap-3 mb-5 pl-2">
-            <div className="bg-slate-50 p-2 rounded-xl border border-slate-100"><span className="text-[9px] text-slate-400 font-bold uppercase tracking-wider block mb-1">Data</span><div className="flex items-center gap-2 text-slate-700 font-bold text-sm"><Calendar size={14} className={`text-[${HOGU_COLORS.primary}]`}/>{booking.date}</div></div>
-            <div className="bg-slate-50 p-2 rounded-xl border border-slate-100"><span className="text-[9px] text-slate-400 font-bold uppercase tracking-wider block mb-1">Orario</span><div className="flex items-center gap-2 text-slate-700 font-bold text-sm"><Clock size={14} className={`text-[${HOGU_COLORS.primary}]`}/>{booking.time}</div></div>
-        </div>
-        <div className="mt-auto pl-2">
-            {isWaitingCustomer ? (
-                <div className="w-full bg-blue-100 text-blue-600 py-3 rounded-xl font-bold text-xs flex items-center justify-center gap-2 border border-blue-200"><Clock size={16} className="animate-pulse"/> In attesa del cliente...</div>
-            ) : (
-                <div className="flex gap-2">
-                    <button onClick={() => onAccept(booking.id)} className={`flex-1 bg-[${HOGU_COLORS.primary}] text-white px-3 py-2.5 rounded-xl font-bold text-xs md:text-sm hover:bg-[${HOGU_COLORS.primaryEmphasis}] shadow-sm hover:shadow-[${HOGU_COLORS.primary}]/20 active:scale-95 transition-all flex items-center justify-center gap-1.5`}><CheckCircle size={16}/> Accetta</button>
-                    <button onClick={() => onRectify(booking)} className="px-3 py-2.5 bg-amber-50 text-amber-600 border border-amber-100 rounded-xl font-bold text-xs md:text-sm hover:bg-amber-100 transition-all flex items-center justify-center gap-1.5"><Edit2 size={16}/></button>
-                    <button onClick={() => onReject(booking)} className="w-10 h-10 shrink-0 flex items-center justify-center bg-white border border-slate-200 text-slate-400 rounded-xl hover:bg-rose-50 hover:text-rose-600 hover:border-rose-200 transition-all"><XCircle size={18}/></button>
-                    <button onClick={() => onOpenDetails(booking)} className={`w-10 h-10 shrink-0 flex items-center justify-center bg-slate-50 text-slate-400 rounded-xl hover:bg-slate-100 hover:text-[${HOGU_COLORS.primary}] transition-all`}><Eye size={18} /></button>
-                </div>
-            )}
-        </div>
+            <div className="mt-auto pl-2">
+                {isWaitingCustomer ? (
+                    <div className="w-full bg-blue-100 text-blue-600 py-3 rounded-xl font-bold text-xs flex items-center justify-center gap-2 border border-blue-200"><Clock size={16} className="animate-pulse" /> In attesa del cliente...</div>
+                ) : (
+                    <div className="flex gap-2">
+                        <button onClick={() => onAccept(booking.id)} className={`flex-1 bg-[${HOGU_COLORS.primary}] text-white px-3 py-2.5 rounded-xl font-bold text-xs md:text-sm hover:bg-[${HOGU_COLORS.primaryEmphasis}] shadow-sm hover:shadow-[${HOGU_COLORS.primary}]/20 active:scale-95 transition-all flex items-center justify-center gap-1.5`}><CheckCircle size={16} /> Accetta</button>
+                        <button onClick={() => onRectify(booking)} className="px-3 py-2.5 bg-amber-50 text-amber-600 border border-amber-100 rounded-xl font-bold text-xs md:text-sm hover:bg-amber-100 transition-all flex items-center justify-center gap-1.5"><Edit2 size={16} /></button>
+                        <button onClick={() => onReject(booking)} className="w-10 h-10 shrink-0 flex items-center justify-center bg-white border border-slate-200 text-slate-400 rounded-xl hover:bg-rose-50 hover:text-rose-600 hover:border-rose-200 transition-all"><XCircle size={18} /></button>
+                        <button onClick={() => onOpenDetails(booking)} className={`w-10 h-10 shrink-0 flex items-center justify-center bg-slate-50 text-slate-400 rounded-xl hover:bg-slate-100 hover:text-[${HOGU_COLORS.primary}] transition-all`}><Eye size={18} /></button>
+                    </div>
+                )}
+            </div>
         </div>
     );
 };
@@ -312,17 +277,20 @@ const PendingRequestCard = ({ booking, onAccept, onReject, onRectify, onOpenDeta
 const ProviderBookingCard = ({ booking, onOpenDetails, onOpenComplaint, onCancelBooking, activeCategory }) => {
     const [isMenuOpen, setIsMenuOpen] = useState(false);
     const menuRef = useRef(null);
+
     useEffect(() => {
         const handleClickOutside = (e) => { if (menuRef.current && !menuRef.current.contains(e.target)) setIsMenuOpen(false); };
         document.addEventListener("mousedown", handleClickOutside);
         return () => document.removeEventListener("mousedown", handleClickOutside);
     }, []);
+
     const isCancelled = booking.status === 'cancelled';
+
     return (
         <div className={`rounded-3xl border p-5 flex flex-col sm:flex-row gap-6 transition-all duration-300 relative group
             ${isCancelled ? 'bg-red-50 border-red-200' : `bg-white border-slate-100 hover:border-[${HOGU_COLORS.primary}]/30 hover:shadow-lg hover:shadow-slate-200/50`}`}>
             <div className={`w-20 h-20 rounded-2xl overflow-hidden shrink-0 shadow-sm ring-1 ${isCancelled ? 'ring-red-100 grayscale' : 'ring-slate-100'}`}>
-                <img src={booking.image} alt="" className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"/>
+                <img src={booking.image} alt="" className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" />
             </div>
             <div className="flex-1 flex flex-col justify-between">
                 <div className="flex justify-between items-start mb-2">
@@ -332,14 +300,14 @@ const ProviderBookingCard = ({ booking, onOpenDetails, onOpenComplaint, onCancel
                     </div>
                     <div className="flex items-center gap-2">
                         <StatusBadge status={booking.status} />
-                        <button onClick={() => onOpenDetails(booking)} className={`w-8 h-8 flex items-center justify-center rounded-full transition-all ml-1 shadow-sm ${isCancelled ? 'bg-red-100 text-red-500 hover:bg-red-200' : `bg-slate-50 text-slate-400 hover:bg-[${HOGU_COLORS.primary}] hover:text-white`}`}><Eye size={16}/></button>
+                        <button onClick={() => onOpenDetails(booking)} className={`w-8 h-8 flex items-center justify-center rounded-full transition-all ml-1 shadow-sm ${isCancelled ? 'bg-red-100 text-red-500 hover:bg-red-200' : `bg-slate-50 text-slate-400 hover:bg-[${HOGU_COLORS.primary}] hover:text-white`}`}><Eye size={16} /></button>
                         {booking.status === 'confirmed' && (
                             <div className="relative" ref={menuRef}>
-                                <button onClick={() => setIsMenuOpen(!isMenuOpen)} className="w-8 h-8 flex items-center justify-center text-slate-400 hover:text-slate-600 hover:bg-slate-100 rounded-full transition-colors"><MoreVertical size={18}/></button>
+                                <button onClick={() => setIsMenuOpen(!isMenuOpen)} className="w-8 h-8 flex items-center justify-center text-slate-400 hover:text-slate-600 hover:bg-slate-100 rounded-full transition-colors"><MoreVertical size={18} /></button>
                                 {isMenuOpen && (
                                     <div className="absolute right-0 top-full mt-2 w-48 bg-white shadow-xl shadow-slate-200/60 border border-slate-100 rounded-2xl p-1.5 z-50 animate-in fade-in zoom-in-95 origin-top-right">
-                                        <button onClick={() => { setIsMenuOpen(false); onCancelBooking(booking); }} className="w-full flex items-center gap-2.5 px-3 py-2.5 text-xs font-bold hover:bg-rose-50 text-slate-600 hover:text-rose-600 rounded-xl transition-colors"><Ban size={14}/> Annulla Prenotazione</button>
-                                        <button onClick={() => { setIsMenuOpen(false); onOpenComplaint(booking); }} className="w-full flex items-center gap-2.5 px-3 py-2.5 text-xs font-bold hover:bg-amber-50 text-slate-600 hover:text-amber-600 rounded-xl transition-colors"><AlertTriangle size={14}/> Segnala Problema</button>
+                                        <button onClick={() => { setIsMenuOpen(false); onCancelBooking(booking); }} className="w-full flex items-center gap-2.5 px-3 py-2.5 text-xs font-bold hover:bg-rose-50 text-slate-600 hover:text-rose-600 rounded-xl transition-colors"><Ban size={14} /> Annulla Prenotazione</button>
+                                        <button onClick={() => { setIsMenuOpen(false); onOpenComplaint(booking); }} className="w-full flex items-center gap-2.5 px-3 py-2.5 text-xs font-bold hover:bg-amber-50 text-slate-600 hover:text-amber-600 rounded-xl transition-colors"><AlertTriangle size={14} /> Segnala Problema</button>
                                     </div>
                                 )}
                             </div>
@@ -348,8 +316,8 @@ const ProviderBookingCard = ({ booking, onOpenDetails, onOpenComplaint, onCancel
                 </div>
                 <div className={`flex items-center justify-between mt-auto pt-3 border-t ${isCancelled ? 'border-red-100' : 'border-slate-50'}`}>
                     <div className={`flex gap-4 text-xs font-semibold tracking-wide ${isCancelled ? 'text-red-400 opacity-70' : 'text-slate-500'}`}>
-                         <span className={`flex items-center gap-1.5 px-2 py-1 rounded-md ${isCancelled ? 'bg-red-100/50' : 'bg-slate-50'}`}><Calendar size={12} className={isCancelled ? "text-red-500" : `text-[${HOGU_COLORS.primary}]`}/> {booking.date}</span>
-                         <span className={`flex items-center gap-1.5 px-2 py-1 rounded-md ${isCancelled ? 'bg-red-100/50' : 'bg-slate-50'}`}><Clock size={12} className={isCancelled ? "text-red-500" : `text-[${HOGU_COLORS.primary}]`}/> {booking.time}</span>
+                        <span className={`flex items-center gap-1.5 px-2 py-1 rounded-md ${isCancelled ? 'bg-red-100/50' : 'bg-slate-50'}`}><Calendar size={12} className={isCancelled ? "text-red-500" : `text-[${HOGU_COLORS.primary}]`} /> {booking.date}</span>
+                        <span className={`flex items-center gap-1.5 px-2 py-1 rounded-md ${isCancelled ? 'bg-red-100/50' : 'bg-slate-50'}`}><Clock size={12} className={isCancelled ? "text-red-500" : `text-[${HOGU_COLORS.primary}]`} /> {booking.time}</span>
                     </div>
                     <span className={`font-extrabold text-lg ${isCancelled ? 'text-red-600' : `text-[${HOGU_COLORS.dark}]`}`}>€ {booking.price}</span>
                 </div>
@@ -358,137 +326,79 @@ const ProviderBookingCard = ({ booking, onOpenDetails, onOpenComplaint, onCancel
     );
 };
 
-// --- MODALS ---
-
 const BookingDetailModal = ({ isOpen, onClose, booking }) => {
-    if(!isOpen || !booking) return null;
-
-    const activeCategory = booking.category || 'storage'; 
-
-    // Helper per renderizzare campi specifici in base alla categoria
-    const renderExtraDetails = () => {
-        switch (activeCategory) {
-            case 'ncc':
-                return (
-                    <div className="col-span-2 bg-slate-50 p-4 rounded-2xl border border-slate-100 mt-2">
-                        <span className="text-[10px] uppercase text-slate-400 font-bold tracking-wider block mb-2">Itinerario</span>
-                        <div className="flex flex-col gap-3 relative">
-                            {/* ... logica NCC rimasta uguale ... */}
-                            <div className="flex items-start gap-3 relative z-10">
-                                <div className="w-5 h-5 rounded-full bg-white border-2 border-slate-300 shrink-0 mt-0.5"></div>
-                                <div>
-                                    <p className="text-xs text-slate-400 font-bold uppercase mb-0.5">Partenza</p>
-                                    <p className="font-bold text-slate-700 leading-tight">{booking.pickup || booking.location || "..."}</p>
-                                </div>
-                            </div>
-                            <div className="flex items-start gap-3 relative z-10">
-                                <div className={`w-5 h-5 rounded-full bg-[${HOGU_COLORS.primary}] border-2 border-white shadow-md shrink-0 mt-0.5`}></div>
-                                <div>
-                                    <p className="text-xs text-slate-400 font-bold uppercase mb-0.5">Arrivo</p>
-                                    <p className="font-bold text-slate-700 leading-tight">{booking.dropoff || "..."}</p>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                );
-            case 'storage':
-                return (
-                    <div className="col-span-2 space-y-4 mt-2">
-                        {/* Box Orari Deposito/Ritiro */}
-                        <div className="bg-slate-50 p-4 rounded-2xl border border-slate-100 flex justify-between gap-4">
-                            <div className="flex-1">
-                                <span className="text-[10px] uppercase text-slate-400 font-bold tracking-wider block mb-1">Deposito</span>
-                                <div className="font-bold text-slate-700 text-sm">{booking.dropoffTime || booking.time.split('-')[0]}</div>
-                            </div>
-                            <div className="w-px bg-slate-200"></div>
-                            <div className="flex-1">
-                                <span className="text-[10px] uppercase text-slate-400 font-bold tracking-wider block mb-1">Ritiro Previsto</span>
-                                <div className="font-bold text-slate-700 text-sm">{booking.pickupTime || booking.time.split('-')[1]}</div>
-                            </div>
-                        </div>
-
-                        {/* Box Dettaglio Bagagli (Taglie) */}
-                        <div className="bg-slate-50 p-4 rounded-2xl border border-slate-100">
-                             <span className="text-[10px] uppercase text-slate-400 font-bold tracking-wider block mb-3">Dettaglio Bagagli</span>
-                             
-                             {booking.baggageDetails ? (
-                                <div className="grid grid-cols-3 gap-2">
-                                    <div className="flex flex-col items-center bg-white p-2 rounded-xl border border-slate-100 shadow-sm">
-                                        <Box size={20} className="text-slate-400 mb-1 scale-75"/> 
-                                        <span className="text-xs text-slate-500 font-medium">Piccolo</span>
-                                        <span className="text-lg font-bold text-slate-800">{booking.baggageDetails.small}</span>
-                                    </div>
-                                    <div className="flex flex-col items-center bg-white p-2 rounded-xl border border-slate-100 shadow-sm">
-                                        <Box size={20} className="text-slate-500 mb-1 scale-90"/> 
-                                        <span className="text-xs text-slate-500 font-medium">Medio</span>
-                                        <span className="text-lg font-bold text-slate-800">{booking.baggageDetails.medium}</span>
-                                    </div>
-                                    <div className="flex flex-col items-center bg-white p-2 rounded-xl border border-slate-100 shadow-sm">
-                                        <Box size={20} className="text-slate-600 mb-1 scale-110"/> 
-                                        <span className="text-xs text-slate-500 font-medium">Grande</span>
-                                        <span className="text-lg font-bold text-slate-800">{booking.baggageDetails.large}</span>
-                                    </div>
-                                </div>
-                             ) : (
-                                <div className="flex items-center gap-3 mt-1">
-                                    <div className={`w-10 h-10 bg-[${HOGU_COLORS.primary}]/20 rounded-xl flex items-center justify-center text-[${HOGU_COLORS.primary}]`}>
-                                        <Luggage size={20} />
-                                    </div>
-                                    <div>
-                                        <p className={`text-xs text-[${HOGU_COLORS.primary}] font-bold uppercase`}>Totale Colli</p>
-                                        <p className="font-extrabold text-slate-800 text-lg leading-none">{booking.quantity} Pezzi</p>
-                                    </div>
-                                </div>
-                             )}
-                        </div>
-                    </div>
-                );
-            default:
-                return null;
-        }
-    };
-
+    if (!isOpen || !booking) return null;
     return (
         <ModalBackdrop onClose={onClose}>
             <div className="flex flex-col md:flex-row gap-8">
-                {/* Colonna Sinistra: Info Cliente */}
                 <div className="w-full md:w-1/3 flex flex-col items-center text-center border-b md:border-b-0 md:border-r border-slate-100 pb-6 md:pb-0 md:pr-6">
                     <div className="relative mb-4">
                         <img src={booking?.image} className="w-28 h-28 rounded-3xl object-cover shadow-xl ring-4 ring-white" alt="" />
-                        <div className="absolute -bottom-2 -right-2 bg-white p-1.5 rounded-xl shadow-sm"><StatusBadge status={booking?.status}/></div>
+                        <div className="absolute -bottom-2 -right-2 bg-white p-1.5 rounded-xl shadow-sm"><StatusBadge status={booking?.status} /></div>
                     </div>
                     <h2 className={`font-extrabold text-2xl text-[${HOGU_COLORS.dark}] mb-1`}>{booking?.customerName}</h2>
                     <p className={`text-[${HOGU_COLORS.primary}] font-bold text-sm mb-4`}>{booking?.serviceName}</p>
                     {booking?.phone && <a href={`tel:${booking.phone}`} className="flex items-center gap-2 bg-slate-50 px-4 py-2 rounded-xl text-slate-600 text-sm font-bold hover:bg-slate-100 transition-colors w-full justify-center"><Phone size={16} /> {booking.phone}</a>}
                 </div>
-                
-                {/* Colonna Destra: Dettagli Tecnici */}
                 <div className="flex-1">
-                    <h3 className={`text-lg font-bold text-[${HOGU_COLORS.dark}] mb-4 flex items-center gap-2`}><ListTodo size={20} className="text-slate-400"/> Dettagli Deposito</h3>
-                    
+                    <h3 className={`text-lg font-bold text-[${HOGU_COLORS.dark}] mb-4 flex items-center gap-2`}><ListTodo size={20} className="text-slate-400" /> Dettagli Deposito</h3>
                     <div className="grid grid-cols-2 gap-4 mb-6">
-                        {/* Data e Ora */}
                         <div className="bg-slate-50 p-4 rounded-2xl border border-slate-100"><span className="text-[10px] uppercase text-slate-400 font-bold tracking-wider block mb-1">Data</span><div className="flex items-center gap-2 font-bold text-slate-700 text-lg"><Calendar size={18} className={`text-[${HOGU_COLORS.primary}]`} /> {booking?.date}</div></div>
                         <div className="bg-slate-50 p-4 rounded-2xl border border-slate-100"><span className="text-[10px] uppercase text-slate-400 font-bold tracking-wider block mb-1">Orario</span><div className="flex items-center gap-2 font-bold text-slate-700 text-lg"><Clock size={18} className={`text-[${HOGU_COLORS.primary}]`} /> {booking?.time}</div></div>
-                        
-                        {/* Quantità/Ospiti (Dinamico) */}
                         <div className="bg-slate-50 p-4 rounded-2xl border border-slate-100">
-                             <span className="text-[10px] uppercase text-slate-400 font-bold tracking-wider block mb-1">
-                                Cliente
-                             </span>
-                             <div className="flex items-center gap-2 font-bold text-slate-700 text-lg">
-                                <User size={18} className={`text-[${HOGU_COLORS.primary}]`} /> 
+                            <span className="text-[10px] uppercase text-slate-400 font-bold tracking-wider block mb-1">Cliente</span>
+                            <div className="flex items-center gap-2 font-bold text-slate-700 text-lg">
+                                <User size={18} className={`text-[${HOGU_COLORS.primary}]`} />
                                 {booking?.guests || 1} Persone
-                             </div>
+                            </div>
                         </div>
-
-                        {/* Prezzo */}
                         <div className="bg-slate-50 p-4 rounded-2xl border border-slate-100"><span className="text-[10px] uppercase text-slate-400 font-bold tracking-wider block mb-1">Totale</span><div className={`flex items-center gap-2 font-extrabold text-[${HOGU_COLORS.dark}] text-lg`}>€ {booking?.price}</div></div>
-
-                        {/* SEZIONE DINAMICA PER I DETTAGLI AGGIUNTIVI (ES. TAGLIE BAGAGLI) */}
-                        {renderExtraDetails()}
+                        <div className="col-span-2 space-y-4 mt-2">
+                            <div className="bg-slate-50 p-4 rounded-2xl border border-slate-100 flex justify-between gap-4">
+                                <div className="flex-1">
+                                    <span className="text-[10px] uppercase text-slate-400 font-bold tracking-wider block mb-1">Deposito</span>
+                                    <div className="font-bold text-slate-700 text-sm">{booking.dropoffTime || (booking.time ? booking.time.split('-')[0] : '--:--')}</div>
+                                </div>
+                                <div className="w-px bg-slate-200"></div>
+                                <div className="flex-1">
+                                    <span className="text-[10px] uppercase text-slate-400 font-bold tracking-wider block mb-1">Ritiro Previsto</span>
+                                    <div className="font-bold text-slate-700 text-sm">{booking.pickupTime || (booking.time && booking.time.includes('-') ? booking.time.split('-')[1] : '--:--')}</div>
+                                </div>
+                            </div>
+                            <div className="bg-slate-50 p-4 rounded-2xl border border-slate-100">
+                                <span className="text-[10px] uppercase text-slate-400 font-bold tracking-wider block mb-3">Dettaglio Bagagli</span>
+                                {booking.baggageDetails ? (
+                                    <div className="grid grid-cols-3 gap-2">
+                                        <div className="flex flex-col items-center bg-white p-2 rounded-xl border border-slate-100 shadow-sm">
+                                            <Box size={20} className="text-slate-400 mb-1 scale-75" />
+                                            <span className="text-xs text-slate-500 font-medium">Piccolo</span>
+                                            <span className="text-lg font-bold text-slate-800">{booking.baggageDetails.small}</span>
+                                        </div>
+                                        <div className="flex flex-col items-center bg-white p-2 rounded-xl border border-slate-100 shadow-sm">
+                                            <Box size={20} className="text-slate-500 mb-1 scale-90" />
+                                            <span className="text-xs text-slate-500 font-medium">Medio</span>
+                                            <span className="text-lg font-bold text-slate-800">{booking.baggageDetails.medium}</span>
+                                        </div>
+                                        <div className="flex flex-col items-center bg-white p-2 rounded-xl border border-slate-100 shadow-sm">
+                                            <Box size={20} className="text-slate-600 mb-1 scale-110" />
+                                            <span className="text-xs text-slate-500 font-medium">Grande</span>
+                                            <span className="text-lg font-bold text-slate-800">{booking.baggageDetails.large}</span>
+                                        </div>
+                                    </div>
+                                ) : (
+                                    <div className="flex items-center gap-3 mt-1">
+                                        <div className={`w-10 h-10 bg-[${HOGU_COLORS.primary}]/20 rounded-xl flex items-center justify-center text-[${HOGU_COLORS.primary}]`}>
+                                            <Luggage size={20} />
+                                        </div>
+                                        <div>
+                                            <p className={`text-xs text-[${HOGU_COLORS.primary}] font-bold uppercase`}>Totale Colli</p>
+                                            <p className="font-extrabold text-slate-800 text-lg leading-none">{booking.quantity} Pezzi</p>
+                                        </div>
+                                    </div>
+                                )}
+                            </div>
+                        </div>
                     </div>
-
                     <div className="flex gap-3 mt-auto">
                         <button onClick={onClose} className="flex-1 py-3.5 bg-slate-100 text-slate-600 rounded-xl font-bold hover:bg-slate-200 transition-colors">Chiudi</button>
                     </div>
@@ -500,14 +410,14 @@ const BookingDetailModal = ({ isOpen, onClose, booking }) => {
 
 const ComplaintModal = ({ isOpen, onClose, onConfirm, booking }) => {
     const [reason, setReason] = useState("");
-    useEffect(() => { if(isOpen) setReason(""); }, [isOpen]);
+    useEffect(() => { if (isOpen) setReason(""); }, [isOpen]);
     if (!isOpen) return null;
     return (
         <ModalBackdrop onClose={onClose}>
             <div className="max-w-sm mx-auto">
-                <div className="w-12 h-12 bg-amber-50 rounded-2xl flex items-center justify-center text-amber-500 mb-4 mx-auto"><AlertTriangle size={24}/></div>
+                <div className="w-12 h-12 bg-amber-50 rounded-2xl flex items-center justify-center text-amber-500 mb-4 mx-auto"><AlertTriangle size={24} /></div>
                 <h2 className={`font-bold text-xl text-[${HOGU_COLORS.dark}] mb-2 text-center`}>Segnala Problema</h2>
-                <textarea className="w-full border border-slate-200 p-4 rounded-xl mb-6 bg-slate-50 focus:ring-2 focus:ring-amber-100 outline-none transition-all text-sm" rows="3" placeholder="Dettagli segnalazione..." value={reason} onChange={e => setReason(e.target.value)}/>
+                <textarea className="w-full border border-slate-200 p-4 rounded-xl mb-6 bg-slate-50 focus:ring-2 focus:ring-amber-100 outline-none transition-all text-sm" rows="3" placeholder="Dettagli segnalazione..." value={reason} onChange={e => setReason(e.target.value)} />
                 <button onClick={() => onConfirm(booking.id, reason)} disabled={!reason.trim()} className="w-full bg-amber-500 text-white py-3 rounded-xl font-bold text-sm hover:bg-amber-600 transition-all">Invia Segnalazione</button>
             </div>
         </ModalBackdrop>
@@ -520,11 +430,11 @@ const CancellationModal = ({ isOpen, onClose, onConfirm, booking }) => {
     return (
         <ModalBackdrop onClose={onClose}>
             <div className="max-w-sm mx-auto">
-                <div className="w-12 h-12 bg-red-50 rounded-2xl flex items-center justify-center text-red-500 mb-4 mx-auto"><Ban size={24}/></div>
+                <div className="w-12 h-12 bg-red-50 rounded-2xl flex items-center justify-center text-red-500 mb-4 mx-auto"><Ban size={24} /></div>
                 <h2 className={`font-bold text-xl text-[${HOGU_COLORS.dark}] mb-2 text-center`}>Annulla Prenotazione</h2>
-                <textarea className="w-full border border-slate-200 p-4 rounded-xl mb-6 bg-slate-50 focus:ring-2 focus:ring-red-100 outline-none transition-all text-sm" rows="3" placeholder="Motivo..." value={reason} onChange={e => setReason(e.target.value)}/>
+                <textarea className="w-full border border-slate-200 p-4 rounded-xl mb-6 bg-slate-50 focus:ring-2 focus:ring-red-100 outline-none transition-all text-sm" rows="3" placeholder="Motivo..." value={reason} onChange={e => setReason(e.target.value)} />
                 <div className="flex gap-3">
-                     <button onClick={onClose} className="flex-1 bg-slate-100 text-slate-600 py-3 rounded-xl font-bold text-sm">Indietro</button>
+                    <button onClick={onClose} className="flex-1 bg-slate-100 text-slate-600 py-3 rounded-xl font-bold text-sm">Indietro</button>
                     <button onClick={() => onConfirm(booking.id, reason)} className="flex-1 bg-red-500 text-white py-3 rounded-xl font-bold text-sm hover:bg-red-600 transition-all">Conferma</button>
                 </div>
             </div>
@@ -535,22 +445,22 @@ const CancellationModal = ({ isOpen, onClose, onConfirm, booking }) => {
 const PriceCorrectionModal = ({ isOpen, onClose, onConfirm, booking }) => {
     const [newPrice, setNewPrice] = useState("");
     const [note, setNote] = useState("");
-    useEffect(() => { 
-        if(isOpen && booking) { setNewPrice(booking.price); setNote(""); }
+    useEffect(() => {
+        if (isOpen && booking) { setNewPrice(booking.price); setNote(""); }
     }, [isOpen, booking]);
     if (!isOpen || !booking) return null;
     return (
         <ModalBackdrop onClose={onClose}>
             <div className="max-w-sm mx-auto">
-                <div className="w-12 h-12 bg-amber-50 rounded-2xl flex items-center justify-center text-amber-500 mb-4 mx-auto"><RefreshCw size={24}/></div>
+                <div className="w-12 h-12 bg-amber-50 rounded-2xl flex items-center justify-center text-amber-500 mb-4 mx-auto"><RefreshCw size={24} /></div>
                 <h2 className={`font-bold text-xl text-[${HOGU_COLORS.dark}] mb-2 text-center`}>Rettifica Prezzo</h2>
                 <div className="mb-4">
                     <label className="block text-xs font-bold text-slate-400 uppercase mb-1.5">Nuovo Prezzo (€)</label>
-                    <input type="number" className="w-full border border-slate-200 p-4 rounded-xl bg-slate-50 focus:ring-2 focus:ring-amber-100 outline-none font-bold text-slate-800" value={newPrice} onChange={e => setNewPrice(e.target.value)}/>
+                    <input type="number" className="w-full border border-slate-200 p-4 rounded-xl bg-slate-50 focus:ring-2 focus:ring-amber-100 outline-none font-bold text-slate-800" value={newPrice} onChange={e => setNewPrice(e.target.value)} />
                 </div>
                 <div className="mb-6">
-                     <label className="block text-xs font-bold text-slate-400 uppercase mb-1.5">Note</label>
-                    <textarea className="w-full border border-slate-200 p-4 rounded-xl bg-slate-50 focus:ring-2 focus:ring-amber-100 outline-none text-sm" rows="3" value={note} onChange={e => setNote(e.target.value)}/>
+                    <label className="block text-xs font-bold text-slate-400 uppercase mb-1.5">Note</label>
+                    <textarea className="w-full border border-slate-200 p-4 rounded-xl bg-slate-50 focus:ring-2 focus:ring-amber-100 outline-none text-sm" rows="3" value={note} onChange={e => setNote(e.target.value)} />
                 </div>
                 <div className="flex gap-3">
                     <button onClick={onClose} className="flex-1 bg-slate-100 text-slate-600 py-3 rounded-xl font-bold text-sm">Annulla</button>
@@ -562,57 +472,132 @@ const PriceCorrectionModal = ({ isOpen, onClose, onConfirm, booking }) => {
 };
 
 // =================================================================================
-// 3. MAIN DASHBOARD COMPONENT (LUGGAGE Dashboard)
+// 3. MAIN COMPONENT - LUGGAGE DASHBOARD
 // =================================================================================
-
 const LuggageDashboard = () => {
     const navigate = useNavigate();
-
-    // Stato
-    const [bookings, setBookings] = useState(STORAGE_BOOKINGS);
-    const [isMobileOverlayOpen, setIsMobileOverlayOpen] = useState(false); // Nuovo stato overlay
-    
-    // Paginazione
+    const [bookings, setBookings] = useState([]);
+    const [serviceId, setServiceId] = useState(null);
+    const [info, setInfo] = useState(null);
+    const [stats, setStats] = useState({ revenue: 0, count: 0 });
+    const [isMobileOverlayOpen, setIsMobileOverlayOpen] = useState(false);
+    const [loading, setLoading] = useState(false);
     const [pendingPage, setPendingPage] = useState(1);
     const [historyPage, setHistoryPage] = useState(1);
     const ITEMS_PER_PAGE = 3;
-
-    // Filtri
-    const [filter, setFilter] = useState('active'); // 'active' | 'past'
-    
-    // Gestione Modali
+    const [filter, setFilter] = useState('active');
     const [selectedBooking, setSelectedBooking] = useState(null);
     const [detailsOpen, setDetailsOpen] = useState(false);
     const [complaintOpen, setComplaintOpen] = useState(false);
     const [cancelOpen, setCancelOpen] = useState(false);
     const [correctionOpen, setCorrectionOpen] = useState(false);
 
-    // --- AZIONI (Simulate) ---
-    const handleAccept = (id) => {
-        setBookings(prev => prev.map(b => b.id === id ? { ...b, status: 'confirmed' } : b));
+    useEffect(() => {
+        const init = async () => {
+            try {
+                const infoData = await luggageService.getInfoProvider();
+                if (infoData && infoData.serviceId) {
+                    setServiceId(infoData.serviceId);
+                    setInfo(infoData);
+                    setStats({
+                        revenue: infoData.totalBookingsAmount || 0,
+                        count: infoData.totalBookings || 0
+                    });
+                }
+            } catch (err) {
+                console.error("Error fetching info:", err);
+            }
+        };
+        init();
+    }, []);
+
+    const fetchBookings = useCallback(async (id) => {
+        const targetId = id || serviceId;
+        if (!targetId) return;
+        try {
+            const response = await luggageService.getBookings(targetId, 0, 100);
+            if (response && response.content) {
+                setBookings(response.content);
+            } else if (Array.isArray(response)) {
+                setBookings(response);
+            }
+        } catch (err) {
+            console.error("Error fetching bookings:", err);
+        }
+    }, [serviceId]);
+
+    useEffect(() => {
+        if (serviceId) {
+            fetchBookings(serviceId);
+        }
+    }, [fetchBookings, serviceId]);
+
+    const handleAccept = async (id) => {
+        try {
+            setLoading(true);
+            await luggageService.acceptBooking(id);
+            await fetchBookings(serviceId);
+        } catch (err) {
+            console.error(err);
+        } finally {
+            setLoading(false);
+        }
     };
 
     const handleReject = (bk) => { setSelectedBooking(bk); setCancelOpen(true); };
     const handleRectify = (bk) => { setSelectedBooking(bk); setCorrectionOpen(true); };
-    
-    // Conferme modali
-    const confirmCancel = (id, reason) => {
-        setBookings(prev => prev.map(b => b.id === id ? { ...b, status: 'cancelled' } : b));
-        setCancelOpen(false);
+
+    const confirmCancel = async (id, reason) => {
+        try {
+            setLoading(true);
+            if (cancelOpen && selectedBooking && selectedBooking.status === 'pending') {
+                await luggageService.rejectBooking(id, reason);
+            } else {
+                await luggageService.cancelBooking(id, reason);
+            }
+            setCancelOpen(false);
+            await fetchBookings(serviceId);
+        } catch (err) {
+            console.error(err);
+        } finally {
+            setLoading(false);
+        }
     };
-    const confirmComplaint = () => { alert("Segnalazione inviata"); setComplaintOpen(false); };
-    const confirmCorrection = (id, price, note) => {
-        setBookings(prev => prev.map(b => b.id === id ? { ...b, status: 'waiting_customer', price: price, oldPrice: b.price } : b));
-        setCorrectionOpen(false);
+
+    const confirmComplaint = async (id, reason) => {
+        try {
+            setLoading(true);
+            await luggageService.reportComplaint(id, reason);
+            alert("Segnalazione inviata.");
+            setComplaintOpen(false);
+            await fetchBookings(serviceId);
+        } catch (err) {
+            console.error(err);
+        } finally {
+            setLoading(false);
+        }
+    };
+
+    const confirmCorrection = async (id, price, note) => {
+        try {
+            setLoading(true);
+            await luggageService.rectifyBooking(id, price, note);
+            alert("Rettifica inviata al cliente.");
+            setCorrectionOpen(false);
+            await fetchBookings(serviceId);
+        } catch (err) {
+            console.error(err);
+        } finally {
+            setLoading(false);
+        }
     };
 
     const handleFilterChange = (newFilter) => { setFilter(newFilter); setHistoryPage(1); };
 
-    // --- CALCOLO LISTE PAGINATE ---
     const pendingListFull = bookings.filter(b => b.status === 'pending' || b.status === 'waiting_customer');
     const totalPendingPages = Math.ceil(pendingListFull.length / ITEMS_PER_PAGE);
     const currentPendingList = pendingListFull.slice(
-        (pendingPage - 1) * ITEMS_PER_PAGE, 
+        (pendingPage - 1) * ITEMS_PER_PAGE,
         pendingPage * ITEMS_PER_PAGE
     );
 
@@ -624,26 +609,27 @@ const LuggageDashboard = () => {
     });
     const totalHistoryPages = Math.ceil(historyListFull.length / ITEMS_PER_PAGE);
     const currentHistoryList = historyListFull.slice(
-        (historyPage - 1) * ITEMS_PER_PAGE, 
+        (historyPage - 1) * ITEMS_PER_PAGE,
         historyPage * ITEMS_PER_PAGE
     );
 
     return (
         <div className="space-y-6 md:space-y-10 animate-in fade-in pb-24 md:pb-12 relative">
-            
-            {/* --- COMPONENTI MOBILE DEDICATI --- */}
-            
-            {/* 1. Tasto Sticky (Visibile solo Mobile se Overlay chiuso e ci sono pending) */}
+            {loading && (
+                <FullModalBackdrop onClose={() => { }}>
+                    <LoadingComponent />
+                </FullModalBackdrop>
+            )}
+
             {!isMobileOverlayOpen && (
-                <MobileStickyTrigger 
-                    count={pendingListFull.length} 
-                    onClick={() => setIsMobileOverlayOpen(true)} 
+                <MobileStickyTrigger
+                    count={pendingListFull.length}
+                    onClick={() => setIsMobileOverlayOpen(true)}
                 />
             )}
 
-            {/* 2. Overlay Full Page (Scivola sopra tutto) */}
-            <MobilePendingFullPage 
-                isOpen={isMobileOverlayOpen} 
+            <MobilePendingFullPage
+                isOpen={isMobileOverlayOpen}
                 onClose={() => setIsMobileOverlayOpen(false)}
                 pendingList={pendingListFull}
                 onAccept={handleAccept}
@@ -652,26 +638,18 @@ const LuggageDashboard = () => {
                 onOpenDetails={(bk) => { setSelectedBooking(bk); setDetailsOpen(true); }}
             />
 
-            {/* --- UI STANDARD --- */}
-
-            {/* Modali */}
             <BookingDetailModal isOpen={detailsOpen} onClose={() => setDetailsOpen(false)} booking={selectedBooking} />
             <ComplaintModal isOpen={complaintOpen} onClose={() => setComplaintOpen(false)} onConfirm={confirmComplaint} booking={selectedBooking} />
             <CancellationModal isOpen={cancelOpen} onClose={() => setCancelOpen(false)} onConfirm={confirmCancel} booking={selectedBooking} />
             <PriceCorrectionModal isOpen={correctionOpen} onClose={() => setCorrectionOpen(false)} onConfirm={confirmCorrection} booking={selectedBooking} />
 
-            {/* 0. HEADER: STATS + ACTIONS (Scanner & Edit) */}
             <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 items-stretch">
                 <div className="lg:col-span-2">
-                    <StatsSummary activeCategory="storage" />
+                    <StatsSummary activeCategory="storage" revenue={stats.revenue} count={stats.count} />
                 </div>
-
-                {/* Colonna Azioni - Separata Desktop vs Mobile */}
                 <div className="flex flex-col gap-4 h-full">
-                    
-                    {/* A. Desktop Side Actions */}
                     <div className="hidden lg:flex flex-col gap-4 h-full">
-                        <div 
+                        <div
                             onClick={() => navigate('/validator?type=storage')}
                             className={`flex-1 min-h-[140px] bg-gradient-to-br from-[${HOGU_COLORS.dark}] to-slate-800 rounded-[2rem] p-6 text-white relative overflow-hidden group cursor-pointer shadow-xl shadow-slate-900/10 hover:shadow-2xl hover:-translate-y-1 transition-all flex flex-col justify-center`}
                         >
@@ -690,9 +668,16 @@ const LuggageDashboard = () => {
                             </div>
                         </div>
 
-                        <button 
-                            onClick={() => navigate('/dashboard/provider/storage/edit')}
-                            className={`h-20 bg-white border border-slate-200 rounded-[1.5rem] px-6 flex items-center justify-between hover:bg-slate-50 hover:border-[${HOGU_COLORS.primary}]/50 transition-all group shadow-sm hover:shadow-md`}
+                        <button
+                            onClick={() => {
+                                if (info?.serviceId) {
+                                    navigate(`/provider/edit/luggage/${info.serviceId}`);
+                                }
+                            }}
+                            disabled={!info?.serviceId}
+                            className={`h-20 bg-white border border-slate-200 rounded-[1.5rem] px-6 flex items-center justify-between
+                                hover:bg-slate-50 hover:border-[${HOGU_COLORS.primary}]/50 transition-all group shadow-sm hover:shadow-md
+                                ${!info?.serviceId ? 'opacity-50 cursor-not-allowed' : 'cursor-pointer'}`}
                         >
                             <div className="flex items-center gap-3 text-left">
                                 <div className={`p-2.5 bg-slate-100 rounded-xl group-hover:bg-[${HOGU_COLORS.primary}]/10 group-hover:text-[${HOGU_COLORS.primary}] transition-colors text-slate-600`}>
@@ -707,28 +692,36 @@ const LuggageDashboard = () => {
                         </button>
                     </div>
 
-                    {/* B. Mobile Actions Grid */}
                     <div className="grid grid-cols-2 gap-3 lg:hidden mb-2 mt-4 md:mt-0">
-                         <button onClick={() => navigate('/validator?type=storage')} className="bg-[#1a1a1a] text-white p-4 rounded-2xl flex flex-col items-center justify-center gap-2 shadow-lg">
+                        <button
+                            onClick={() => navigate('/validator?type=storage')}
+                            className="bg-[#1a1a1a] text-white p-4 rounded-2xl flex flex-col items-center justify-center gap-2 shadow-lg"
+                        >
                             <QrCode size={24} />
                             <span className="text-xs font-bold">Scanner</span>
-                         </button>
-                         <button onClick={() => navigate('/dashboard/provider/storage/edit')} className="bg-white text-slate-700 p-4 rounded-2xl flex flex-col items-center justify-center gap-2 border border-slate-100 shadow-sm">
+                        </button>
+
+                        <button
+                            onClick={() => {
+                                if (info?.serviceId) {
+                                    navigate(`/provider/edit/luggage/${info.serviceId}`);
+                                }
+                            }}
+                            disabled={!info?.serviceId}
+                            className={`bg-white text-slate-700 p-4 rounded-2xl flex flex-col items-center justify-center gap-2 border border-slate-100 shadow-sm ${!info?.serviceId ? 'opacity-50 cursor-not-allowed' : ''}`}
+                        >
                             <Settings size={24} />
                             <span className="text-xs font-bold">Deposito</span>
-                         </button>
+                        </button>
                     </div>
-
                 </div>
             </div>
 
-            {/* 2. RICHIESTE IN ATTESA */}
-            {/* Nascosto su Mobile (md:block) perché gestito dall'Overlay */}
             <section className="hidden md:block">
                 <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 mb-6">
                     <div className="flex items-center gap-4">
                         <div className={`p-3 rounded-2xl border ${pendingListFull.length > 0 ? 'bg-amber-50 border-amber-100 text-amber-600' : 'bg-slate-50 border-slate-100 text-slate-400'}`}>
-                             <BellRing size={28} className={pendingListFull.length > 0 ? 'animate-bounce' : ''} />
+                            <BellRing size={28} className={pendingListFull.length > 0 ? 'animate-bounce' : ''} />
                         </div>
                         <div>
                             <h2 className={`text-2xl font-extrabold text-[${HOGU_COLORS.dark}]`}>Depositi in Attesa</h2>
@@ -737,25 +730,24 @@ const LuggageDashboard = () => {
                             </p>
                         </div>
                     </div>
-                    
                     <div className="flex items-center gap-4 w-full sm:w-auto justify-between sm:justify-end">
-                        <PaginationControls 
-                            currentPage={pendingPage} 
-                            totalPages={totalPendingPages} 
-                            onNext={() => setPendingPage(p => p + 1)} 
-                            onPrev={() => setPendingPage(p => p - 1)} 
+                        <PaginationControls
+                            currentPage={pendingPage}
+                            totalPages={totalPendingPages}
+                            onNext={() => setPendingPage(p => p + 1)}
+                            onPrev={() => setPendingPage(p => p - 1)}
                         />
                     </div>
                 </div>
-                
+
                 {currentPendingList.length > 0 ? (
                     <div className="p-1.5 rounded-[2rem] bg-gradient-to-br from-indigo-50 via-blue-50 to-transparent">
                         <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
                             {currentPendingList.map(b => (
-                                <PendingRequestCard 
-                                    key={b.id} 
-                                    booking={b} 
-                                    activeCategory="storage" 
+                                <PendingRequestCard
+                                    key={b.id}
+                                    booking={b}
+                                    activeCategory="storage"
                                     onAccept={handleAccept}
                                     onReject={handleReject}
                                     onRectify={handleRectify}
@@ -773,25 +765,23 @@ const LuggageDashboard = () => {
 
             <div className="hidden md:block border-t border-slate-100 my-8"></div>
 
-            {/* 3. DEPOSITI ATTIVI / STORICO */}
             <section>
                 <div className="flex flex-col sm:flex-row justify-between items-end sm:items-center gap-4 mb-6">
                     <div>
                         <h2 className="text-xl font-bold text-slate-800 flex items-center gap-2">
-                            <PackageCheck className={`text-[${HOGU_COLORS.primary}]`}/> Depositi Attivi & Storico
+                            <PackageCheck className={`text-[${HOGU_COLORS.primary}]`} /> Depositi Attivi & Storico
                         </h2>
                     </div>
-                    
                     <div className="flex items-center gap-4 w-full sm:w-auto justify-between sm:justify-end">
                         <div className="flex bg-white p-1 rounded-2xl border border-slate-200 shadow-sm">
                             <button onClick={() => handleFilterChange('active')} className={`px-4 py-2 rounded-xl text-xs font-bold uppercase tracking-wide transition-all ${filter === 'active' ? `bg-[${HOGU_COLORS.primary}] text-white shadow-md` : 'text-slate-400 hover:bg-slate-50'}`}>Attivi Ora</button>
                             <button onClick={() => handleFilterChange('past')} className={`px-4 py-2 rounded-xl text-xs font-bold uppercase tracking-wide transition-all ${filter === 'past' ? 'bg-slate-800 text-white shadow-md' : 'text-slate-400 hover:bg-slate-50'}`}>Archivio</button>
                         </div>
-                        <PaginationControls 
-                            currentPage={historyPage} 
-                            totalPages={totalHistoryPages} 
-                            onNext={() => setHistoryPage(p => p + 1)} 
-                            onPrev={() => setHistoryPage(p => p - 1)} 
+                        <PaginationControls
+                            currentPage={historyPage}
+                            totalPages={totalHistoryPages}
+                            onNext={() => setHistoryPage(p => p + 1)}
+                            onPrev={() => setHistoryPage(p => p - 1)}
                         />
                     </div>
                 </div>
@@ -799,9 +789,9 @@ const LuggageDashboard = () => {
                 <div className="flex flex-col gap-4">
                     {currentHistoryList.length > 0 ? (
                         currentHistoryList.map(b => (
-                            <ProviderBookingCard 
-                                key={b.id} 
-                                booking={b} 
+                            <ProviderBookingCard
+                                key={b.id}
+                                booking={b}
                                 activeCategory="storage"
                                 onOpenDetails={(bk) => { setSelectedBooking(bk); setDetailsOpen(true); }}
                                 onOpenComplaint={(bk) => { setSelectedBooking(bk); setComplaintOpen(true); }}
@@ -810,8 +800,8 @@ const LuggageDashboard = () => {
                         ))
                     ) : (
                         <div className="flex flex-col items-center justify-center py-12 bg-white rounded-3xl border border-slate-100 border-dashed">
-                             <History className="text-slate-300 mb-2" size={32} />
-                             <p className="text-slate-400 font-medium">Nessun deposito in questa lista.</p>
+                            <History className="text-slate-300 mb-2" size={32} />
+                            <p className="text-slate-400 font-medium">Nessun deposito in questa lista.</p>
                         </div>
                     )}
                 </div>

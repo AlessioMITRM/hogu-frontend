@@ -1,6 +1,7 @@
 import React, { useState, useMemo, useEffect, useRef } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
+import CurrencyInput from 'react-currency-input-field'; // ← Libreria aggiunta
 import { withAuthProtection } from '../../auth/withAuthProtection.jsx';
 import { luggageService } from '../../../../api/apiClient.js';
 import italianLocationsData from '../../../../assets/data/italian_locations.json';
@@ -23,6 +24,7 @@ const HOGU_COLORS = {
   subtleText: '#4A5568',
   error: '#EF4444'
 };
+
 const HOGU_THEME = {
   bg: 'bg-white',
   text: `text-[${HOGU_COLORS.dark}]`,
@@ -41,6 +43,7 @@ const processLocations = (data) => {
         flat.push({
           city,
           province: province.name,
+          provinceId: province.provinceId,
           region: region.region,
           fullLabel: `${city}, ${region.region}`,
           searchString: `${city}, ${province.name}, ${region.region}`
@@ -99,25 +102,32 @@ const CityAutocomplete = ({ label, value, onChange, icon: Icon }) => {
   }, []);
 
   const handleInputChange = e => {
-    const v = e.target.value;
-    setInputValue(v);
-    onChange(v);
-    if (v.length < 2) { setSuggestions([]); setShow(false); return; }
-    const norm = v.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '');
-    const filtered = locationData
-      .filter(item => item.searchString.includes(norm))
-      .sort((a, b) => {
-        const aCity = a.city.toLowerCase();
-        const bCity = b.city.toLowerCase();
-        const aStarts = aCity.startsWith(norm);
-        const bStarts = bCity.startsWith(norm);
-        if (aStarts && !bStarts) return -1;
-        if (!bStarts && bStarts) return 1;
-        return aCity.localeCompare(bCity);
-      })
-      .slice(0, 8);
-    setSuggestions(filtered);
-    setShow(true);
+    const userInput = e.target.value;
+    setInputValue(userInput);
+    onChange(userInput);
+    const lowerInput = userInput.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '');
+    
+    if (userInput.length > 2) {
+      const filtered = locationData
+        .filter(item => item.searchString.includes(lowerInput))
+        .sort((a, b) => {
+          const aCity = a.city.toLowerCase();
+          const bCity = b.city.toLowerCase();
+          if (aCity === lowerInput && bCity !== lowerInput) return -1;
+          if (bCity === lowerInput && aCity !== lowerInput) return 1;
+          const aStarts = aCity.startsWith(lowerInput);
+          const bStarts = bCity.startsWith(lowerInput);
+          if (aStarts && !bStarts) return -1;
+          if (!aStarts && bStarts) return 1;
+          return aCity.localeCompare(bCity);
+        })
+        .slice(0, 8);
+      setSuggestions(filtered);
+      setShow(true);
+    } else {
+      setSuggestions([]);
+      setShow(false);
+    }
   };
 
   const handleSelect = item => {
@@ -227,8 +237,8 @@ const ImageUploadCard = ({ src, onDelete, isMain = false, isNew = false }) => {
   );
 };
 
-/* --------------  LuggageSizePriceCard  -------------- */
-const LuggageSizePriceCard = ({ size, label, icon: Icon, description, price, onPriceChange, onDescChange }) => (
+/* --------------  LuggageSizePriceCard con CurrencyInput  -------------- */
+const LuggageSizePriceCard = ({ size, label, icon: Icon, description, priceDay, priceHour, onPriceDayChange, onPriceHourChange, onDescChange }) => (
   <div className="bg-gray-50 rounded-2xl p-6 border border-gray-100 hover:border-[#68B49B]/30 transition-all">
     <div className="flex items-start gap-4 mb-4">
       <div className="p-3 bg-white rounded-xl shadow-sm">
@@ -245,18 +255,46 @@ const LuggageSizePriceCard = ({ size, label, icon: Icon, description, price, onP
         />
       </div>
     </div>
-    <div className="relative">
-      <label className="text-xs font-bold text-gray-400 uppercase">Prezzo al giorno</label>
-      <div className="relative mt-2">
-        <input
-          type="number"
-          min="0"
-          step="0.01"
-          value={price}
-          onChange={e => onPriceChange(e.target.value)}
-          className="w-full pl-10 pr-4 py-3 rounded-xl border border-gray-200 font-bold text-2xl focus:border-[#68B49B] outline-none"
-        />
-        <span className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400 text-2xl">€</span>
+
+    <div className="grid grid-cols-2 gap-4">
+      {/* Prezzo / Ora */}
+      <div className="relative">
+        <label className="text-xs font-bold text-gray-400 uppercase">Prezzo / Ora</label>
+        <div className="relative mt-2">
+          <CurrencyInput
+            id={`price-hour-${size}`}
+            name={`price-hour-${size}`}
+            value={priceHour}
+            onValueChange={(value) => onPriceHourChange(value || '')}
+            placeholder="0,00"
+            decimalsLimit={2}
+            decimalScale={2}
+            decimalSeparator=","
+            groupSeparator="."
+            prefix="€ "
+            className="w-full pl-10 pr-4 py-3 rounded-xl border border-gray-200 font-bold text-xl focus:border-[#68B49B] outline-none"
+          />
+        </div>
+      </div>
+
+      {/* Prezzo / Giorno */}
+      <div className="relative">
+        <label className="text-xs font-bold text-gray-400 uppercase">Prezzo / Giorno</label>
+        <div className="relative mt-2">
+          <CurrencyInput
+            id={`price-day-${size}`}
+            name={`price-day-${size}`}
+            value={priceDay}
+            onValueChange={(value) => onPriceDayChange(value || '')}
+            placeholder="0,00"
+            decimalsLimit={2}
+            decimalScale={2}
+            decimalSeparator=","
+            groupSeparator="."
+            prefix="€ "
+            className="w-full pl-10 pr-4 py-3 rounded-xl border border-gray-200 font-bold text-xl focus:border-[#68B49B] outline-none"
+          />
+        </div>
       </div>
     </div>
   </div>
@@ -266,7 +304,7 @@ const LuggageSizePriceCard = ({ size, label, icon: Icon, description, price, onP
  * PAGINA PRINCIPALE - DEPOSITO BAGAGLI
  * ========================================================= */
 export const LuggageServiceEditPageBase = () => {
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
   const { id } = useParams();
   const navigate = useNavigate();
   const isEditMode = !!id;
@@ -285,12 +323,12 @@ export const LuggageServiceEditPageBase = () => {
     publicationStatus: true,
     openingTime: '08:00',
     closingTime: '20:00',
-    closedOnHolidaysAndSunday: true, // true = chiuso domenica e festivi
+    closedOnHolidaysAndSunday: true,
     capacity: 50,
     sizes: {
-      SMALL: { description: 'Zaino o borsa piccola - max 40cm', pricePerDay: 5 },
-      MEDIUM: { description: 'Trolley cabina - fino a 65cm', pricePerDay: 8 },
-      LARGE: { description: 'Valigia grande - oltre 65cm', pricePerDay: 12 }
+      SMALL: { description: 'Zaino o borsa piccola - max 40cm', pricePerDay: '', pricePerHour: '' },
+      MEDIUM: { description: 'Trolley cabina - fino a 65cm', pricePerDay: '', pricePerHour: '' },
+      LARGE: { description: 'Valigia grande - oltre 65cm', pricePerDay: '', pricePerHour: '' }
     }
   });
 
@@ -304,22 +342,32 @@ export const LuggageServiceEditPageBase = () => {
     sizes: { ...p.sizes, [size]: { ...p.sizes[size], [field]: value } }
   }));
 
-  // Calcolo basePrice automatico
-  const basePrice = Math.min(
-    formData.sizes.SMALL.pricePerDay || Infinity,
-    formData.sizes.MEDIUM.pricePerDay || Infinity,
-    formData.sizes.LARGE.pricePerDay || Infinity
+  // Calcolo basePrice automatico (solo prezzi validi)
+  const calculatedBasePrice = Math.min(
+    ...(Object.values(formData.sizes)
+      .map(s => parseFloat(s.pricePerDay?.toString().replace(',', '.')) || Infinity)
+      .filter(v => v !== Infinity))
   );
+  const basePrice = calculatedBasePrice === Infinity ? 0 : calculatedBasePrice;
 
   const validate = () => {
     const errors = [];
     if (!formData.name.trim()) errors.push('Il nome del deposito è obbligatorio');
     if (!formData.city.trim()) errors.push('La città è obbligatoria');
     if (!formData.address.trim()) errors.push('L\'indirizzo è obbligatorio');
+    if (!formData.description.trim()) errors.push('La descrizione è obbligatoria');
     if (!formData.openingTime || !formData.closingTime) errors.push('Orari di apertura e chiusura obbligatori');
     if (formData.openingTime >= formData.closingTime) errors.push('L\'orario di chiusura deve essere successivo all\'apertura');
-    if (images.length + newImages.length === 0) errors.push('Almeno un\'immagine è obbligatoria');
+    if (!formData.capacity || formData.capacity < 1) errors.push('La capacità deve essere almeno 1');
+    
+    const totalImages = images.length + newImages.length;
+    if (totalImages < 6) errors.push(`Devi caricare almeno 6 immagini (attuali: ${totalImages})`);
+    
     if (basePrice <= 0) errors.push('Almeno una categoria deve avere un prezzo maggiore di 0€');
+    
+    if (errors.length > 0) {
+        console.log("Validation errors:", errors);
+    }
     return errors;
   };
 
@@ -336,18 +384,34 @@ export const LuggageServiceEditPageBase = () => {
         const res = await luggageService.getLuggageProvider(id);
         const data = res;
 
-        const cityStr = data.locales?.[0]?.city && data.locales?.[0]?.state
-          ? `${data.locales[0].city}, ${data.locales[0].state}`
-          : '';
+        // Helper per formattare la città
+        const getFormattedCity = (locale) => {
+          if (!locale || !locale.city) return '';
+          
+          // 1. Prova a cercare la città nel database locale per ottenere "Città, Regione"
+          const normalizedCity = locale.city.toLowerCase().trim();
+          for (const region of italianLocationsData) {
+            for (const province of region.provinces) {
+              const foundCity = province.cities.find(c => c.toLowerCase() === normalizedCity);
+              if (foundCity) {
+                return `${foundCity}, ${region.region}`;
+              }
+            }
+          }
 
-        // Estrai orari (cerca un giorno aperto per prendere orario standard)
+          // 2. Fallback: Se non trovata o se c'è lo stato nell'API, usa quello
+          return locale.state ? `${locale.city}, ${locale.state}` : locale.city;
+        };
+
+        const cityStr = getFormattedCity(data.locales?.[0]) || getFormattedCity(data.serviceLocale?.[0]) || '';
+
         let openingTime = '08:00';
         let closingTime = '20:00';
         let closedOnHolidaysAndSunday = true;
 
         if (data.openingHours && data.openingHours.length > 0) {
           const monday = data.openingHours.find(h => h.dayOfWeek === 1);
-          if (monday && !monday.closed) {
+          if (monday) {
             openingTime = monday.openingTime || '08:00';
             closingTime = monday.closingTime || '20:00';
           }
@@ -356,17 +420,19 @@ export const LuggageServiceEditPageBase = () => {
         }
 
         const sizes = {
-          SMALL: { description: '', pricePerDay: 0 },
-          MEDIUM: { description: '', pricePerDay: 0 },
-          LARGE: { description: '', pricePerDay: 0 }
+          SMALL: { description: '', pricePerDay: '', pricePerHour: '' },
+          MEDIUM: { description: '', pricePerDay: '', pricePerHour: '' },
+          LARGE: { description: '', pricePerDay: '', pricePerHour: '' }
         };
 
-        if (data.luggageSizePrices) {
-          data.luggageSizePrices.forEach(p => {
+        const sizePricesData = data.sizePrices || data.luggageSizePrices;
+        if (sizePricesData) {
+          sizePricesData.forEach(p => {
             if (sizes[p.sizeLabel]) {
               sizes[p.sizeLabel] = {
                 description: p.description || '',
-                pricePerDay: p.pricePerDay || 0
+                pricePerDay: p.pricePerDay != null ? p.pricePerDay.toString() : '',
+                pricePerHour: p.pricePerHour != null ? p.pricePerHour.toString() : ''
               };
             }
           });
@@ -376,8 +442,8 @@ export const LuggageServiceEditPageBase = () => {
           name: data.name || '',
           description: data.description || '',
           city: cityStr,
-          address: data.locales?.[0]?.address || '',
-          publicationStatus: data.publicationStatus ?? true,
+          address: data.locales?.[0]?.address || data.serviceLocale?.[0]?.address || '',
+          publicationStatus: data.publicationStatus ?? data.available ?? true,
           openingTime,
           closingTime,
           closedOnHolidaysAndSunday,
@@ -426,67 +492,257 @@ export const LuggageServiceEditPageBase = () => {
 
     setIsSaving(true);
 
-    const cityParts = formData.city.split(',').map(p => p.trim());
-    const city = cityParts[0] || '';
-    const state = cityParts[1] || '';
-
-    // Genera openingHours (7 giorni)
-    const openingHours = [];
-    for (let day = 1; day <= 7; day++) {
-      const isSunday = day === 7;
-      const closed = formData.closedOnHolidaysAndSunday && isSunday;
-      openingHours.push({
-        dayOfWeek: day,
-        openingTime: closed ? null : formData.openingTime,
-        closingTime: closed ? null : formData.closingTime,
-        closed
-      });
-    }
-
-    // Genera luggageSizePrices
-    const luggageSizePrices = Object.entries(formData.sizes).map(([sizeLabel, info]) => ({
-      sizeLabel,
-      pricePerDay: parseFloat(info.pricePerDay) || 0,
-      pricePerHour: null,
-      description: info.description.trim() || null
-    }));
-
-    const payload = {
-      name: formData.name,
-      description: formData.description,
-      locales: [{
-        serviceType: 'LUGGAGE',
-        language: 'it',
-        country: 'IT',
-        state: state,
-        city: city,
-        address: formData.address
-      }],
-      capacity: parseInt(formData.capacity, 10) || null,
-      basePrice: basePrice,
-      publicationStatus: formData.publicationStatus,
-      openingHours,
-      luggageSizePrices
-    };
-
-    const formDataToSend = new FormData();
-    formDataToSend.append('data', new Blob([JSON.stringify(payload)], { type: 'application/json' }));
-
-    // Rinvio tutte le immagini
-    for (const url of images) {
-      try {
-        const response = await fetch(url);
-        const blob = await response.blob();
-        const filename = url.split('/').pop();
-        const file = new File([blob], filename, { type: blob.type });
-        formDataToSend.append('images', file);
-      } catch (err) {
-        console.error('Errore riconversione immagine:', url, err);
-      }
-    }
-    newImages.forEach(item => formDataToSend.append('images', item.file));
-
     try {
+      const cityParts = formData.city.split(',').map(p => p.trim());
+      const city = cityParts[0] || '';
+      const state = cityParts[1] || '';
+
+      let locales = [];
+      let foundProvinceId = null;
+      let foundSourceLang = null;
+
+      const findLocation = (dataset, cityName, regionName) => {
+        if (!dataset) return null;
+        for (const r of dataset) {
+          if (r.region && r.region.toLowerCase() === regionName.toLowerCase()) {
+            for (const p of r.provinces) {
+              if (p.cities && p.cities.some(c => c.toLowerCase() === cityName.toLowerCase())) {
+                return { region: r, province: p, city: cityName };
+              }
+            }
+          }
+        }
+        return null;
+      };
+
+      // 1. Prova a trovare nel DB Italiano
+      let match = findLocation(italianLocationsData, city, state);
+      if (match) {
+        foundProvinceId = match.province.provinceId;
+        foundSourceLang = 'it';
+      } else {
+        // 2. Prova Inglese
+        match = findLocation(englishLocationsData, city, state);
+        if (match) {
+          foundProvinceId = match.province.provinceId;
+          foundSourceLang = 'en';
+        }
+      }
+
+      if (foundProvinceId) {
+        // Lingua sorgente
+        locales.push({
+          serviceType: 'LUGGAGE',
+          language: foundSourceLang,
+          country: foundSourceLang === 'it' ? 'Italia' : 'Italy',
+          state: state,
+          city: city,
+          address: formData.address
+        });
+
+        // Lingua opposta
+        const targetLang = foundSourceLang === 'it' ? 'en' : 'it';
+        const targetDataset = foundSourceLang === 'it' ? englishLocationsData : italianLocationsData;
+        
+        let targetMatch = null;
+        for (const r of targetDataset) {
+          for (const p of r.provinces) {
+            if (p.provinceId === foundProvinceId) {
+              targetMatch = {
+                region: r.region,
+                province: p.name,
+                city: city // Assumiamo nome città invariato di base
+              };
+
+              // Se la città sorgente è nell'array della provincia sorgente, proviamo a mapparla per indice
+              // per trovare il nome corrispondente nell'altra lingua (es. Firenze -> Florence)
+              // Ma attenzione: gli array devono essere perfettamente allineati.
+              // Controlliamo se nel dataset target esiste una città nella stessa posizione?
+              // Rischiose se gli array non sono ordinati uguali.
+              // Dato che i file sembrano avere "Firenze" anche in inglese (vedi grep), forse il problema è la provincia?
+              // L'utente dice: "continuando a vedere la citta e la provicnia in italiano"
+              
+              // Se la città nel file inglese è "Firenze", allora è giusto che sia Firenze.
+              // Ma se la provincia nel file inglese è "Florence", dobbiamo usare quella.
+              
+              // Nel codice precedente usavo: province: p.name.
+              // Ma nel payload finale inviavo `state: targetMatch.region`.
+              // Non inviavo la provincia nel payload 'locales'.
+              // Il payload ha campi: language, country, state, city, address.
+              // 'state' corrisponde alla regione nel nostro mapping.
+              // Dove finisce la provincia? 
+              // Se l'utente intende che nel campo 'state' vede la regione italiana (es. Toscana) invece di Tuscany,
+              // allora il mio codice dovrebbe aver risolto (targetMatch.region).
+              
+              // Se l'utente intende che nel campo 'city' vede "Firenze" invece di "Florence", 
+              // allora dobbiamo vedere se nel file inglese c'è "Florence".
+              // Ho visto che in english_locations.json c'è "Florence" come nome provincia, ma "Firenze" come città.
+              // Quindi se l'utente vuole "Florence" come città, il JSON inglese non lo supporta per la città, solo per la provincia.
+              
+              // TUTTAVIA, se l'utente intende che vede "Toscana" invece di "Tuscany", allora il fix è corretto.
+              // Ma forse l'utente vuole che se nel file inglese la provincia si chiama "Florence", 
+              // e la città è il capoluogo, allora la città dovrebbe chiamarsi "Florence"?
+              // Questo è un caso specifico.
+              
+              // In ogni caso, il codice precedente usava `city: city` (quindi user input).
+              // Se l'utente ha scritto "Firenze", rimane "Firenze".
+              
+              // Se vogliamo provare a mappare la città:
+              // Cerchiamo se la città esiste nell'elenco della provincia target.
+              // Se c'è "Florence" nella lista città della provincia "Florence" (id 89), usiamo quella.
+              // Ma nel file ho visto "Firenze" nella lista città della provincia Florence.
+              
+              // Se l'utente si lamenta che vede "citta e provincia in italiano",
+              // forse intende che il `state` (Regione) è rimasto in italiano?
+              // O forse che non stiamo salvando correttamente la provincia da nessuna parte?
+              // Nel payload standard non c'è un campo esplicito 'province'. C'è 'state' (che usiamo per regione).
+              // Forse il backend si aspetta 'province'? O forse 'state' dovrebbe essere la provincia?
+              // Nei formati indirizzo spesso State = Provincia/Regione.
+              
+              // Rileggendo la richiesta: "mettendo sotto al nome della provincia un altro parametro keyProvince..."
+              // E ora: "non ho il corrispettivo esatto anche nell'altra località... continuando a vedere la città e la provincia in italiano".
+              
+              // Se il backend o il frontend visualizza "Città, Provincia", e la provincia viene dal campo 'state' o è dedotta?
+              // Se 'state' nel payload è la Regione (es. Tuscany), e la città è Firenze.
+              // L'utente vede "Firenze, Tuscany".
+              // Se vede "Firenze, Toscana" nel locale EN, allora il mapping non ha funzionato.
+              
+              // Possibile causa: `match` non trovato nel primo step.
+              // `findLocation` cerca per `region.toLowerCase() === regionName.toLowerCase()`.
+              // `state` (input) è "Lazio" (trim). `region.region` è "Lazio". Match!
+              // Ma se l'utente ha input "Firenze, Toscana".
+              // `state` = "Toscana".
+              // Cerchiamo in Italian DB. Troviamo ProvinceId 89.
+              // Cerchiamo in English DB ProvinceId 89.
+              // Troviamo Region "Tuscany".
+              // targetMatch.region = "Tuscany".
+              // Payload EN: state = "Tuscany".
+              
+              // Se l'utente dice che non va, forse `state` non viene passato correttamente o salvato?
+              // O forse `cityParts[1]` non è la regione ma la provincia?
+              // Nell'autocomplete: `fullLabel: ${city}, ${region.region}`.
+              // Quindi "Firenze, Toscana". Toscana è la REGIONE.
+              // La provincia (Florence/Firenze) non è nella stringa "Firenze, Toscana".
+              
+              // Quindi `state` nel payload è la Regione.
+              // Se l'utente vuole vedere la provincia corretta, dove la vede?
+              // Forse l'utente chiama "Provincia" la Regione (Toscana)?
+              
+              // Proviamo a garantire che `targetMatch` venga costruito correttamente.
+              // E aggiungiamo un controllo: se la città è uguale al nome della provincia (es. Firenze == Firenze),
+              // e nel target la provincia ha nome diverso (es. Florence),
+              // forse dovremmo usare il nome della provincia target come città?
+              // Es. Provincia target name = "Florence".
+              // Se la città source era il capoluogo (uguale a nome provincia source), usiamo capoluogo target.
+              
+              if (match.city.toLowerCase() === match.province.name.toLowerCase()) {
+                 // È un capoluogo (es. Firenze == Firenze)
+                 // Usiamo il nome della provincia target come città (es. Florence)
+                 targetMatch.city = p.name;
+              }
+              
+              break;
+            }
+          }
+          if (targetMatch) break;
+        }
+
+        if (targetMatch) {
+          locales.push({
+            serviceType: 'LUGGAGE',
+            language: targetLang,
+            country: targetLang === 'it' ? 'Italia' : 'Italy',
+            state: targetMatch.region,
+            city: targetMatch.city,
+            address: formData.address
+          });
+        }
+      } else {
+        // Fallback standard se non trovato nel DB
+        const isEnglish = i18n.language?.startsWith('en');
+        const country = isEnglish ? 'Italy' : 'Italia';
+        const lang = isEnglish ? 'en' : 'it';
+        locales.push({
+          serviceType: 'LUGGAGE',
+          language: lang,
+          country: country,
+          state: state,
+          city: city,
+          address: formData.address
+        });
+      }
+
+      const openingHours = [];
+      for (let day = 1; day <= 7; day++) {
+        const isSunday = day === 7;
+        const closed = formData.closedOnHolidaysAndSunday && isSunday;
+        openingHours.push({
+          dayOfWeek: day,
+          openingTime: formData.openingTime,
+          closingTime: formData.closingTime,
+          closed
+        });
+      }
+
+      const sizePrices = Object.entries(formData.sizes).map(([sizeLabel, info]) => ({
+        sizeLabel,
+        pricePerDay: info.pricePerDay ? parseFloat(info.pricePerDay.toString().replace(',', '.')) : 0,
+        pricePerHour: info.pricePerHour ? parseFloat(info.pricePerHour.toString().replace(',', '.')) : 0,
+        description: info.description.trim() || null
+      }));
+
+      const payload = {
+        name: formData.name,
+        description: formData.description,
+        locales: locales,
+        capacity: parseInt(formData.capacity, 10) || null,
+        basePrice: basePrice,
+        publicationStatus: formData.publicationStatus,
+        openingHours,
+        sizePrices
+      };
+
+      const formDataToSend = new FormData();
+      formDataToSend.append('data', new Blob([JSON.stringify(payload)], { type: 'application/json' }));
+
+      // Process images in parallel to avoid hanging
+      const imagePromises = images.map(async (url) => {
+        try {
+          // Check if URL is valid
+          if (!url) return null;
+
+          // If it's a relative URL, fetch might need full path if not proxied correctly, 
+          // but usually relative works with fetch in browser.
+          // Adding a timeout is crucial.
+          const controller = new AbortController();
+          const timeoutId = setTimeout(() => controller.abort(), 10000); // 10s timeout
+          
+          const response = await fetch(url, { signal: controller.signal });
+          clearTimeout(timeoutId);
+
+          if (!response.ok) {
+             console.warn(`Failed to fetch image ${url}: ${response.status}`);
+             return null;
+          }
+
+          const blob = await response.blob();
+          const filename = url.split('/').pop() || 'image.jpg';
+          return new File([blob], filename, { type: blob.type });
+        } catch (err) {
+          console.error('Error processing image:', url, err);
+          return null;
+        }
+      });
+
+      const processedImages = await Promise.all(imagePromises);
+      processedImages.forEach(file => {
+        if (file) formDataToSend.append('images', file);
+      });
+      
+      newImages.forEach(item => formDataToSend.append('images', item.file));
+
+      console.log("Sending request...", payload); // Debug log
+
       if (isEditMode) {
         await luggageService.updateLuggageProvider(id, formDataToSend);
       } else {
@@ -498,6 +754,7 @@ export const LuggageServiceEditPageBase = () => {
       const updatedPreviews = [...images, ...newImages.map(i => i.preview)];
       setImages(updatedPreviews);
     } catch (e) {
+      console.error("Save error:", e);
       setErrorMessage(e.message || 'Errore durante il salvataggio');
       setShowError(true);
     } finally {
@@ -509,7 +766,6 @@ export const LuggageServiceEditPageBase = () => {
 
   const breadcrumbsItems = [
     { label: 'Dashboard', href: '/provider/dashboard' },
-    { label: 'I miei Depositi', href: '/provider/luggage' },
     { label: isEditMode ? 'Modifica Deposito' : 'Crea Deposito', href: '#' }
   ];
 
@@ -550,7 +806,7 @@ export const LuggageServiceEditPageBase = () => {
               />
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
                 <CityAutocomplete
-                  label="Città"
+                  label="Città *"
                   value={formData.city}
                   onChange={v => handle('city', v)}
                   icon={MapPin}
@@ -637,8 +893,10 @@ export const LuggageServiceEditPageBase = () => {
                   label="Small"
                   icon={Backpack}
                   description={formData.sizes.SMALL.description}
-                  price={formData.sizes.SMALL.pricePerDay}
-                  onPriceChange={v => handleSize('SMALL', 'pricePerDay', v)}
+                  priceDay={formData.sizes.SMALL.pricePerDay}
+                  priceHour={formData.sizes.SMALL.pricePerHour}
+                  onPriceDayChange={v => handleSize('SMALL', 'pricePerDay', v)}
+                  onPriceHourChange={v => handleSize('SMALL', 'pricePerHour', v)}
                   onDescChange={v => handleSize('SMALL', 'description', v)}
                 />
                 <LuggageSizePriceCard
@@ -646,8 +904,10 @@ export const LuggageServiceEditPageBase = () => {
                   label="Medium"
                   icon={Briefcase}
                   description={formData.sizes.MEDIUM.description}
-                  price={formData.sizes.MEDIUM.pricePerDay}
-                  onPriceChange={v => handleSize('MEDIUM', 'pricePerDay', v)}
+                  priceDay={formData.sizes.MEDIUM.pricePerDay}
+                  priceHour={formData.sizes.MEDIUM.pricePerHour}
+                  onPriceDayChange={v => handleSize('MEDIUM', 'pricePerDay', v)}
+                  onPriceHourChange={v => handleSize('MEDIUM', 'pricePerHour', v)}
                   onDescChange={v => handleSize('MEDIUM', 'description', v)}
                 />
                 <LuggageSizePriceCard
@@ -655,8 +915,10 @@ export const LuggageServiceEditPageBase = () => {
                   label="Large"
                   icon={Package}
                   description={formData.sizes.LARGE.description}
-                  price={formData.sizes.LARGE.pricePerDay}
-                  onPriceChange={v => handleSize('LARGE', 'pricePerDay', v)}
+                  priceDay={formData.sizes.LARGE.pricePerDay}
+                  priceHour={formData.sizes.LARGE.pricePerHour}
+                  onPriceDayChange={v => handleSize('LARGE', 'pricePerDay', v)}
+                  onPriceHourChange={v => handleSize('LARGE', 'pricePerHour', v)}
                   onDescChange={v => handleSize('LARGE', 'description', v)}
                 />
               </div>
@@ -709,7 +971,7 @@ export const LuggageServiceEditPageBase = () => {
 
                 <div className="mb-6">
                   <label className="block text-xs font-bold text-gray-400 uppercase tracking-wider mb-2">
-                    Capienza Massima (numero bagagli)
+                    Capienza Massima (numero bagagli) <span className="text-red-500">*</span>
                   </label>
                   <div className="relative">
                     <Warehouse className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400" size={20} />

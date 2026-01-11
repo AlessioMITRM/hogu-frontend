@@ -4,6 +4,7 @@
     "provinces": [
       {
         "name": "Chieti",
+        "provinceId": 1,
         "cities": [
           "Altino",
           "Archi",
@@ -112,110 +113,8 @@
         ]
       },
       {
-        "name": "Pescara",
-        "cities": [
-          "Abbateggio",
-          "Alanno",
-          "Bolognano",
-          "Brittoli",
-          "Bussi sul Tirino",
-          "Cappelle sul Tavo",
-          "Caramanico Terme",
-          "Carpineto della Nora",
-          "Castiglione a Casauria",
-          "Catignano",
-          "Cepagatti",
-          "Città Sant'Angelo",
-          "Civitaquana",
-          "Civitella Casanova",
-          "Collecorvino",
-          "Corvara",
-          "Cugnoli",
-          "Elice",
-          "Farindola",
-          "Lettomanoppello",
-          "Loreto Aprutino",
-          "Manoppello",
-          "Montebello di Bertona",
-          "Montesilvano",
-          "Moscufo",
-          "Nocciano",
-          "Penne",
-          "Pescara",
-          "Pescosansonesco",
-          "Pianella",
-          "Picciano",
-          "Pietranico",
-          "Popoli Terme",
-          "Roccamorice",
-          "Rosciano",
-          "Salle",
-          "San Valentino in Abruzzo Citeriore",
-          "Sant'Eufemia a Maiella",
-          "Scafa",
-          "Serramonacesca",
-          "Spoltore",
-          "Tocco da Casauria",
-          "Torre de' Passeri",
-          "Turrivalignani",
-          "Vicoli",
-          "Villa Celiera"
-        ]
-      },
-      {
-        "name": "Teramo",
-        "cities": [
-          "Alba Adriatica",
-          "Ancarano",
-          "Arsita",
-          "Atri",
-          "Basciano",
-          "Bellante",
-          "Bisenti",
-          "Campli",
-          "Canzano",
-          "Castel Castagna",
-          "Castellalto",
-          "Castelli",
-          "Castiglione Messer Raimondo",
-          "Castilenti",
-          "Cellino Attanasio",
-          "Cermignano",
-          "Civitella del Tronto",
-          "Colledara",
-          "Colonnella",
-          "Controguerra",
-          "Corropoli",
-          "Cortino",
-          "Crognaleto",
-          "Fano Adriano",
-          "Giulianova",
-          "Isola del Gran Sasso d'Italia",
-          "Martinsicuro",
-          "Montefino",
-          "Montorio al Vomano",
-          "Morro d'Oro",
-          "Mosciano Sant'Angelo",
-          "Nereto",
-          "Notaresco",
-          "Penna Sant'Andrea",
-          "Pietracamela",
-          "Pineto",
-          "Rocca Santa Maria",
-          "Roseto degli Abruzzi",
-          "Sant'Egidio alla Vibrata",
-          "Sant'Omero",
-          "Silvi",
-          "Teramo",
-          "Torano Nuovo",
-          "Torricella Sicura",
-          "Tortoreto",
-          "Tossicia",
-          "Valle Castellana"
-        ]
-      },
-      {
-        "name": "The Eagle",
+        "name": "L'Aquila",
+        "provinceId": 2,
         "cities": [
           "Acciano",
           "Aielli",
@@ -326,6 +225,111 @@
           "Villetta Barrea",
           "Vittorito"
         ]
+      },
+      {
+        "name": "Pescara",
+        "provinceId": 3,
+        "cities": [
+          "Abbateggio",
+          "Alanno",
+          "Bolognano",
+          "Brittoli",
+          "Bussi sul Tirino",
+          "Cappelle sul Tavo",
+          "Caramanico Terme",
+          "Carpineto della Nora",
+          "Castiglione a Casauria",
+          "Catignano",
+          "Cepagatti",
+          "Città Sant'Angelo",
+          "Civitaquana",
+          "Civitella Casanova",
+          "Collecorvino",
+          "Corvara",
+          "Cugnoli",
+          "Elice",
+          "Farindola",
+          "Lettomanoppello",
+          "Loreto Aprutino",
+          "Manoppello",
+          "Montebello di Bertona",
+          "Montesilvano",
+          "Moscufo",
+          "Nocciano",
+          "Penne",
+          "Pescara",
+          "Pescosansonesco",
+          "Pianella",
+          "Picciano",
+          "Pietranico",
+          "Popoli Terme",
+          "Roccamorice",
+          "Rosciano",
+          "Salle",
+          "San Valentino in Abruzzo Citeriore",
+          "Sant'Eufemia a Maiella",
+          "Scafa",
+          "Serramonacesca",
+          "Spoltore",
+          "Tocco da Casauria",
+          "Torre de' Passeri",
+          "Turrivalignani",
+          "Vicoli",
+          "Villa Celiera"
+        ]
+      },
+      {
+        "name": "Teramo",
+        "provinceId": 4,
+        "cities": [
+          "Alba Adriatica",
+          "Ancarano",
+          "Arsita",
+          "Atri",
+          "Basciano",
+          "Bellante",
+          "Bisenti",
+          "Campli",
+          "Canzano",
+          "Castel Castagna",
+          "Castellalto",
+          "Castelli",
+          "Castiglione Messer Raimondo",
+          "Castilenti",
+          "Cellino Attanasio",
+          "Cermignano",
+          "Civitella del Tronto",
+          "Colledara",
+          "Colonnella",
+          "Controguerra",
+          "Corropoli",
+          "Cortino",
+          "Crognaleto",
+          "Fano Adriano",
+          "Giulianova",
+          "Isola del Gran Sasso d'Italia",
+          "Martinsicuro",
+          "Montefino",
+          "Montorio al Vomano",
+          "Morro d'Oro",
+          "Mosciano Sant'Angelo",
+          "Nereto",
+          "Notaresco",
+          "Penna Sant'Andrea",
+          "Pietracamela",
+          "Pineto",
+          "Rocca Santa Maria",
+          "Roseto degli Abruzzi",
+          "Sant'Egidio alla Vibrata",
+          "Sant'Omero",
+          "Silvi",
+          "Teramo",
+          "Torano Nuovo",
+          "Torricella Sicura",
+          "Tortoreto",
+          "Tossicia",
+          "Valle Castellana"
+        ]
       }
     ]
   },
@@ -334,6 +338,7 @@
     "provinces": [
       {
         "name": "Matera",
+        "provinceId": 5,
         "cities": [
           "Accettura",
           "Aliano",
@@ -369,7 +374,8 @@
         ]
       },
       {
-        "name": "Power",
+        "name": "Potenza",
+        "provinceId": 6,
         "cities": [
           "Abriola",
           "Acerenza",
@@ -480,6 +486,7 @@
     "provinces": [
       {
         "name": "Catanzaro",
+        "provinceId": 7,
         "cities": [
           "Albi",
           "Amaroni",
@@ -565,6 +572,7 @@
       },
       {
         "name": "Cosenza",
+        "provinceId": 8,
         "cities": [
           "Acquaformosa",
           "Acquappesa",
@@ -720,6 +728,7 @@
       },
       {
         "name": "Crotone",
+        "provinceId": 9,
         "cities": [
           "Belvedere di Spinello",
           "Caccuri",
@@ -752,6 +761,7 @@
       },
       {
         "name": "Reggio Calabria",
+        "provinceId": 10,
         "cities": [
           "Africo",
           "Agnana Calabra",
@@ -854,6 +864,7 @@
       },
       {
         "name": "Vibo Valentia",
+        "provinceId": 11,
         "cities": [
           "Acquaro",
           "Arena",
@@ -914,6 +925,7 @@
     "provinces": [
       {
         "name": "Avellino",
+        "provinceId": 12,
         "cities": [
           "Aiello del Sabato",
           "Altavilla Irpina",
@@ -1037,6 +1049,7 @@
       },
       {
         "name": "Benevento",
+        "provinceId": 13,
         "cities": [
           "Airola",
           "Amorosi",
@@ -1120,6 +1133,7 @@
       },
       {
         "name": "Caserta",
+        "provinceId": 14,
         "cities": [
           "Ailano",
           "Alife",
@@ -1229,6 +1243,7 @@
       },
       {
         "name": "Naples",
+        "provinceId": 15,
         "cities": [
           "Acerra",
           "Afragola",
@@ -1326,6 +1341,7 @@
       },
       {
         "name": "Salerno",
+        "provinceId": 16,
         "cities": [
           "Acerno",
           "Agropoli",
@@ -1494,6 +1510,7 @@
     "provinces": [
       {
         "name": "Bologna",
+        "provinceId": 17,
         "cities": [
           "Alto Reno Terme",
           "Anzola dell'Emilia",
@@ -1554,6 +1571,7 @@
       },
       {
         "name": "Ferrara",
+        "provinceId": 18,
         "cities": [
           "Argenta",
           "Bondeno",
@@ -1580,6 +1598,7 @@
       },
       {
         "name": "Forlì-Cesena",
+        "provinceId": 19,
         "cities": [
           "Bagno di Romagna",
           "Bertinoro",
@@ -1615,6 +1634,7 @@
       },
       {
         "name": "Modena",
+        "provinceId": 20,
         "cities": [
           "Bastiglia",
           "Bomporto",
@@ -1667,6 +1687,7 @@
       },
       {
         "name": "Parma",
+        "provinceId": 21,
         "cities": [
           "Albareto",
           "Bardi",
@@ -1716,6 +1737,7 @@
       },
       {
         "name": "Piacenza",
+        "provinceId": 22,
         "cities": [
           "Agazzano",
           "Alseno",
@@ -1767,6 +1789,7 @@
       },
       {
         "name": "Ravenna",
+        "provinceId": 23,
         "cities": [
           "Alfonsine",
           "Bagnacavallo",
@@ -1790,6 +1813,7 @@
       },
       {
         "name": "Reggio nell'Emilia",
+        "provinceId": 24,
         "cities": [
           "Albinea",
           "Bagnolo in Piano",
@@ -1837,6 +1861,7 @@
       },
       {
         "name": "Rimini",
+        "provinceId": 25,
         "cities": [
           "Bellaria-Igea Marina",
           "Casteldelci",
@@ -1874,6 +1899,7 @@
     "provinces": [
       {
         "name": "Gorizia",
+        "provinceId": 26,
         "cities": [
           "Capriva del Friuli",
           "Cormons",
@@ -1904,6 +1930,7 @@
       },
       {
         "name": "Pordenone",
+        "provinceId": 27,
         "cities": [
           "Andreis",
           "Arba",
@@ -1959,6 +1986,7 @@
       },
       {
         "name": "Trieste",
+        "provinceId": 28,
         "cities": [
           "Duino Aurisina",
           "Monrupino",
@@ -1970,6 +1998,7 @@
       },
       {
         "name": "Udine",
+        "provinceId": 29,
         "cities": [
           "Aiello del Friuli",
           "Amaro",
@@ -2114,6 +2143,7 @@
     "provinces": [
       {
         "name": "Frosinone",
+        "provinceId": 30,
         "cities": [
           "Acquafondata",
           "Acuto",
@@ -2209,7 +2239,8 @@
         ]
       },
       {
-        "name": "Latin",
+        "name": "Latina",
+        "provinceId": 31,
         "cities": [
           "Aprilia",
           "Bassiano",
@@ -2248,6 +2279,7 @@
       },
       {
         "name": "Rieti",
+        "provinceId": 32,
         "cities": [
           "Accumoli",
           "Amatrice",
@@ -2326,6 +2358,7 @@
       },
       {
         "name": "Rome",
+        "provinceId": 33,
         "cities": [
           "Affile",
           "Agosta",
@@ -2452,6 +2485,7 @@
       },
       {
         "name": "Viterbo",
+        "provinceId": 34,
         "cities": [
           "Acquapendente",
           "Arlena di Castro",
@@ -2522,6 +2556,7 @@
     "provinces": [
       {
         "name": "Genoa",
+        "provinceId": 35,
         "cities": [
           "Arenzano",
           "Avegno",
@@ -2594,6 +2629,7 @@
       },
       {
         "name": "Imperia",
+        "provinceId": 36,
         "cities": [
           "Airole",
           "Apricale",
@@ -2665,6 +2701,7 @@
       },
       {
         "name": "La Spezia",
+        "provinceId": 37,
         "cities": [
           "Ameglia",
           "Arcola",
@@ -2702,6 +2739,7 @@
       },
       {
         "name": "Savona",
+        "provinceId": 38,
         "cities": [
           "Alassio",
           "Albenga",
@@ -2781,6 +2819,7 @@
     "provinces": [
       {
         "name": "Bergamo",
+        "provinceId": 39,
         "cities": [
           "Adrara San Martino",
           "Adrara San Rocco",
@@ -3029,6 +3068,7 @@
       },
       {
         "name": "Brescia",
+        "provinceId": 40,
         "cities": [
           "Acquafredda",
           "Adro",
@@ -3238,125 +3278,8 @@
         ]
       },
       {
-        "name": "Cremona",
-        "cities": [
-          "Acquanegra Cremonese",
-          "Agnadello",
-          "Annicco",
-          "Azzanello",
-          "Bagnolo Cremasco",
-          "Bonemerse",
-          "Bordolano",
-          "Calvatone",
-          "Camisano",
-          "Campagnola Cremasca",
-          "Capergnanica",
-          "Cappella Cantone",
-          "Cappella de' Picenardi",
-          "Capralba",
-          "Casalbuttano ed Uniti",
-          "Casale Cremasco-Vidolasco",
-          "Casaletto Ceredano",
-          "Casaletto Vaprio",
-          "Casaletto di Sopra",
-          "Casalmaggiore",
-          "Casalmorano",
-          "Castel Gabbiano",
-          "Casteldidone",
-          "Castelleone",
-          "Castelverde",
-          "Castelvisconti",
-          "Cella Dati",
-          "Chieve",
-          "Cicognolo",
-          "Cingia de' Botti",
-          "Corte de' Cortesi con Cignone",
-          "Corte de' Frati",
-          "Credera Rubbiano",
-          "Crema",
-          "Cremona",
-          "Cremosano",
-          "Crotta d'Adda",
-          "Cumignano sul Naviglio",
-          "Derovere",
-          "Dovera",
-          "Fiesco",
-          "Formigara",
-          "Gabbioneta-Binanuova",
-          "Gadesco-Pieve Delmona",
-          "Genivolta",
-          "Gerre de' Caprioli",
-          "Gombito",
-          "Grontardo",
-          "Grumello Cremonese ed Uniti",
-          "Gussola",
-          "Isola Dovarese",
-          "Izano",
-          "Madignano",
-          "Malagnino",
-          "Martignana di Po",
-          "Monte Cremasco",
-          "Montodine",
-          "Moscazzano",
-          "Motta Baluffi",
-          "Offanengo",
-          "Olmeneta",
-          "Ostiano",
-          "Paderno Ponchielli",
-          "Palazzo Pignano",
-          "Pandino",
-          "Persico Dosimo",
-          "Pescarolo ed Uniti",
-          "Pessina Cremonese",
-          "Piadena Drizzona",
-          "Pianengo",
-          "Pieranica",
-          "Pieve San Giacomo",
-          "Pieve d'Olmi",
-          "Pizzighettone",
-          "Pozzaglio ed Uniti",
-          "Quintano",
-          "Ricengo",
-          "Ripalta Arpina",
-          "Ripalta Cremasca",
-          "Ripalta Guerina",
-          "Rivarolo del Re ed Uniti",
-          "Rivolta d'Adda",
-          "Robecco d'Oglio",
-          "Romanengo",
-          "Salvirola",
-          "San Bassano",
-          "San Daniele Po",
-          "San Giovanni in Croce",
-          "San Martino del Lago",
-          "Scandolara Ravara",
-          "Scandolara Ripa d'Oglio",
-          "Sergnano",
-          "Sesto ed Uniti",
-          "Solarolo Rainerio",
-          "Soncino",
-          "Soresina",
-          "Sospiro",
-          "Spinadesco",
-          "Spineda",
-          "Spino d'Adda",
-          "Stagno Lombardo",
-          "Ticengo",
-          "Torlino Vimercati",
-          "Tornata",
-          "Torre de' Picenardi",
-          "Torricella del Pizzo",
-          "Trescore Cremasco",
-          "Trigolo",
-          "Vaiano Cremasco",
-          "Vailate",
-          "Vescovato",
-          "Volongo",
-          "Voltido"
-        ]
-      },
-      {
-        "name": "How",
+        "name": "Como",
+        "provinceId": 41,
         "cities": [
           "Albavilla",
           "Albese con Cassano",
@@ -3508,7 +3431,127 @@
         ]
       },
       {
+        "name": "Cremona",
+        "provinceId": 42,
+        "cities": [
+          "Acquanegra Cremonese",
+          "Agnadello",
+          "Annicco",
+          "Azzanello",
+          "Bagnolo Cremasco",
+          "Bonemerse",
+          "Bordolano",
+          "Calvatone",
+          "Camisano",
+          "Campagnola Cremasca",
+          "Capergnanica",
+          "Cappella Cantone",
+          "Cappella de' Picenardi",
+          "Capralba",
+          "Casalbuttano ed Uniti",
+          "Casale Cremasco-Vidolasco",
+          "Casaletto Ceredano",
+          "Casaletto Vaprio",
+          "Casaletto di Sopra",
+          "Casalmaggiore",
+          "Casalmorano",
+          "Castel Gabbiano",
+          "Casteldidone",
+          "Castelleone",
+          "Castelverde",
+          "Castelvisconti",
+          "Cella Dati",
+          "Chieve",
+          "Cicognolo",
+          "Cingia de' Botti",
+          "Corte de' Cortesi con Cignone",
+          "Corte de' Frati",
+          "Credera Rubbiano",
+          "Crema",
+          "Cremona",
+          "Cremosano",
+          "Crotta d'Adda",
+          "Cumignano sul Naviglio",
+          "Derovere",
+          "Dovera",
+          "Fiesco",
+          "Formigara",
+          "Gabbioneta-Binanuova",
+          "Gadesco-Pieve Delmona",
+          "Genivolta",
+          "Gerre de' Caprioli",
+          "Gombito",
+          "Grontardo",
+          "Grumello Cremonese ed Uniti",
+          "Gussola",
+          "Isola Dovarese",
+          "Izano",
+          "Madignano",
+          "Malagnino",
+          "Martignana di Po",
+          "Monte Cremasco",
+          "Montodine",
+          "Moscazzano",
+          "Motta Baluffi",
+          "Offanengo",
+          "Olmeneta",
+          "Ostiano",
+          "Paderno Ponchielli",
+          "Palazzo Pignano",
+          "Pandino",
+          "Persico Dosimo",
+          "Pescarolo ed Uniti",
+          "Pessina Cremonese",
+          "Piadena Drizzona",
+          "Pianengo",
+          "Pieranica",
+          "Pieve San Giacomo",
+          "Pieve d'Olmi",
+          "Pizzighettone",
+          "Pozzaglio ed Uniti",
+          "Quintano",
+          "Ricengo",
+          "Ripalta Arpina",
+          "Ripalta Cremasca",
+          "Ripalta Guerina",
+          "Rivarolo del Re ed Uniti",
+          "Rivolta d'Adda",
+          "Robecco d'Oglio",
+          "Romanengo",
+          "Salvirola",
+          "San Bassano",
+          "San Daniele Po",
+          "San Giovanni in Croce",
+          "San Martino del Lago",
+          "Scandolara Ravara",
+          "Scandolara Ripa d'Oglio",
+          "Sergnano",
+          "Sesto ed Uniti",
+          "Solarolo Rainerio",
+          "Soncino",
+          "Soresina",
+          "Sospiro",
+          "Spinadesco",
+          "Spineda",
+          "Spino d'Adda",
+          "Stagno Lombardo",
+          "Ticengo",
+          "Torlino Vimercati",
+          "Tornata",
+          "Torre de' Picenardi",
+          "Torricella del Pizzo",
+          "Trescore Cremasco",
+          "Trigolo",
+          "Vaiano Cremasco",
+          "Vailate",
+          "Vescovato",
+          "Volongo",
+          "Voltido"
+        ]
+      },
+      {
         "name": "Lecco",
+        "provinceId": 43,
         "cities": [
           "Abbadia Lariana",
           "Airuno",
@@ -3597,7 +3640,74 @@
         ]
       },
       {
-        "name": "Mantua",
+        "name": "Lodi",
+        "provinceId": 44,
+        "cities": [
+          "Abbadia Cerreto",
+          "Bertonico",
+          "Boffalora d'Adda",
+          "Borghetto Lodigiano",
+          "Borgo San Giovanni",
+          "Brembio",
+          "Casaletto Lodigiano",
+          "Casalmaiocco",
+          "Casalpusterlengo",
+          "Caselle Landi",
+          "Caselle Lurani",
+          "Castelgerundo",
+          "Castelnuovo Bocca d'Adda",
+          "Castiglione d'Adda",
+          "Castiraga Vidardo",
+          "Cavenago d'Adda",
+          "Cervignano d'Adda",
+          "Codogno",
+          "Comazzo",
+          "Cornegliano Laudense",
+          "Corno Giovine",
+          "Cornovecchio",
+          "Corte Palasio",
+          "Crespiatica",
+          "Fombio",
+          "Galgagnano",
+          "Graffignana",
+          "Guardamiglio",
+          "Livraga",
+          "Lodi",
+          "Lodi Vecchio",
+          "Maccastorna",
+          "Mairago",
+          "Maleo",
+          "Marudo",
+          "Massalengo",
+          "Meleti",
+          "Merlino",
+          "Montanaso Lombardo",
+          "Mulazzano",
+          "Orio Litta",
+          "Ospedaletto Lodigiano",
+          "Ossago Lodigiano",
+          "Pieve Fissiraga",
+          "Salerano sul Lambro",
+          "San Fiorano",
+          "San Martino in Strada",
+          "San Rocco al Porto",
+          "Sant'Angelo Lodigiano",
+          "Santo Stefano Lodigiano",
+          "Secugnago",
+          "Senna Lodigiana",
+          "Somaglia",
+          "Sordio",
+          "Tavazzano con Villavesco",
+          "Terranova dei Passerini",
+          "Turano Lodigiano",
+          "Valera Fratta",
+          "Villanova del Sillaro",
+          "Zelo Buon Persico"
+        ]
+      },
+      {
+        "name": "Mantova",
+        "provinceId": 45,
         "cities": [
           "Acquanegra sul Chiese",
           "Asola",
@@ -3667,6 +3777,7 @@
       },
       {
         "name": "Milan",
+        "provinceId": 46,
         "cities": [
           "Abbiategrasso",
           "Albairate",
@@ -3804,7 +3915,8 @@
         ]
       },
       {
-        "name": "Monza and Brianza",
+        "name": "Monza e della Brianza",
+        "provinceId": 47,
         "cities": [
           "Agrate Brianza",
           "Aicurzio",
@@ -3865,6 +3977,7 @@
       },
       {
         "name": "Pavia",
+        "provinceId": 48,
         "cities": [
           "Alagna",
           "Albonese",
@@ -4054,72 +4167,8 @@
         ]
       },
       {
-        "name": "Praises",
-        "cities": [
-          "Abbadia Cerreto",
-          "Bertonico",
-          "Boffalora d'Adda",
-          "Borghetto Lodigiano",
-          "Borgo San Giovanni",
-          "Brembio",
-          "Casaletto Lodigiano",
-          "Casalmaiocco",
-          "Casalpusterlengo",
-          "Caselle Landi",
-          "Caselle Lurani",
-          "Castelgerundo",
-          "Castelnuovo Bocca d'Adda",
-          "Castiglione d'Adda",
-          "Castiraga Vidardo",
-          "Cavenago d'Adda",
-          "Cervignano d'Adda",
-          "Codogno",
-          "Comazzo",
-          "Cornegliano Laudense",
-          "Corno Giovine",
-          "Cornovecchio",
-          "Corte Palasio",
-          "Crespiatica",
-          "Fombio",
-          "Galgagnano",
-          "Graffignana",
-          "Guardamiglio",
-          "Livraga",
-          "Lodi",
-          "Lodi Vecchio",
-          "Maccastorna",
-          "Mairago",
-          "Maleo",
-          "Marudo",
-          "Massalengo",
-          "Meleti",
-          "Merlino",
-          "Montanaso Lombardo",
-          "Mulazzano",
-          "Orio Litta",
-          "Ospedaletto Lodigiano",
-          "Ossago Lodigiano",
-          "Pieve Fissiraga",
-          "Salerano sul Lambro",
-          "San Fiorano",
-          "San Martino in Strada",
-          "San Rocco al Porto",
-          "Sant'Angelo Lodigiano",
-          "Santo Stefano Lodigiano",
-          "Secugnago",
-          "Senna Lodigiana",
-          "Somaglia",
-          "Sordio",
-          "Tavazzano con Villavesco",
-          "Terranova dei Passerini",
-          "Turano Lodigiano",
-          "Valera Fratta",
-          "Villanova del Sillaro",
-          "Zelo Buon Persico"
-        ]
-      },
-      {
         "name": "Sondrio",
+        "provinceId": 49,
         "cities": [
           "Albaredo per San Marco",
           "Albosaggia",
@@ -4202,6 +4251,7 @@
       },
       {
         "name": "Varese",
+        "provinceId": 50,
         "cities": [
           "Agra",
           "Albizzate",
@@ -4348,6 +4398,7 @@
     "provinces": [
       {
         "name": "Ancona",
+        "provinceId": 51,
         "cities": [
           "Agugliano",
           "Ancona",
@@ -4400,6 +4451,7 @@
       },
       {
         "name": "Ascoli Piceno",
+        "provinceId": 52,
         "cities": [
           "Acquasanta Terme",
           "Acquaviva Picena",
@@ -4437,7 +4489,54 @@
         ]
       },
       {
+        "name": "Fermo",
+        "provinceId": 53,
+        "cities": [
+          "Altidona",
+          "Amandola",
+          "Belmonte Piceno",
+          "Campofilone",
+          "Falerone",
+          "Fermo",
+          "Francavilla d'Ete",
+          "Grottazzolina",
+          "Lapedona",
+          "Magliano di Tenna",
+          "Massa Fermana",
+          "Monsampietro Morico",
+          "Montappone",
+          "Monte Giberto",
+          "Monte Rinaldo",
+          "Monte San Pietrangeli",
+          "Monte Urano",
+          "Monte Vidon Combatte",
+          "Monte Vidon Corrado",
+          "Montefalcone Appennino",
+          "Montefortino",
+          "Montegiorgio",
+          "Montegranaro",
+          "Monteleone di Fermo",
+          "Montelparo",
+          "Monterubbiano",
+          "Montottone",
+          "Moresco",
+          "Ortezzano",
+          "Pedaso",
+          "Petritoli",
+          "Ponzano di Fermo",
+          "Porto San Giorgio",
+          "Porto Sant'Elpidio",
+          "Rapagnano",
+          "Sant'Elpidio a Mare",
+          "Santa Vittoria in Matenano",
+          "Servigliano",
+          "Smerillo",
+          "Torre San Patrizio"
+        ]
+      },
+      {
         "name": "Macerata",
+        "provinceId": 54,
         "cities": [
           "Apiro",
           "Appignano",
@@ -4497,7 +4596,8 @@
         ]
       },
       {
-        "name": "Pesaro and Urbino",
+        "name": "Pesaro e Urbino",
+        "provinceId": 55,
         "cities": [
           "Acqualagna",
           "Apecchio",
@@ -4550,51 +4650,6 @@
           "Urbino",
           "Vallefoglia"
         ]
-      },
-      {
-        "name": "Stopped",
-        "cities": [
-          "Altidona",
-          "Amandola",
-          "Belmonte Piceno",
-          "Campofilone",
-          "Falerone",
-          "Fermo",
-          "Francavilla d'Ete",
-          "Grottazzolina",
-          "Lapedona",
-          "Magliano di Tenna",
-          "Massa Fermana",
-          "Monsampietro Morico",
-          "Montappone",
-          "Monte Giberto",
-          "Monte Rinaldo",
-          "Monte San Pietrangeli",
-          "Monte Urano",
-          "Monte Vidon Combatte",
-          "Monte Vidon Corrado",
-          "Montefalcone Appennino",
-          "Montefortino",
-          "Montegiorgio",
-          "Montegranaro",
-          "Monteleone di Fermo",
-          "Montelparo",
-          "Monterubbiano",
-          "Montottone",
-          "Moresco",
-          "Ortezzano",
-          "Pedaso",
-          "Petritoli",
-          "Ponzano di Fermo",
-          "Porto San Giorgio",
-          "Porto Sant'Elpidio",
-          "Rapagnano",
-          "Sant'Elpidio a Mare",
-          "Santa Vittoria in Matenano",
-          "Servigliano",
-          "Smerillo",
-          "Torre San Patrizio"
-        ]
       }
     ]
   },
@@ -4603,6 +4658,7 @@
     "provinces": [
       {
         "name": "Campobasso",
+        "provinceId": 56,
         "cities": [
           "Acquaviva Collecroce",
           "Baranello",
@@ -4692,6 +4748,7 @@
       },
       {
         "name": "Isernia",
+        "provinceId": 57,
         "cities": [
           "Acquaviva d'Isernia",
           "Agnone",
@@ -4753,7 +4810,8 @@
     "region": "Piedmont",
     "provinces": [
       {
-        "name": "Alexandria",
+        "name": "Alessandria",
+        "provinceId": 58,
         "cities": [
           "Acqui Terme",
           "Albera Ligure",
@@ -4946,6 +5004,7 @@
       },
       {
         "name": "Asti",
+        "provinceId": 59,
         "cities": [
           "Agliano Terme",
           "Albugnano",
@@ -5068,6 +5127,7 @@
       },
       {
         "name": "Biella",
+        "provinceId": 60,
         "cities": [
           "Ailoche",
           "Andorno Micca",
@@ -5146,7 +5206,261 @@
         ]
       },
       {
+        "name": "Cuneo",
+        "provinceId": 61,
+        "cities": [
+          "Acceglio",
+          "Aisone",
+          "Alba",
+          "Albaretto della Torre",
+          "Alto",
+          "Argentera",
+          "Arguello",
+          "Bagnasco",
+          "Bagnolo Piemonte",
+          "Baldissero d'Alba",
+          "Barbaresco",
+          "Barge",
+          "Barolo",
+          "Bastia Mondovì",
+          "Battifollo",
+          "Beinette",
+          "Bellino",
+          "Belvedere Langhe",
+          "Bene Vagienna",
+          "Benevello",
+          "Bergolo",
+          "Bernezzo",
+          "Bonvicino",
+          "Borgo San Dalmazzo",
+          "Borgomale",
+          "Bosia",
+          "Bossolasco",
+          "Boves",
+          "Bra",
+          "Briaglia",
+          "Briga Alta",
+          "Brondello",
+          "Brossasco",
+          "Busca",
+          "Camerana",
+          "Canale",
+          "Canosio",
+          "Caprauna",
+          "Caraglio",
+          "Caramagna Piemonte",
+          "Cardè",
+          "Carrù",
+          "Cartignano",
+          "Casalgrasso",
+          "Castagnito",
+          "Casteldelfino",
+          "Castelletto Stura",
+          "Castelletto Uzzone",
+          "Castellinaldo d'Alba",
+          "Castellino Tanaro",
+          "Castelmagno",
+          "Castelnuovo di Ceva",
+          "Castiglione Falletto",
+          "Castiglione Tinella",
+          "Castino",
+          "Cavallerleone",
+          "Cavallermaggiore",
+          "Celle di Macra",
+          "Centallo",
+          "Ceresole Alba",
+          "Cerretto Langhe",
+          "Cervasca",
+          "Cervere",
+          "Ceva",
+          "Cherasco",
+          "Chiusa di Pesio",
+          "Cigliè",
+          "Cissone",
+          "Clavesana",
+          "Corneliano d'Alba",
+          "Cortemilia",
+          "Cossano Belbo",
+          "Costigliole Saluzzo",
+          "Cravanzana",
+          "Crissolo",
+          "Cuneo",
+          "Demonte",
+          "Diano d'Alba",
+          "Dogliani",
+          "Dronero",
+          "Elva",
+          "Entracque",
+          "Envie",
+          "Farigliano",
+          "Faule",
+          "Feisoglio",
+          "Fossano",
+          "Frabosa Soprana",
+          "Frabosa Sottana",
+          "Frassino",
+          "Gaiola",
+          "Gambasca",
+          "Garessio",
+          "Genola",
+          "Gorzegno",
+          "Gottasecca",
+          "Govone",
+          "Grinzane Cavour",
+          "Guarene",
+          "Igliano",
+          "Isasca",
+          "La Morra",
+          "Lagnasco",
+          "Lequio Berria",
+          "Lequio Tanaro",
+          "Lesegno",
+          "Levice",
+          "Limone Piemonte",
+          "Lisio",
+          "Macra",
+          "Magliano Alfieri",
+          "Magliano Alpi",
+          "Mango",
+          "Manta",
+          "Marene",
+          "Margarita",
+          "Marmora",
+          "Marsaglia",
+          "Martiniana Po",
+          "Melle",
+          "Moiola",
+          "Mombarcaro",
+          "Mombasiglio",
+          "Monastero di Vasco",
+          "Monasterolo Casotto",
+          "Monasterolo di Savigliano",
+          "Monchiero",
+          "Mondovì",
+          "Monesiglio",
+          "Monforte d'Alba",
+          "Montaldo Roero",
+          "Montaldo di Mondovì",
+          "Montanera",
+          "Montelupo Albese",
+          "Montemale di Cuneo",
+          "Monterosso Grana",
+          "Monteu Roero",
+          "Montezemolo",
+          "Monticello d'Alba",
+          "Montà",
+          "Moretta",
+          "Morozzo",
+          "Murazzano",
+          "Murello",
+          "Narzole",
+          "Neive",
+          "Neviglie",
+          "Niella Belbo",
+          "Niella Tanaro",
+          "Novello",
+          "Nucetto",
+          "Oncino",
+          "Ormea",
+          "Ostana",
+          "Paesana",
+          "Pagno",
+          "Pamparato",
+          "Paroldo",
+          "Perletto",
+          "Perlo",
+          "Peveragno",
+          "Pezzolo Valle Uzzone",
+          "Pianfei",
+          "Piasco",
+          "Pietraporzio",
+          "Piobesi d'Alba",
+          "Piozzo",
+          "Pocapaglia",
+          "Polonghera",
+          "Pontechianale",
+          "Pradleves",
+          "Prazzo",
+          "Priero",
+          "Priocca",
+          "Priola",
+          "Prunetto",
+          "Racconigi",
+          "Revello",
+          "Rifreddo",
+          "Rittana",
+          "Roaschia",
+          "Roascio",
+          "Robilante",
+          "Roburent",
+          "Rocca Cigliè",
+          "Rocca de' Baldi",
+          "Roccabruna",
+          "Roccaforte Mondovì",
+          "Roccasparvera",
+          "Roccavione",
+          "Rocchetta Belbo",
+          "Roddi",
+          "Roddino",
+          "Rodello",
+          "Rossana",
+          "Ruffia",
+          "Sale San Giovanni",
+          "Sale delle Langhe",
+          "Saliceto",
+          "Salmour",
+          "Saluzzo",
+          "Sambuco",
+          "Sampeyre",
+          "San Benedetto Belbo",
+          "San Damiano Macra",
+          "San Michele Mondovì",
+          "Sanfront",
+          "Sanfrè",
+          "Sant'Albano Stura",
+          "Santa Vittoria d'Alba",
+          "Santo Stefano Belbo",
+          "Santo Stefano Roero",
+          "Savigliano",
+          "Scagnello",
+          "Scarnafigi",
+          "Serralunga d'Alba",
+          "Serravalle Langhe",
+          "Sinio",
+          "Somano",
+          "Sommariva Perno",
+          "Sommariva del Bosco",
+          "Stroppo",
+          "Tarantasca",
+          "Torre Bormida",
+          "Torre Mondovì",
+          "Torre San Giorgio",
+          "Torresina",
+          "Treiso",
+          "Trezzo Tinella",
+          "Trinità",
+          "Valdieri",
+          "Valgrana",
+          "Valloriate",
+          "Venasca",
+          "Verduno",
+          "Vernante",
+          "Verzuolo",
+          "Vezza d'Alba",
+          "Vicoforte",
+          "Vignolo",
+          "Villafalletto",
+          "Villanova Mondovì",
+          "Villanova Solaro",
+          "Villar San Costanzo",
+          "Vinadio",
+          "Viola",
+          "Vottignasco"
+        ]
+      },
+      {
         "name": "Novara",
+        "provinceId": 62,
         "cities": [
           "Agrate Conturbia",
           "Ameno",
@@ -5239,6 +5553,7 @@
       },
       {
         "name": "Turin",
+        "provinceId": 63,
         "cities": [
           "Agliè",
           "Airasca",
@@ -5555,6 +5870,7 @@
       },
       {
         "name": "Verbano-Cusio-Ossola",
+        "provinceId": 64,
         "cities": [
           "Antrona Schieranco",
           "Anzola d'Ossola",
@@ -5634,6 +5950,7 @@
       },
       {
         "name": "Vercelli",
+        "provinceId": 65,
         "cities": [
           "Alagna Valsesia",
           "Albano Vercellese",
@@ -5718,266 +6035,15 @@
           "Villata",
           "Vocca"
         ]
-      },
-      {
-        "name": "Wedge",
-        "cities": [
-          "Acceglio",
-          "Aisone",
-          "Alba",
-          "Albaretto della Torre",
-          "Alto",
-          "Argentera",
-          "Arguello",
-          "Bagnasco",
-          "Bagnolo Piemonte",
-          "Baldissero d'Alba",
-          "Barbaresco",
-          "Barge",
-          "Barolo",
-          "Bastia Mondovì",
-          "Battifollo",
-          "Beinette",
-          "Bellino",
-          "Belvedere Langhe",
-          "Bene Vagienna",
-          "Benevello",
-          "Bergolo",
-          "Bernezzo",
-          "Bonvicino",
-          "Borgo San Dalmazzo",
-          "Borgomale",
-          "Bosia",
-          "Bossolasco",
-          "Boves",
-          "Bra",
-          "Briaglia",
-          "Briga Alta",
-          "Brondello",
-          "Brossasco",
-          "Busca",
-          "Camerana",
-          "Canale",
-          "Canosio",
-          "Caprauna",
-          "Caraglio",
-          "Caramagna Piemonte",
-          "Cardè",
-          "Carrù",
-          "Cartignano",
-          "Casalgrasso",
-          "Castagnito",
-          "Casteldelfino",
-          "Castelletto Stura",
-          "Castelletto Uzzone",
-          "Castellinaldo d'Alba",
-          "Castellino Tanaro",
-          "Castelmagno",
-          "Castelnuovo di Ceva",
-          "Castiglione Falletto",
-          "Castiglione Tinella",
-          "Castino",
-          "Cavallerleone",
-          "Cavallermaggiore",
-          "Celle di Macra",
-          "Centallo",
-          "Ceresole Alba",
-          "Cerretto Langhe",
-          "Cervasca",
-          "Cervere",
-          "Ceva",
-          "Cherasco",
-          "Chiusa di Pesio",
-          "Cigliè",
-          "Cissone",
-          "Clavesana",
-          "Corneliano d'Alba",
-          "Cortemilia",
-          "Cossano Belbo",
-          "Costigliole Saluzzo",
-          "Cravanzana",
-          "Crissolo",
-          "Cuneo",
-          "Demonte",
-          "Diano d'Alba",
-          "Dogliani",
-          "Dronero",
-          "Elva",
-          "Entracque",
-          "Envie",
-          "Farigliano",
-          "Faule",
-          "Feisoglio",
-          "Fossano",
-          "Frabosa Soprana",
-          "Frabosa Sottana",
-          "Frassino",
-          "Gaiola",
-          "Gambasca",
-          "Garessio",
-          "Genola",
-          "Gorzegno",
-          "Gottasecca",
-          "Govone",
-          "Grinzane Cavour",
-          "Guarene",
-          "Igliano",
-          "Isasca",
-          "La Morra",
-          "Lagnasco",
-          "Lequio Berria",
-          "Lequio Tanaro",
-          "Lesegno",
-          "Levice",
-          "Limone Piemonte",
-          "Lisio",
-          "Macra",
-          "Magliano Alfieri",
-          "Magliano Alpi",
-          "Mango",
-          "Manta",
-          "Marene",
-          "Margarita",
-          "Marmora",
-          "Marsaglia",
-          "Martiniana Po",
-          "Melle",
-          "Moiola",
-          "Mombarcaro",
-          "Mombasiglio",
-          "Monastero di Vasco",
-          "Monasterolo Casotto",
-          "Monasterolo di Savigliano",
-          "Monchiero",
-          "Mondovì",
-          "Monesiglio",
-          "Monforte d'Alba",
-          "Montaldo Roero",
-          "Montaldo di Mondovì",
-          "Montanera",
-          "Montelupo Albese",
-          "Montemale di Cuneo",
-          "Monterosso Grana",
-          "Monteu Roero",
-          "Montezemolo",
-          "Monticello d'Alba",
-          "Montà",
-          "Moretta",
-          "Morozzo",
-          "Murazzano",
-          "Murello",
-          "Narzole",
-          "Neive",
-          "Neviglie",
-          "Niella Belbo",
-          "Niella Tanaro",
-          "Novello",
-          "Nucetto",
-          "Oncino",
-          "Ormea",
-          "Ostana",
-          "Paesana",
-          "Pagno",
-          "Pamparato",
-          "Paroldo",
-          "Perletto",
-          "Perlo",
-          "Peveragno",
-          "Pezzolo Valle Uzzone",
-          "Pianfei",
-          "Piasco",
-          "Pietraporzio",
-          "Piobesi d'Alba",
-          "Piozzo",
-          "Pocapaglia",
-          "Polonghera",
-          "Pontechianale",
-          "Pradleves",
-          "Prazzo",
-          "Priero",
-          "Priocca",
-          "Priola",
-          "Prunetto",
-          "Racconigi",
-          "Revello",
-          "Rifreddo",
-          "Rittana",
-          "Roaschia",
-          "Roascio",
-          "Robilante",
-          "Roburent",
-          "Rocca Cigliè",
-          "Rocca de' Baldi",
-          "Roccabruna",
-          "Roccaforte Mondovì",
-          "Roccasparvera",
-          "Roccavione",
-          "Rocchetta Belbo",
-          "Roddi",
-          "Roddino",
-          "Rodello",
-          "Rossana",
-          "Ruffia",
-          "Sale San Giovanni",
-          "Sale delle Langhe",
-          "Saliceto",
-          "Salmour",
-          "Saluzzo",
-          "Sambuco",
-          "Sampeyre",
-          "San Benedetto Belbo",
-          "San Damiano Macra",
-          "San Michele Mondovì",
-          "Sanfront",
-          "Sanfrè",
-          "Sant'Albano Stura",
-          "Santa Vittoria d'Alba",
-          "Santo Stefano Belbo",
-          "Santo Stefano Roero",
-          "Savigliano",
-          "Scagnello",
-          "Scarnafigi",
-          "Serralunga d'Alba",
-          "Serravalle Langhe",
-          "Sinio",
-          "Somano",
-          "Sommariva Perno",
-          "Sommariva del Bosco",
-          "Stroppo",
-          "Tarantasca",
-          "Torre Bormida",
-          "Torre Mondovì",
-          "Torre San Giorgio",
-          "Torresina",
-          "Treiso",
-          "Trezzo Tinella",
-          "Trinità",
-          "Valdieri",
-          "Valgrana",
-          "Valloriate",
-          "Venasca",
-          "Verduno",
-          "Vernante",
-          "Verzuolo",
-          "Vezza d'Alba",
-          "Vicoforte",
-          "Vignolo",
-          "Villafalletto",
-          "Villanova Mondovì",
-          "Villanova Solaro",
-          "Villar San Costanzo",
-          "Vinadio",
-          "Viola",
-          "Vottignasco"
-        ]
       }
     ]
   },
   {
-    "region": "Puglia",
+    "region": "Apulia",
     "provinces": [
       {
         "name": "Bari",
+        "provinceId": 66,
         "cities": [
           "Acquaviva delle Fonti",
           "Adelfia",
@@ -6024,6 +6090,7 @@
       },
       {
         "name": "Barletta-Andria-Trani",
+        "provinceId": 67,
         "cities": [
           "Andria",
           "Barletta",
@@ -6038,7 +6105,34 @@
         ]
       },
       {
+        "name": "Brindisi",
+        "provinceId": 68,
+        "cities": [
+          "Brindisi",
+          "Carovigno",
+          "Ceglie Messapica",
+          "Cellino San Marco",
+          "Cisternino",
+          "Erchie",
+          "Fasano",
+          "Francavilla Fontana",
+          "Latiano",
+          "Mesagne",
+          "Oria",
+          "Ostuni",
+          "San Donaci",
+          "San Michele Salentino",
+          "San Pancrazio Salentino",
+          "San Pietro Vernotico",
+          "San Vito dei Normanni",
+          "Torchiarolo",
+          "Torre Santa Susanna",
+          "Villa Castelli"
+        ]
+      },
+      {
         "name": "Foggia",
+        "provinceId": 69,
         "cities": [
           "Accadia",
           "Alberona",
@@ -6105,6 +6199,7 @@
       },
       {
         "name": "Lecce",
+        "provinceId": 70,
         "cities": [
           "Alessano",
           "Alezio",
@@ -6206,6 +6301,7 @@
       },
       {
         "name": "Taranto",
+        "provinceId": 71,
         "cities": [
           "Avetrana",
           "Carosino",
@@ -6237,31 +6333,6 @@
           "Taranto",
           "Torricella"
         ]
-      },
-      {
-        "name": "Toasts",
-        "cities": [
-          "Brindisi",
-          "Carovigno",
-          "Ceglie Messapica",
-          "Cellino San Marco",
-          "Cisternino",
-          "Erchie",
-          "Fasano",
-          "Francavilla Fontana",
-          "Latiano",
-          "Mesagne",
-          "Oria",
-          "Ostuni",
-          "San Donaci",
-          "San Michele Salentino",
-          "San Pancrazio Salentino",
-          "San Pietro Vernotico",
-          "San Vito dei Normanni",
-          "Torchiarolo",
-          "Torre Santa Susanna",
-          "Villa Castelli"
-        ]
       }
     ]
   },
@@ -6270,6 +6341,7 @@
     "provinces": [
       {
         "name": "Cagliari",
+        "provinceId": 72,
         "cities": [
           "Assemini",
           "Cagliari",
@@ -6292,6 +6364,7 @@
       },
       {
         "name": "Nuoro",
+        "provinceId": 73,
         "cities": [
           "Aritzo",
           "Arzana",
@@ -6371,6 +6444,7 @@
       },
       {
         "name": "Oristano",
+        "provinceId": 74,
         "cities": [
           "Abbasanta",
           "Aidomaggiore",
@@ -6463,6 +6537,7 @@
       },
       {
         "name": "Sassari",
+        "provinceId": 75,
         "cities": [
           "Aggius",
           "Aglientu",
@@ -6559,7 +6634,8 @@
         ]
       },
       {
-        "name": "South Sardinia",
+        "name": "Sud Sardegna",
+        "provinceId": 76,
         "cities": [
           "Arbus",
           "Armungia",
@@ -6677,6 +6753,7 @@
     "provinces": [
       {
         "name": "Agrigento",
+        "provinceId": 77,
         "cities": [
           "Agrigento",
           "Alessandria della Rocca",
@@ -6725,6 +6802,7 @@
       },
       {
         "name": "Caltanissetta",
+        "provinceId": 78,
         "cities": [
           "Acquaviva Platani",
           "Bompensiere",
@@ -6752,6 +6830,7 @@
       },
       {
         "name": "Catania",
+        "provinceId": 79,
         "cities": [
           "Aci Bonaccorsi",
           "Aci Castello",
@@ -6815,6 +6894,7 @@
       },
       {
         "name": "Enna",
+        "provinceId": 80,
         "cities": [
           "Agira",
           "Aidone",
@@ -6840,6 +6920,7 @@
       },
       {
         "name": "Messina",
+        "provinceId": 81,
         "cities": [
           "Acquedolci",
           "Alcara li Fusi",
@@ -6953,6 +7034,7 @@
       },
       {
         "name": "Palermo",
+        "provinceId": 82,
         "cities": [
           "Alia",
           "Alimena",
@@ -7040,6 +7122,7 @@
       },
       {
         "name": "Ragusa",
+        "provinceId": 83,
         "cities": [
           "Acate",
           "Chiaramonte Gulfi",
@@ -7056,7 +7139,8 @@
         ]
       },
       {
-        "name": "Syracuse",
+        "name": "Siracusa",
+        "provinceId": 84,
         "cities": [
           "Augusta",
           "Avola",
@@ -7083,6 +7167,7 @@
       },
       {
         "name": "Trapani",
+        "provinceId": 85,
         "cities": [
           "Alcamo",
           "Buseto Palizzolo",
@@ -7113,11 +7198,12 @@
       }
     ]
   },
-  {
-    "region": "Trentino-Alto Adige/Südtirol",
+    {
+    "region": "Trentino-South Tyrol",
     "provinces": [
       {
-        "name": "Bolzano/Bozen",
+        "name": "South Tyrol / Bolzano",
+        "provinceId": 86,
         "cities": [
           "Aldino",
           "Andriano",
@@ -7238,7 +7324,8 @@
         ]
       },
       {
-        "name": "Trent",
+        "name": "Trentino",
+        "provinceId": 87,
         "cities": [
           "Ala",
           "Albiano",
@@ -7415,6 +7502,7 @@
     "provinces": [
       {
         "name": "Arezzo",
+        "provinceId": 88,
         "cities": [
           "Anghiari",
           "Arezzo",
@@ -7456,6 +7544,7 @@
       },
       {
         "name": "Florence",
+        "provinceId": 89,
         "cities": [
           "Bagno a Ripoli",
           "Barberino Tavarnelle",
@@ -7502,6 +7591,7 @@
       },
       {
         "name": "Grosseto",
+        "provinceId": 90,
         "cities": [
           "Arcidosso",
           "Campagnatico",
@@ -7534,19 +7624,8 @@
         ]
       },
       {
-        "name": "Lawn",
-        "cities": [
-          "Cantagallo",
-          "Carmignano",
-          "Montemurlo",
-          "Poggio a Caiano",
-          "Prato",
-          "Vaiano",
-          "Vernio"
-        ]
-      },
-      {
         "name": "Livorno",
+        "provinceId": 91,
         "cities": [
           "Bibbona",
           "Campiglia Marittima",
@@ -7571,6 +7650,7 @@
       },
       {
         "name": "Lucca",
+        "provinceId": 92,
         "cities": [
           "Altopascio",
           "Bagni di Lucca",
@@ -7609,6 +7689,7 @@
       },
       {
         "name": "Massa-Carrara",
+        "provinceId": 93,
         "cities": [
           "Aulla",
           "Bagnone",
@@ -7631,6 +7712,7 @@
       },
       {
         "name": "Pisa",
+        "provinceId": 94,
         "cities": [
           "Bientina",
           "Buti",
@@ -7673,6 +7755,7 @@
       },
       {
         "name": "Pistoia",
+        "provinceId": 95,
         "cities": [
           "Abetone Cutigliano",
           "Agliana",
@@ -7697,7 +7780,21 @@
         ]
       },
       {
+        "name": "Prato",
+        "provinceId": 96,
+        "cities": [
+          "Cantagallo",
+          "Carmignano",
+          "Montemurlo",
+          "Poggio a Caiano",
+          "Prato",
+          "Vaiano",
+          "Vernio"
+        ]
+      },
+      {
         "name": "Siena",
+        "provinceId": 97,
         "cities": [
           "Abbadia San Salvatore",
           "Asciano",
@@ -7743,6 +7840,7 @@
     "provinces": [
       {
         "name": "Perugia",
+        "provinceId": 98,
         "cities": [
           "Assisi",
           "Bastia Umbra",
@@ -7807,6 +7905,7 @@
       },
       {
         "name": "Terni",
+        "provinceId": 99,
         "cities": [
           "Acquasparta",
           "Allerona",
@@ -7846,10 +7945,11 @@
     ]
   },
   {
-    "region": "Valle d'Aosta/Vallée d'Aoste",
+    "region": "Aosta Valley",
     "provinces": [
       {
-        "name": "Valle d'Aosta/Vallée d'Aoste",
+        "name": "Aosta Valley",
+        "provinceId": 100,
         "cities": [
           "Allein",
           "Antey-Saint-André",
@@ -7934,6 +8034,7 @@
     "provinces": [
       {
         "name": "Belluno",
+        "provinceId": 101,
         "cities": [
           "Agordo",
           "Alleghe",
@@ -7998,7 +8099,8 @@
         ]
       },
       {
-        "name": "Padua",
+        "name": "Padova",
+        "provinceId": 102,
         "cities": [
           "Abano Terme",
           "Agna",
@@ -8105,6 +8207,7 @@
       },
       {
         "name": "Rovigo",
+        "provinceId": 103,
         "cities": [
           "Adria",
           "Ariano nel Polesine",
@@ -8160,6 +8263,7 @@
       },
       {
         "name": "Treviso",
+        "provinceId": 104,
         "cities": [
           "Altivole",
           "Arcade",
@@ -8259,6 +8363,7 @@
       },
       {
         "name": "Venice",
+        "provinceId": 105,
         "cities": [
           "Annone Veneto",
           "Campagna Lupia",
@@ -8308,6 +8413,7 @@
       },
       {
         "name": "Verona",
+        "provinceId": 106,
         "cities": [
           "Affi",
           "Albaredo d'Adige",
@@ -8411,6 +8517,7 @@
       },
       {
         "name": "Vicenza",
+        "provinceId": 107,
         "cities": [
           "Agugliaro",
           "Albettone",

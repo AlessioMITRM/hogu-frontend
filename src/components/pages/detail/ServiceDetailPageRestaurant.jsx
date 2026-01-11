@@ -113,12 +113,17 @@ const RestaurantMenuSection = ({ menuList, dailySpecials }) => {
         );
     }
 
-    const MenuItemStandard = ({ name, price }) => (
+    const MenuItemStandard = ({ name, price, description }) => (
         <div className="flex justify-between items-start group w-full mb-6 py-1 border-b border-gray-50 last:border-0">
             <div className="flex flex-col pr-8">
                 <span className={`text-[17px] font-medium text-gray-900 leading-tight group-hover:text-[${HOGU_COLORS.primary}] transition-colors`}>
                     {name}
                 </span>
+                {description && (
+                    <span className="text-sm text-gray-500 mt-1 leading-snug">
+                        {description}
+                    </span>
+                )}
             </div>
             {price !== undefined && (
                 <span className="text-[16px] font-semibold text-gray-900 whitespace-nowrap pt-0.5">
@@ -128,11 +133,16 @@ const RestaurantMenuSection = ({ menuList, dailySpecials }) => {
         </div>
     );
 
-    const MenuItemSpecial = ({ name, price }) => (
+    const MenuItemSpecial = ({ name, price, description }) => (
         <div className="flex flex-col items-center text-center group relative p-4">
             <span className="text-2xl font-serif text-gray-900 mb-2 leading-tight group-hover:text-amber-700 transition-colors">
                 {name}
             </span>
+            {description && (
+                <span className="text-sm text-gray-500 mb-3 italic max-w-xs">
+                    {description}
+                </span>
+            )}
             <div className="w-12 h-px bg-amber-400 mb-3 opacity-0 transform translate-y-2 group-hover:opacity-100 group-hover:translate-y-0 transition-all duration-300"></div>
             <span className="text-lg font-bold text-amber-600 bg-amber-50/50 px-4 py-1 rounded-full border border-amber-100">
                 € {parseFloat(price).toFixed(2)}
@@ -169,7 +179,7 @@ const RestaurantMenuSection = ({ menuList, dailySpecials }) => {
                         </div>
                         <div className="flex flex-col items-center space-y-4 px-4 md:px-12">
                             {dailySpecials.items.map((item, i) => (
-                                <MenuItemSpecial key={i} name={item.name} price={item.price} />
+                                <MenuItemSpecial key={i} name={item.name} price={item.price} description={item.description} />
                             ))}
                         </div>
                     </div>
@@ -186,7 +196,12 @@ const RestaurantMenuSection = ({ menuList, dailySpecials }) => {
                             </div>
                             <div className="">
                                 {section.items && section.items.map((item, i) => (
-                                    <MenuItemStandard key={i} name={item.name} price={item.price} />
+                                    <MenuItemStandard 
+                                        key={i} 
+                                        name={item.name} 
+                                        price={item.price} 
+                                        description={item.description}
+                                    />
                                 ))}
                             </div>
                         </div>
@@ -575,7 +590,7 @@ export const ServiceDetailPageRestaurant = ({ id, dateFrom, timeFrom, totalPerso
 
         const displayAddress = locale ? `${locale.address}, ${locale.city}, ${locale.country}` : "";
         const images = (service.images && service.images.length > 0)
-            ? service.images.map(img => img.startsWith('http') ? img : `${IMG_BASE_URL}${img}`)
+            ? service.images.map(img => img.startsWith('http') ? img : `/files/restaurant/${id}/${img}`)
             : ['https://placehold.co/1200x800/f1f5f9/94a3b8?text=Foto+Non+Disponibile'];
 
         return {
@@ -589,7 +604,7 @@ export const ServiceDetailPageRestaurant = ({ id, dateFrom, timeFrom, totalPerso
             images,
             available: service.available !== false // Estraggo available (default true)
         };
-    }, [service]);
+    }, [service, id]);
 
     const handleBookingRedirect = (bookingData) => {
         navigate('/payment/summary', { state: { booking: bookingData, service: parsedData } });

@@ -847,5 +847,104 @@
     "val_theme": "Tema musicale è obbligatorio",
     "val_img": "Almeno un'immagine è obbligatoria",
     "price": "Prezzo"
+  },
+  "provider_dashboard": {
+    "luggage_edit": {
+      "breadcrumbs": {
+        "dashboard": "Dashboard",
+        "my_luggage": "I miei Depositi",
+        "edit_luggage": "Modifica Deposito",
+        "create_luggage": "Crea Deposito"
+      },
+      "hero": {
+        "service_name": "Servizio Deposito Bagagli",
+        "title_edit": "Modifica Deposito",
+        "title_create": "Crea Nuovo Deposito",
+        "subtitle": "Configura orari, prezzi e dettagli del tuo punto deposito bagagli."
+      },
+      "form": {
+        "name_label": "Nome del Deposito",
+        "city_label": "Città",
+        "address_label": "Indirizzo completo",
+        "address_placeholder": "Via Example 123, 00100 Roma",
+        "hours_title": "Orario Standard",
+        "opening_label": "Apertura",
+        "closing_label": "Chiusura",
+        "holidays_title": "Festivi e Domenica",
+        "always_open": "Sempre aperto (anche domenica e festivi)",
+        "closed_holidays": "Chiuso la domenica e nei principali festivi europei",
+        "description_label": "Descrizione e istruzioni per i clienti (visibile dopo prenotazione)",
+        "prices_title": "Prezzi per Bagaglio al Giorno",
+        "commission_note": "Commissione 15% inclusa",
+        "prices_description": "Imposta il prezzo per ogni dimensione. Se non accetti una dimensione, lascia il prezzo a 0.",
+        "price_per_hour": "PREZZO / ORA",
+        "price_per_day": "PREZZO / GIORNO",
+        "capacity_title": "Capacità",
+        "max_capacity_label": "Numero massimo bagagli",
+        "capacity_help": "Totale bagagli ospitabili contemporaneamente",
+        "gallery_title": "Galleria Foto",
+        "add_photo": "Aggiungi",
+        "gallery_help": "Carica foto chiare e luminose del punto di deposito e dell'ingresso.",
+        "save_button": "Salva Modifiche",
+        "saving": "Salvataggio...",
+        "cover_label": "Copertina",
+        "new_label": "Nuova",
+        "location_placeholder": "Dove si trova il deposito?",
+        "no_city_found": "Nessuna città trovata",
+        "upload_images": "Carica immagini"
+      },
+      "sidebar": {
+        "info_title": "Info Servizio",
+        "booking_title": "Prenotazioni",
+        "booking_desc": "Capienza gestita automaticamente per evitare overbooking.",
+        "payments_title": "Pagamenti",
+        "payments_desc": "Ricevi i compensi settimanalmente al netto delle commissioni.",
+        "commissions_title": "Commissioni",
+        "commissions_desc": "Applicate solo sulle prenotazioni completate.",
+        "status_title": "Stato Operativo",
+        "capacity_label": "Capienza Massima (numero bagagli)",
+        "visibility_title": "Visibilità",
+        "visibility_online": "Online",
+        "visibility_hidden": "Nascosto",
+        "save_button_loading": "Salvataggio in corso...",
+        "save_button_edit": "Salva Modifiche",
+        "save_button_create": "Crea Deposito"
+      },
+      "modal": {
+        "success_title_edit": "Deposito Aggiornato",
+        "success_title_create": "Deposito Creato",
+        "success_msg_edit": "Le modifiche sono state salvate con successo",
+        "success_msg_create": "Il nuovo deposito è stato creato correttamente",
+        "close": "Chiudi"
+      },
+      "sizes": {
+        "small": {
+          "label": "Small",
+          "placeholder": "es. Zaino o borsa piccola - max 40cm"
+        },
+        "medium": {
+          "label": "Medium",
+          "placeholder": "es. Trolley cabina - fino a 65cm"
+        },
+        "large": {
+          "label": "Large",
+          "placeholder": "es. Valigia grande - oltre 65cm"
+        }
+      },
+      "validation": {
+        "name_required": "Il nome del deposito è obbligatorio",
+        "city_required": "La città è obbligatoria",
+        "address_required": "L'indirizzo è obbligatorio",
+        "description_required": "La descrizione è obbligatoria",
+        "hours_required": "Orari di apertura e chiusura obbligatori",
+        "closing_after_opening": "L'orario di chiusura deve essere successivo all'apertura",
+        "capacity_min": "La capacità deve essere almeno 1",
+        "images_min": "Devi caricare almeno 6 immagini (attuali: {{count}})",
+        "price_min": "Almeno una categoria deve avere un prezzo maggiore di 0€",
+        "load_error": "Errore nel caricamento del deposito",
+        "save_error": "Errore durante il salvataggio",
+        "save_success": "Deposito salvato con successo!"
+      }
+    }
   }
 }

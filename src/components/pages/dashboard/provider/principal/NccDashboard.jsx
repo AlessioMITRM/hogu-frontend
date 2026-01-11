@@ -13,7 +13,11 @@ import {
     MapPin, Navigation, Settings, History, QrCode, ArrowRight, CarFront, CalendarClock
 } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
+import { nccService } from '../../../../../api/apiClient';
 import { HOGU_COLORS, HOGU_THEME } from '../../../../../config/theme.js';
+import SuccessModal from '../../../../ui/SuccessModal.jsx';
+import ErrorModal from '../../../../ui/ErrorModal.jsx';
+import LoadingScreen from '../../../../ui/LoadingScreen.jsx';
 
 // =================================================================================
 // 1. CONFIGURAZIONE & COSTANTI
@@ -27,118 +31,9 @@ const SERVICE_CATEGORIES = {
     STORAGE: { id: 'storage', label: 'Depositi', icon: Luggage, unit: 'Bagagli' }
 };
 
-// --- MOCK DATA SPECIFICI PER NCC / DRIVER ---
-const NCC_BOOKINGS = [
-    // PENDING (Richieste)
-    { 
-        id: 401, 
-        customerName: "Azienda Tech Srl", 
-        serviceName: "Transfer Business Van", 
-        date: "23 Nov 2025", 
-        time: "07:00", 
-        status: "pending", 
-        price: 95, 
-        guests: 4, 
-        category: 'ncc',
-        location: "MXP T1 -> Hotel Gallia, Milano", 
-        pickup: "Aeroporto Malpensa (MXP), Terminal 1", 
-        dropoff: "Hotel Excelsior Gallia, Milano",      
-        image: "https://images.unsplash.com/photo-1549317661-bd32c8ce0db2?auto=format&fit=crop&q=80&w=300" 
-    },
-    { 
-        id: 402, 
-        customerName: "Mario Rossi", 
-        serviceName: "Transfer Città", 
-        date: "23 Nov 2025", 
-        time: "14:30", 
-        status: "pending", 
-        price: 50, 
-        guests: 1, 
-        category: 'ncc',
-        location: "Stazione Centrale -> Fiera Rho", 
-        image: "https://images.unsplash.com/photo-1449965408869-eaa3f722e40d?auto=format&fit=crop&q=80&w=300" 
-    },
-    { 
-        id: 403, 
-        customerName: "Giulia Verdi", 
-        serviceName: "Transfer Aeroporto", 
-        date: "24 Nov 2025", 
-        time: "05:30", 
-        status: "waiting_customer", 
-        price: 80, 
-        oldPrice: 70,
-        guests: 1, 
-        category: 'ncc',
-        location: "Via Roma 10, Como -> Linate",
-        pickup: "Via Roma 10, Como",
-        dropoff: "Aeroporto Linate (LIN)",
-        image: "https://images.unsplash.com/photo-1469854523086-cc02fe5d8800?auto=format&fit=crop&q=80&w=300" 
-    },
-    { 
-        id: 404, 
-        customerName: "Luca Bianchi", 
-        serviceName: "Berlina Lusso", 
-        date: "24 Nov 2025", 
-        time: "09:00", 
-        status: "pending", 
-        price: 120, 
-        guests: 2, 
-        category: 'ncc',
-        location: "Hotel Principe -> Outlet Serravalle",
-        pickup: "Hotel Principe di Savoia",
-        dropoff: "Serravalle Designer Outlet",
-        image: "https://images.unsplash.com/photo-1552519507-da3b142c6e3d?auto=format&fit=crop&q=80&w=300" 
-    },
+// --- MOCK DATA RIMOSSI ---
+const NCC_BOOKINGS = [];
 
-    // ACTIVE / CONFIRMED
-    { 
-        id: 410, 
-        customerName: "Mr. James Bond", 
-        serviceName: "Berlina Lusso (4h)", 
-        date: "23 Nov 2025", 
-        time: "20:00", 
-        status: "confirmed", 
-        price: 350, 
-        guests: 2, 
-        category: 'ncc',
-        location: "Disposizione Milano Centro",
-        pickup: "Milano Centro (Disposizione)",
-        dropoff: "A disposizione (4 ore)",
-        image: "https://images.unsplash.com/photo-1550355291-bbee04a92027?auto=format&fit=crop&q=80&w=300" 
-    },
-    { 
-        id: 411, 
-        customerName: "Sara Neri", 
-        serviceName: "Transfer Veloce", 
-        date: "25 Nov 2025", 
-        time: "18:00", 
-        status: "confirmed", 
-        price: 40, 
-        guests: 1, 
-        category: 'ncc',
-        location: "Duomo -> San Siro Stadium",
-        pickup: "Piazza del Duomo, Milano",
-        dropoff: "Stadio San Siro",
-        image: "https://images.unsplash.com/photo-1449965408869-eaa3f722e40d?auto=format&fit=crop&q=80&w=300" 
-    },
-
-    // PAST
-    { 
-        id: 420, 
-        customerName: "Gruppo Turisti", 
-        serviceName: "Van Tour", 
-        date: "10 Nov 2025", 
-        time: "09:00", 
-        status: "completed", 
-        price: 200, 
-        guests: 6, 
-        category: 'ncc',
-        location: "Tour Lago di Como",
-        pickup: "Milano (Pick-up Hotel)",
-        dropoff: "Tour Lago di Como (Rientro Milano)",
-        image: "https://images.unsplash.com/photo-1565043589221-1a6fd9ae45c7?auto=format&fit=crop&q=80&w=300" 
-    }
-];
 
 // =================================================================================
 // 2. COMPONENTI UI CONDIVISI (ProviderUI)
@@ -298,9 +193,6 @@ const StatsSummary = ({ activeCategory }) => {
                 <div className="relative z-10">
                     <p className="text-slate-400 text-xs font-bold uppercase tracking-widest mb-1">Fatturato {label}</p>
                     <h3 className="text-3xl font-extrabold mb-4">€ --.--<span className="text-slate-500 text-lg">,00</span></h3>
-                    <div className="inline-flex items-center gap-2 bg-emerald-500/20 text-emerald-400 px-3 py-1 rounded-full text-xs font-bold border border-emerald-500/30">
-                        <TrendingUp size={14} /> +12% vs mese scorso
-                    </div>
                 </div>
             </div>
             <div className={`bg-white p-6 rounded-[2rem] border border-slate-100 shadow-sm flex flex-col justify-center relative overflow-hidden group hover:border-[${HOGU_COLORS.primary}]/30 hover:shadow-lg transition-all`}>
@@ -599,7 +491,42 @@ const NccDashboard = () => {
     const navigate = useNavigate();
 
     // --- STATO ---
-    const [bookings, setBookings] = useState(NCC_BOOKINGS);
+    const [bookings, setBookings] = useState([]);
+    const [serviceId, setServiceId] = useState(null);
+    const [isLoading, setIsLoading] = useState(false);
+    const [successMessage, setSuccessMessage] = useState(null);
+    const [errorMessage, setErrorMessage] = useState(null);
+
+    // --- API ---
+    const fetchBookings = async (id) => {
+        try {
+            const sid = id || serviceId;
+            if (!sid) return;
+            const data = await nccService.getBookings(sid);
+            // Gestione risposta paginata o lista piatta
+            const list = data.content || data || [];
+            setBookings(list);
+        } catch (error) {
+            console.error("Errore recupero prenotazioni:", error);
+        }
+    };
+
+    useEffect(() => {
+        const init = async () => {
+            try {
+                const info = await nccService.getInfoProvider();
+                // NOTA: l'API restituisce { serviceId: 12, ... } quindi usiamo info.serviceId
+                const sid = info.serviceId || info.id; 
+                if (info && sid) {
+                    setServiceId(sid);
+                    await fetchBookings(sid);
+                }
+            } catch (error) {
+                console.error("Errore inizializzazione provider:", error);
+            }
+        };
+        init();
+    }, []);
     const [isMobileOverlayOpen, setIsMobileOverlayOpen] = useState(false); // Stato per l'apertura full page
     
     // --- PAGINAZIONE ---
@@ -650,26 +577,78 @@ const NccDashboard = () => {
         setDetailsOpen(true);
     };
 
-    const handleAccept = (id) => {
-        setBookings(prev => prev.map(b => b.id === id ? { ...b, status: 'confirmed' } : b));
+    const handleAccept = async (id) => {
+        setIsLoading(true);
+        try {
+            await nccService.acceptBooking(id);
+            await fetchBookings();
+            setSuccessMessage("Prenotazione accettata con successo!");
+        } catch (error) {
+            console.error("Errore accettazione:", error);
+            setErrorMessage("Errore durante l'accettazione della prenotazione.");
+        } finally {
+            setIsLoading(false);
+        }
     };
     const handleReject = (bk) => { setSelectedBooking(bk); setCancelOpen(true); };
     const handleRectify = (bk) => { setSelectedBooking(bk); setCorrectionOpen(true); };
     
-    const confirmCancel = (id, reason) => {
-        setBookings(prev => prev.map(b => b.id === id ? { ...b, status: 'cancelled' } : b));
-        setCancelOpen(false);
+    const confirmCancel = async (id, reason) => {
+        setIsLoading(true);
+        try {
+            const booking = bookings.find(b => b.id === id);
+            // Distingue tra rifiuto (pending) e cancellazione (confirmed)
+            if (booking?.status === 'pending' || booking?.status === 'waiting_customer') {
+                await nccService.rejectBooking(id, reason);
+                setSuccessMessage("Richiesta rifiutata.");
+            } else {
+                await nccService.cancelBooking(id, reason);
+                setSuccessMessage("Prenotazione cancellata.");
+            }
+            await fetchBookings();
+            setCancelOpen(false);
+        } catch (error) {
+            console.error("Errore cancellazione:", error);
+            setErrorMessage("Errore durante la cancellazione.");
+        } finally {
+            setIsLoading(false);
+        }
     };
-    const confirmComplaint = () => { alert("Segnalazione inviata"); setComplaintOpen(false); };
-    const confirmCorrection = (id, price, note) => {
-        setBookings(prev => prev.map(b => b.id === id ? { ...b, status: 'waiting_customer', price: price, oldPrice: b.price } : b));
-        setCorrectionOpen(false);
+    const confirmComplaint = async (id, reason) => {
+        setIsLoading(true);
+        try {
+            await nccService.reportComplaint(id, reason);
+            setSuccessMessage("Segnalazione inviata con successo.");
+            setComplaintOpen(false);
+        } catch (error) {
+            console.error("Errore segnalazione:", error);
+            setErrorMessage("Errore durante l'invio della segnalazione.");
+        } finally {
+            setIsLoading(false);
+        }
+    };
+    const confirmCorrection = async (id, price, note) => {
+        setIsLoading(true);
+        try {
+            await nccService.rectifyBooking(id, price, note);
+            await fetchBookings();
+            setSuccessMessage("Proposta di rettifica inviata.");
+            setCorrectionOpen(false);
+        } catch (error) {
+            console.error("Errore rettifica:", error);
+            setErrorMessage("Errore durante l'invio della rettifica.");
+        } finally {
+            setIsLoading(false);
+        }
     };
     const handleFilterChange = (newFilter) => { setFilter(newFilter); setHistoryPage(1); };
 
     return (
         <div className="space-y-6 md:space-y-10 animate-in fade-in pb-24 md:pb-12 relative">
-            
+            <LoadingScreen isLoading={isLoading} />
+            <SuccessModal isOpen={!!successMessage} onClose={() => setSuccessMessage(null)} message={successMessage} />
+            {errorMessage && <ErrorModal onClose={() => setErrorMessage(null)} message={errorMessage} />}
+
             {/* --- MODALI --- */}
             <BookingDetailModal isOpen={detailsOpen} onClose={() => setDetailsOpen(false)} booking={selectedBooking} />
             <ComplaintModal isOpen={complaintOpen} onClose={() => setComplaintOpen(false)} onConfirm={confirmComplaint} booking={selectedBooking} />
@@ -733,7 +712,7 @@ const NccDashboard = () => {
 
                     {/* B. Card MODIFICA SERVIZIO (Stile Light) */}
                     <button 
-                        onClick={() => navigate('/dashboard/provider/ncc/edit')}
+                        onClick={() => navigate(`/provider/edit/ncc/${serviceId}`)}
                         className={`h-20 bg-white border border-slate-200 rounded-[1.5rem] px-6 flex items-center justify-between hover:bg-slate-50 hover:border-[${HOGU_COLORS.primary}]/50 transition-all group shadow-sm hover:shadow-md`}
                     >
                         <div className="flex items-center gap-3 text-left">

@@ -372,6 +372,102 @@ export const restaurantService = {
       throw error;
     }
   },
+
+  // --- PROVIDER METHODS ---
+
+  async getInfoProvider() {
+    try {
+      const response = await apiClient.get('/api/provider/services/restaurant/get-info');
+      return response.data;
+    } catch (error) {
+      console.error("Errore getInfo:", error);
+      throw error;
+    }
+  },
+
+  async getBookings(serviceId, page = 0, size = 10) {
+    try {
+      const response = await apiClient.get(`/api/provider/services/restaurant/${serviceId}/bookings`, {
+        params: { page, size }
+      });
+      return response.data;
+    } catch (error) {
+      console.error("Errore getBookings:", error);
+      throw error;
+    }
+  },
+
+  async acceptBooking(bookingId) {
+    const response = await apiClient.put(`/api/provider/services/restaurant/booking/${bookingId}/accept`);
+    return response.data;
+  },
+
+  async rejectBooking(bookingId, reason) {
+    const response = await apiClient.put(`/api/provider/services/restaurant/booking/${bookingId}/reject`, { reason });
+
+    return response.data;
+  },
+
+  async rectifyBooking(bookingId, newPrice, note) {
+    const response = await apiClient.put(`/api/provider/services/restaurant/booking/${bookingId}/rectify`, { price: newPrice, note });
+    return response.data;
+  },
+
+  async cancelBooking(bookingId, reason) {
+    const response = await apiClient.put(`/api/provider/services/restaurant/booking/${bookingId}/cancel`, { reason });
+    return response.data;
+  },
+
+  async reportComplaint(bookingId, reason) {
+    const response = await apiClient.post(`/api/provider/services/restaurant/booking/${bookingId}/complaint`, { reason });
+    return response.data;
+  },
+
+  async getRestaurantProvider(id) {
+    try {
+      const response = await apiClient.get(`/api/provider/services/restaurant/${id}`);
+      return response.data;
+    } catch (error) {
+      console.error(`Failed to fetch restaurant provider details for ID ${id}`, error);
+      throw error;
+    }
+  },
+
+  async updateRestaurantProvider(id, formData) {
+    try {
+      const response = await apiClient.put(
+        `/api/provider/services/restaurant/${id}`,
+        formData,
+        {
+          headers: {
+            'Content-Type': 'multipart/form-data'
+          }
+        }
+      );
+      return response.data;
+    } catch (error) {
+      console.error('Errore update restaurant:', error);
+      throw error;
+    }
+  },
+
+  async createRestaurantProvider(formData) {
+    try {
+      const response = await apiClient.post(
+        `/api/provider/services/restaurant/create`,
+        formData,
+        {
+          headers: {
+            'Content-Type': 'multipart/form-data'
+          }
+        }
+      );
+      return response.data;
+    } catch (error) {
+      console.error('Errore create restaurant:', error);
+      throw error;
+    }
+  },
 };
 
 // BNB SERVICE
@@ -480,9 +576,78 @@ export const listingService = {
 
 export const luggageService = {
 
+  async getInfoProvider() {
+    try {
+      const response = await apiClient.get('/api/provider/services/luggage/get-info');
+      return response.data;
+    } catch (error) {
+      console.error("Errore getInfo:", error);
+      throw error;
+    }
+  },
+
+  async getBookings(serviceId, page = 0, size = 10) {
+    try {
+      const response = await apiClient.get(`/api/provider/services/luggage/${serviceId}/bookings`, {
+        params: { page, size }
+      });
+      return response.data;
+    } catch (error) {
+      console.error("Errore getBookings:", error);
+      throw error;
+    }
+  },
+
+  async acceptBooking(bookingId) {
+    const response = await apiClient.put(`/api/provider/services/luggage/booking/${bookingId}/accept`);
+    return response.data;
+  },
+
+  async rejectBooking(bookingId, reason) {
+    const response = await apiClient.put(`/api/provider/services/luggage/booking/${bookingId}/reject`, { reason });
+    return response.data;
+  },
+
+  async rectifyBooking(bookingId, newPrice, note) {
+    const response = await apiClient.put(`/api/provider/services/luggage/booking/${bookingId}/rectify`, { price: newPrice, note });
+    return response.data;
+  },
+
+  async cancelBooking(bookingId, reason) {
+    const response = await apiClient.put(`/api/provider/services/luggage/booking/${bookingId}/cancel`, { reason });
+    return response.data;
+  },
+
+  async reportComplaint(bookingId, reason) {
+    const response = await apiClient.post(`/api/provider/services/luggage/booking/${bookingId}/complaint`, { reason });
+    return response.data;
+  },
+
+  async getInfo() {
+    try {
+      const response = await apiClient.get('/api/provider/services/luggage/get-info');
+      return response.data;
+    } catch (error) {
+      console.error("Errore getInfo:", error);
+      throw error;
+    }
+  },
+
+  async getBookings(serviceId, page = 0, size = 10) {
+    try {
+      const response = await apiClient.get(`/api/provider/services/luggage/${serviceId}/bookings`, {
+        params: { page, size }
+      });
+      return response.data;
+    } catch (error) {
+      console.error("Errore getBookings:", error);
+      throw error;
+    }
+  },
+
   async getLuggageProvider(id) {
     try {
-      const response = await apiClient.get(`/api/public/services/luggage/${id}`);
+      const response = await apiClient.get(`/api/provider/services/luggage/${id}`);
       return response.data;
     } catch (error) {
       console.error(`Failed to fetch luggage details for ID ${id}`, error);
@@ -503,7 +668,7 @@ export const luggageService = {
   updateLuggageProvider: async (id, formData) => {
     try {
       const response = await apiClient.put(
-        `/api/provider/services/club/event/${id}/update`,
+        `/api/provider/services/luggage/${id}/update`,
         formData,
         {
           headers: {
@@ -513,7 +678,7 @@ export const luggageService = {
       );
       return response.data;
     } catch (error) {
-      console.error('Errore update event:', error);
+      console.error('Errore update luggage:', error);
       throw error;
     }
   },
@@ -521,7 +686,7 @@ export const luggageService = {
   createLuggageProvider: async (formData) => {
     try {
       const response = await apiClient.post(
-        `/api/provider/services/club/event/create`,
+        `/api/provider/services/luggage/create`,
         formData,
         {
           headers: {
@@ -531,7 +696,7 @@ export const luggageService = {
       );
       return response.data;
     } catch (error) {
-      console.error('Errore create event:', error);
+      console.error('Errore create luggage:', error);
       throw error;
     }
   },
@@ -582,6 +747,101 @@ export const nccService = {
       return response.data;
     } catch (error) {
       console.error(`Failed to fetch NCC details for ID ${id}`, error);
+      throw error;
+    }
+  },
+
+  // --- PROVIDER METHODS ---
+
+  async getInfoProvider() {
+    try {
+      const response = await apiClient.get('/api/provider/services/ncc/get-info');
+      return response.data;
+    } catch (error) {
+      console.error("Errore getInfo:", error);
+      throw error;
+    }
+  },
+
+  async getBookings(serviceId, page = 0, size = 10) {
+    try {
+      const response = await apiClient.get(`/api/provider/services/ncc/${serviceId}/bookings`, {
+        params: { page, size }
+      });
+      return response.data;
+    } catch (error) {
+      console.error("Errore getBookings:", error);
+      throw error;
+    }
+  },
+
+  async acceptBooking(bookingId) {
+    const response = await apiClient.put(`/api/provider/services/ncc/booking/${bookingId}/accept`);
+    return response.data;
+  },
+
+  async rejectBooking(bookingId, reason) {
+    const response = await apiClient.put(`/api/provider/services/ncc/booking/${bookingId}/reject`, { reason });
+    return response.data;
+  },
+
+  async rectifyBooking(bookingId, newPrice, note) {
+    const response = await apiClient.put(`/api/provider/services/ncc/booking/${bookingId}/rectify`, { price: newPrice, note });
+    return response.data;
+  },
+
+  async cancelBooking(bookingId, reason) {
+    const response = await apiClient.put(`/api/provider/services/ncc/booking/${bookingId}/cancel`, { reason });
+    return response.data;
+  },
+
+  async reportComplaint(bookingId, reason) {
+    const response = await apiClient.post(`/api/provider/services/ncc/booking/${bookingId}/complaint`, { reason });
+    return response.data;
+  },
+
+  async getNccProvider(id) {
+    try {
+      const response = await apiClient.get(`/api/provider/services/ncc/${id}`);
+      return response.data;
+    } catch (error) {
+      console.error(`Failed to fetch NCC provider details for ID ${id}`, error);
+      throw error;
+    }
+  },
+
+  updateNccProvider: async (id, formData) => {
+    try {
+      const response = await apiClient.put(
+        `/api/provider/services/ncc/${id}`,
+        formData,
+        {
+          headers: {
+            'Content-Type': 'multipart/form-data'
+          }
+        }
+      );
+      return response.data;
+    } catch (error) {
+      console.error('Errore update NCC:', error);
+      throw error;
+    }
+  },
+
+  createNccProvider: async (formData) => {
+    try {
+      const response = await apiClient.post(
+        `/api/provider/services/ncc/create`,
+        formData,
+        {
+          headers: {
+            'Content-Type': 'multipart/form-data'
+          }
+        }
+      );
+      return response.data;
+    } catch (error) {
+      console.error('Errore create NCC:', error);
       throw error;
     }
   }

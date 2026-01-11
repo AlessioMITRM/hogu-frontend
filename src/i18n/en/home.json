@@ -836,5 +836,104 @@
     "val_theme": "Tema musicale è obbligatorio",
     "val_img": "Almeno un'immagine è obbligatoria",
     "price": "Prezzo"
+  },
+  "provider_dashboard": {
+    "luggage_edit": {
+      "breadcrumbs": {
+        "dashboard": "Dashboard",
+        "my_luggage": "My Luggage",
+        "edit_luggage": "Edit Luggage",
+        "create_luggage": "Create Luggage"
+      },
+      "hero": {
+        "service_name": "Luggage Storage Service",
+        "title_edit": "Edit Luggage Storage",
+        "title_create": "Create New Luggage Storage",
+        "subtitle": "Configure hours, prices, and details of your luggage storage point."
+      },
+      "form": {
+        "name_label": "Storage Name",
+        "city_label": "City",
+        "address_label": "Full Address",
+        "address_placeholder": "Example Street 123, 00100 Rome",
+        "hours_title": "Standard Hours",
+        "opening_label": "Opening",
+        "closing_label": "Closing",
+        "holidays_title": "Holidays and Sunday",
+        "always_open": "Always open (including Sunday and holidays)",
+        "closed_holidays": "Closed on Sunday and main holidays",
+        "description_label": "Description and instructions for customers (visible after booking)",
+        "prices_title": "Price per Luggage per Day",
+        "commission_note": "15% Commission included",
+        "prices_description": "Set the price for each size. If you don't accept a size, leave the price at 0.",
+        "price_per_hour": "PRICE / HOUR",
+        "price_per_day": "PRICE / DAY",
+        "capacity_title": "Capacity",
+        "max_capacity_label": "Max number of bags",
+        "capacity_help": "Total bags hosted simultaneously",
+        "gallery_title": "Photo Gallery",
+        "add_photo": "Add",
+        "gallery_help": "Upload clear and bright photos of the storage point and entrance.",
+        "save_button": "Save Changes",
+        "saving": "Saving...",
+        "cover_label": "Cover",
+        "new_label": "New",
+        "location_placeholder": "Where is the storage located?",
+        "no_city_found": "No city found",
+        "upload_images": "Upload images"
+      },
+      "sidebar": {
+        "info_title": "Service Info",
+        "booking_title": "Bookings",
+        "booking_desc": "Capacity managed automatically to avoid overbooking.",
+        "payments_title": "Payments",
+        "payments_desc": "Receive payments weekly net of commissions.",
+        "commissions_title": "Commissions",
+        "commissions_desc": "Applied only on completed bookings.",
+        "status_title": "Operating Status",
+        "capacity_label": "Max Capacity (number of bags)",
+        "visibility_title": "Visibility",
+        "visibility_online": "Online",
+        "visibility_hidden": "Hidden",
+        "save_button_loading": "Saving...",
+        "save_button_edit": "Save Changes",
+        "save_button_create": "Create Storage"
+      },
+      "modal": {
+        "success_title_edit": "Storage Updated",
+        "success_title_create": "Storage Created",
+        "success_msg_edit": "Changes saved successfully",
+        "success_msg_create": "New storage created successfully",
+        "close": "Close"
+      },
+      "sizes": {
+        "small": {
+          "label": "Small",
+          "placeholder": "e.g., Backpack or small bag - max 40cm"
+        },
+        "medium": {
+          "label": "Medium",
+          "placeholder": "e.g., Cabin trolley - up to 65cm"
+        },
+        "large": {
+          "label": "Large",
+          "placeholder": "e.g., Large suitcase - over 65cm"
+        }
+      },
+      "validation": {
+        "name_required": "Storage name is required",
+        "city_required": "City is required",
+        "address_required": "Address is required",
+        "description_required": "Description is required",
+        "hours_required": "Opening and closing hours are required",
+        "closing_after_opening": "Closing time must be after opening time",
+        "capacity_min": "Capacity must be at least 1",
+        "images_min": "You must upload at least 6 images (current: {{count}})",
+        "price_min": "At least one category must have a price greater than 0€",
+        "load_error": "Error loading storage",
+        "save_error": "Error during save",
+        "save_success": "Storage saved successfully!"
+      }
+    }
   }
 }

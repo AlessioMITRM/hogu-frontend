@@ -5,8 +5,8 @@ COPY package*.json ./
 RUN npm ci || npm install
 COPY . .
 # Intercetta la variabile dal docker-compose in fase di build
-ARG VITE_API_URL
-ENV VITE_API_URL=$VITE_API_URL
+ARG VITE_API_BASE_URL
+ENV VITE_API_BASE_URL=$VITE_API_BASE_URL
 RUN npm run build
 
 # Stage 2: Setup Nginx Reverse Proxy / Web Server
@@ -30,6 +30,12 @@ RUN echo 'server { \
         root /usr/share/nginx/html; \
         index index.html; \
         try_files $uri $uri/ /index.html; \
+    } \
+    location /api/ { \
+        auth_basic off; \
+        proxy_pass http://staging-backend:8080; \
+        proxy_set_header Host $http_host; \
+        proxy_set_header X-Real-IP $remote_addr; \
     } \
 }' > /etc/nginx/conf.d/default.conf
 

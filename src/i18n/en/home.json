@@ -2,6 +2,7 @@
   "selector": {
     "title": "Select Language"
   },
+  "live_viewers": "{{count}} people are watching",
   "nav": {
     "restaurants": "Restaurants",
     "bnb": "B&B",
@@ -69,16 +70,41 @@
       "passengers": "Passengers",
       "search_button": "Search",
       "search_car_mobile": "Search Car",
-      "not_found_citys": "No city found"
+      "not_found": "No vehicles found",
+      "not_found_citys": "No city found",
+      "select_label": "Select {{label}}",
+      "city_label": "City",
+      "city_search_placeholder": "Search city...",
+      "address_label": "Address",
+      "address_placeholder": "Street / Number / Airport",
+      "suggested_label": "Suggested",
+      "confirm_selection": "Confirm Selection",
+      "validation_error": "Please fill in all required fields.",
+      "invalid_city": "Please select valid cities from the list.",
+      "searching": "Searching..."
     },
     "popular_routes": {
       "title": "Popular routes from the airport",
       "to": "to {{destination}}",
-      "from": "from"
+      "from": "from",
+      "routes": {
+        "roma_centro": "Rome Center",
+        "fiumicino": "Fiumicino (FCO)",
+        "milano_duomo": "Milan (Duomo)",
+        "malpensa": "Malpensa (MXP)",
+        "venezia": "Venice (P.le Roma)",
+        "marco_polo": "Marco Polo (VCE)",
+        "roma_termini": "Rome Termini",
+        "milano_centrale": "Milan Central",
+        "ciampino": "Ciampino (CIA)",
+        "linate": "Linate (LIN)"
+      }
     },
     "results": {
       "available_vehicles": "available vehicles",
-      "not_found": "Vehicles not found"
+      "not_found": "No vehicles found",
+      "page_of": "Page {{current}} of {{total}}",
+      "no_results_retry": "Try changing your search parameters."
     },
     "card": {
       "tag_executive": "Executive",
@@ -89,7 +115,11 @@
       "cancellation_policy": "Free cancellation up to 24h",
       "estimated_rate": "Estimated Rate",
       "details_button": "Details",
-      "book_button": "Book"
+      "book_button": "Book",
+      "guaranteed": "Guaranteed",
+      "default_description": "Professional chauffeur service. Guaranteed comfort.",
+      "hide": "Hide",
+      "info_prices": "Info & Prices"
     }
   },
   "breadcrumbs": {
@@ -99,7 +129,10 @@
     "ncc": "NCC",
     "restaurant": "Restaurant",
     "bnb": "B&B",
-    "club": "Club"
+    "club": "Club",
+    "checkout": "Checkout",
+    "catalog": "Catalog",
+    "payment": "Payment"
   },
   "luggage_listing": {
     "service_type": "Luggage Storage",
@@ -116,7 +149,14 @@
       "pickup": "Pickup",
       "luggage_label": "Luggage",
       "search_button": "Search Storage",
-      "not_found_citys": "No city found"
+      "not_found_citys": "No city found",
+      "select": "Select",
+      "select_times": "Select Times",
+      "confirm_times": "Confirm Times",
+      "date": "Date",
+      "time": "Time",
+      "select_luggage": "Select Luggage",
+      "confirm_count": "Confirm ({{count}})"
     },
     "luggage_selector": {
       "size_s_label": "Carry-on",
@@ -128,7 +168,9 @@
     },
     "results": {
       "available_deposits": "available storage points",
-      "no_deposits_found": "No storage points found matching these criteria."
+      "no_deposits_found": "No storage points found matching these criteria.",
+      "page_of": "Page {{current}} of {{total}}",
+      "retry_search": "Try changing your search parameters."
     },
     "card": {
       "img_fallback": "HOGU",
@@ -136,7 +178,11 @@
       "feature_cancellation": "Free cancellation",
       "estimated_total": "Estimated Total",
       "per_day": "/day",
-      "view_details": "View Details"
+      "view_details": "View Details",
+      "luggage_count": "{{count}} Luggage",
+      "hide": "Hide",
+      "info_prices": "Info & Prices",
+      "bag_per_day": "/ bag / day"
     }
   },
   "restaurant_listing": {
@@ -156,22 +202,33 @@
       "time_label": "At what time?",
       "search_mobile_text": "Search",
       "not_found": "No Restaurant found",
-      "not_found_citys": "No city found"
+      "not_found_citys": "No city found",
+      "all_times": "All"
     },
     "popular": {
       "title": "Recommended",
+      "scopri": "Explore",
+      "roma": "Rome",
+      "milano": "Milan",
+      "firenze": "Florence",
+      "venezia": "Venice",
+      "lazio": "Lazio",
+      "lombardia": "Lombardy",
+      "toscana": "Tuscany",
+      "veneto": "Veneto",
       "italian_cuisine": "Italian",
       "japanese_cuisine": "Japanese",
       "french_cuisine": "French",
       "mexican_cuisine": "Mexican",
       "roma_center": "Rome Center",
       "milano_brera": "Milan Brera",
-      "firenze": "Florence",
+      "firenze_city": "Florence",
       "napoli": "Naples"
     },
     "results": {
       "found": "restaurants found",
-      "no_restaurants": "No restaurants found"
+      "no_restaurants": "No restaurants found",
+      "page_of": "Page {{current}} of {{total}}"
     },
     "card": {
       "img_fallback_popular": "Food",
@@ -179,7 +236,13 @@
       "feature_outdoor": "Outdoor seating",
       "feature_vegan": "Vegan options",
       "menu_button": "Menu",
-      "book_table_button": "Book Table"
+      "book_table_button": "Book Table",
+      "hide": "Hide",
+      "info_prices": "Info & Prices",
+      "view_details": "View Details",
+      "address_not_available": "Address not available",
+      "restaurant_placeholder": "Restaurant",
+      "avg_price_label": "Average Price"
     }
   },
   "bnb_listing": {
@@ -226,7 +289,11 @@
       "service_type_label": "B&B",
       "roma_center": "Rome, Historic Center",
       "roma_trastevere": "Rome, Trastevere",
-      "roma_vaticano": "Rome, Vatican"
+      "roma_vaticano": "Rome, Vatican",
+      "page_of": "Page {{current}} of {{total}}",
+      "total_per_night": "Total for {{nights}} {{unit}}",
+      "night": "night",
+      "nights": "nights"
     },
     "card": {
       "exclusive_tag": "Exclusive",
@@ -237,7 +304,10 @@
       "last_room_warning": "Last room remaining!",
       "currency": "$",
       "per_night": "/ night",
-      "taxes_included": "Taxes and fees included"
+      "taxes_included": "Taxes and fees included",
+      "hide": "Hide",
+      "info_prices": "Info & Prices",
+      "location_not_available": "Location not available"
     }
   },
   "club_listing": {
@@ -392,12 +462,12 @@
   },
   "how_it_works": {
     "main_title": "How HOGU Works",
-    "step1_title": "Discover",
-    "step1_desc": "Browse exclusive and luxury services, filtered according to your needs.",
-    "step2_title": "Book",
-    "step2_desc": "Confirm your experience with a click, using secure payments (Stripe/PayPal).",
-    "step3_title": "Experience",
-    "step3_desc": "Enjoy the HOGU premium experience with no hidden commissions on your bill."
+    "step1_title": "Search and Compare",
+    "step1_desc": "Find the perfect service for your needs among hundreds of verified options.",
+    "step2_title": "Book in a Click",
+    "step2_desc": "Direct booking system, secure and without hidden commissions for users.",
+    "step3_title": "Enjoy the Experience",
+    "step3_desc": "Live your event or service worry-free. 24/7 active support."
   },
   "earnings": {
     "main_title": "How much you earn with Hogu",
@@ -682,6 +752,8 @@
     "view_details": "View Booking Details",
     "back_home": "Back to Home",
     "confirmation_email": "A confirmation email has been sent to your account email address.",
+    "request_sent": "Request Sent!",
+    "pending_message": "Your booking has been received. You will receive a confirmation from the provider shortly.",
     "homepage": "HOGU Homepage",
     "simulate_payment": "Simulate New Payment",
     "booking_details": "Booking Details",
@@ -693,31 +765,37 @@
     "failed_reason": "Reason: Insufficient funds or card declined by the bank.",
     "retry": "Retry Payment",
     "cancel": "Cancel and go back",
-    "contact_support": "If the problem persists, contact your bank or HOGU support."
-  },
-  "payment_summary": {
-    "summary": "Summary",
-    "booking": "Booking",
-    "secure_checkout": "Secure and encrypted checkout",
-    "billing_data": "Billing Information",
-    "first_name": "First Name",
-    "first_name_placeholder": "John",
-    "last_name": "Last Name",
-    "last_name_placeholder": "Doe",
-    "email": "Email",
-    "email_placeholder": "john.doe@example.com",
-    "address": "Full Address",
-    "address_placeholder": "123 Main St, City, Country",
-    "tax_code": "Tax Code",
-    "tax_code_placeholder": "ABC12345X",
-    "vat": "VAT",
-    "vat_placeholder": "Optional for individuals",
-    "company_name": "Company Name",
-    "company_name_placeholder": "Optional (if Company)",
-    "payment_method": "Payment Method",
-    "credit_card": "Credit Card",
-    "secure_ssl": "Secure SSL Transaction",
-    "payment_info": "By clicking \"Proceed to Payment\" you will be redirected to the secure platform to complete the transaction. We do not store your card details."
+    "contact_support": "If the problem persists, contact your bank or HOGU support.",
+    "retry_payment_desc": "Retry Payment",
+    "paypal_link_not_found": "PayPal link not found.",
+    "unable_to_retry_payment": "Unable to retry payment.",
+    "waiting": "Waiting...",
+    "cancelling": "Cancelling...",
+    "payment_status": "Payment Status",
+    "booking_status": "Booking Status",
+    "no_booking_found": "No booking found",
+    "service_booked": "Booked Service",
+    "hogu_provider": "Hogu Provider",
+    "hogu_service": "HOGU Service",
+    "hogu_partner": "Hogu Partner",
+    "payment_confirmed_status": "Payment Confirmed",
+    "status": {
+      "pending": "Pending",
+      "completed": "Completed",
+      "authorized": "Authorized",
+      "failed": "Failed",
+      "refunded": "Refunded",
+      "not_required": "Not Required",
+      "deposit_paid": "Deposit Paid",
+      "payment_authorized": "Payment Authorized",
+      "cancelled_provider": "Cancelled by Provider",
+      "modified_provider": "Modified by Provider",
+      "refunded_admin": "Refunded by Admin",
+      "cancelled_admin": "Cancelled by Admin",
+      "full_payment_completed": "Full Payment Completed",
+      "waiting_provider": "Waiting for Provider Confirmation",
+      "waiting_customer": "Waiting for Customer Payment"
+    }
   },
   "password_reset": {
       "forgot_password": "Forgot Password?",
@@ -780,7 +858,7 @@
     }
   },
    "EventServiceEditPage": {
-    "title": "Modifica Club",
+    "title": "Modifica Evento",
     "subtitle": "Gestisci le informazioni del locale, le serate e il listino prezzi.",
     "serviceLabel": "Servizio Evento Club",
     "name": "Nome Locale / Evento",
@@ -934,6 +1012,102 @@
         "save_error": "Error during save",
         "save_success": "Storage saved successfully!"
       }
+    }
+  },
+  "payment_summary": {
+    "summary": "Summary",
+    "booking": "Booking",
+    "secure_checkout": "Secure Checkout",
+    "billing_data": "Billing Data",
+    "billing_subtitle": "Enter your billing details",
+    "payment_method": "Payment Method",
+    "payment_subtitle": "Choose how to pay",
+    "credit_card": "Credit Card",
+    "credit_card_subtitle": "Visa, Mastercard, American Express.",
+    "paypal_subtitle": "Use your PayPal balance or link an account.",
+    "security_guarantee": "HOGU Security Guarantee",
+    "payment_info": "Your payment details are encrypted and processed securely. We do not store your card details on our servers.",
+    "confirm_pay": "Confirm and Pay",
+    "first_name": "First Name",
+    "first_name_placeholder": "Your name",
+    "last_name": "Last Name",
+    "last_name_placeholder": "Your last name",
+    "email": "Email",
+    "email_placeholder": "example@email.com",
+    "address": "Full Address",
+    "address_placeholder": "123 Main St, City, Country",
+    "tax_code": "Tax Code",
+    "tax_code_placeholder": "Tax Code",
+    "vat": "VAT (Optional)",
+    "vat_placeholder": "VAT Number",
+    "company_name": "Company Name (Optional)",
+    "company_name_placeholder": "Company Name",
+    "secure_ssl": "SSL Protected Transaction",
+    "date": "Date",
+    "time": "Time",
+    "location": "Location",
+    "guests": "Guests",
+    "people": "People",
+    "total_amount": "Total Amount",
+    "taxes_included": "Taxes included",
+    "secure_transaction": "100% Secure Transaction"
+  },
+  "cities": {
+    "roma": "Rome",
+    "rome": "Rome",
+    "milano": "Milan",
+    "milan": "Milan",
+    "venezia": "Venice",
+    "venice": "Venice",
+    "firenze": "Florence",
+    "florence": "Florence",
+    "napoli": "Naples",
+    "naples": "Naples",
+    "lombardia": "Lombardy",
+    "lazio": "Lazio",
+    "toscana": "Tuscany",
+    "veneto": "Veneto"
+  },
+  "ncc_detail": {
+    "error_payment": "Unable to proceed to payment.",
+    "error_unknown": "Unknown error",
+    "breadcrumb_detail": "Service Detail",
+    "tag_premium": "Premium NCC",
+    "location_not_available": "Location not available",
+    "no_description": "No description available.",
+    "error_load": "Unable to load the requested service.",
+    "route_title": "Your route",
+    "provider_title": "Service provider",
+    "estimated_total": "Estimated total",
+    "all_included": "/ all inclusive",
+    "date": "Date",
+    "time": "Time",
+    "passengers": "Passengers",
+    "people": "People",
+    "free_cancellation": "Free cancellation up to 24h before",
+    "instant_confirmation": "Instant confirmation",
+    "processing": "Processing...",
+    "book_now": "Book now",
+    "no_charge_info": "You will not be charged at this stage",
+    "route": {
+      "loading": "Loading map...",
+      "error_route": "Unable to find route. Please check addresses.",
+      "departure": "Departure",
+      "arrival": "Arrival",
+      "destination": "Destination",
+      "one_way": "One Way",
+      "round_trip": "Round Trip",
+      "return": "Return",
+      "total": "Total",
+      "duration": "Duration",
+      "estimation": "Estimation",
+      "osm_info": "* Route and estimates based on OpenStreetMap/OSRM."
+    },
+    "provider": {
+      "info_title": "Service Information",
+      "fleet_details": "Fleet & Details",
+      "see_all": "See all",
+      "reviews": "reviews"
     }
   }
 }

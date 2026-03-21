@@ -6,8 +6,10 @@ import LoadingScreen from '../../ui/LoadingScreen.jsx';
  * Higher-Order Component per proteggere le rotte.
  * @param {React.Component} WrappedComponent - Il componente (pagina) da proteggere.
  * @param {Array<string>} allowedRoles - (Opzionale) Array di ruoli permessi es: ['PROVIDER', 'ADMIN']. Se vuoto, basta essere loggati.
+ * @param {string} typeService - (Opzionale) Tipo di servizio per controllo provider.
+ * @param {string} customUnauthRedirect - (Opzionale) Rotta custom per redirect se non autenticato (es. '/booking-auth-required').
  */
-export const withAuthProtection = (WrappedComponent, allowedRoles = [], typeService = null) => {
+export const withAuthProtection = (WrappedComponent, allowedRoles = [], typeService = null, customUnauthRedirect = null) => {
     return (props) => {
         const navigate = useNavigate();
         const [isAuthorized, setIsAuthorized] = useState(false);
@@ -18,7 +20,7 @@ export const withAuthProtection = (WrappedComponent, allowedRoles = [], typeServ
             const token = localStorage.getItem('authToken');
 
             if (!storedUser || !token) {
-                navigate('/unauthorized-page', { 
+                navigate(customUnauthRedirect || '/unauthorized-page', { 
                     replace: true, 
                     state: { type: 'expired' }
                 });

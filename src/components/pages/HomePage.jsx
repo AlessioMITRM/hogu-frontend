@@ -1,5 +1,5 @@
 import React from 'react';
-import { useTranslation } from 'react-i18next'; // ** AGGIUNTO **
+import { useTranslation } from 'react-i18next';
 import { HOGU_THEME } from '../../config/theme.js';
 import { HeroSection } from './home/HeroSection.jsx';
 import { ServiceSearch } from './home/ServiceSearch.jsx';
@@ -11,34 +11,34 @@ import { HowItWorksSection } from './home/HowItWorksSection.jsx';
 import { EarningsSection } from './home/EarningsSection.jsx';
 
 export const HomePage = ({ setPage }) => {
-    const { t } = useTranslation("home");
-  
-  return (
-    <div className={HOGU_THEME.fontFamily}>
-      
-      <HeroSection setPage={setPage} />
-      
-      <ServiceSearch setPage={setPage} />
+  const { t } = useTranslation("home");
 
-      <ExclusiveServicesCarousel setPage={setPage} />
+  return (
+    <div className={HOGU_THEME.fontFamily}>
 
-      <section className="bg-gray-50 py-16 lg:py-24">
-        <div className="max-w-7xl mx-auto px-4">
-          
-          <HowItWorksSection />
+      <HeroSection setPage={setPage} />
 
-          <EarningsSection />
-         
-          {/* CTA Finale */}
-          <div className="text-center mt-12">
-            <DarkPrimaryButton onClick={() => setPage('register')} className="text-lg">
-              {t('homepage.cta_final')}
-            </DarkPrimaryButton>
-          </div>
+      <ServiceSearch setPage={setPage} />
 
-        </div>
-      </section>
+      <ExclusiveServicesCarousel setPage={setPage} />
 
-    </div>
-  );
+      <section className="bg-gray-50 py-8 lg:py-24">
+        <div className="max-w-7xl mx-auto px-4">
+
+          <HowItWorksSection />
+
+          <EarningsSection />
+
+          {/* CTA Finale */}
+          <div className="text-center mt-8 lg:mt-24 px-4 md:px-0">
+            <DarkPrimaryButton onClick={() => setPage('register')} className="shadow-xl">
+              {t('homepage.cta_final')}
+            </DarkPrimaryButton>
+          </div>
+
+        </div>
+      </section>
+
+    </div>
+  );
 };

@@ -1,0 +1,46 @@
+{
+  "expandable": {
+    "showLess": "Show less",
+    "showMore": "Show more"
+  },
+  "map": {
+    "verifiedPosition": "Verified position",
+    "whereWeAre": "Where we are",
+    "getDirections": "Get directions",
+    "whereYouWillSleep": "Where you will sleep"
+  },
+  "booking": {
+    "checkIn": "Check-in",
+    "checkOut": "Check-out",
+    "from": "From",
+    "to": "to",
+    "guests": "Guests",
+    "guestsCount": "{{count}} Guests (Max {{max}})",
+    "nights": "nights",
+    "total": "Total",
+    "selectDatesToSeePrice": "Select dates to see the price",
+    "bookNow": "Book now",
+    "noChargeNow": "You won't be charged yet",
+    "pricePerNight": "Price per night",
+    "perNight": " / night",
+    "perNightShort": "/night",
+    "checkAvailability": "Check availability",
+    "yourBooking": "Your booking",
+    "selectDatesAndGuests": "Select dates and guests"
+  },
+  "error": {
+    "loading": "Unable to load the B&B.",
+    "addressNotAvailable": "Address not available",
+    "photoNotAvailable": "Photo Not Available"
+  },
+  "accommodation": {
+    "title": "The Accommodation",
+    "roomTitle": "The Room",
+    "roomDescription": "Enjoy a relaxing stay. The structure offers all the comforts needed for a perfect holiday or a business trip."
+  },
+  "breadcrumb": {
+    "home": "Home",
+    "bnb": "B&B"
+  },
+  "live_viewers": "{{count}} people are watching"
+}

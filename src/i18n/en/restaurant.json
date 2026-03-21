@@ -1,0 +1,49 @@
+{
+  "expandable": {
+    "showLess": "Show less",
+    "showMore": "Show more"
+  },
+  "map": {
+    "verifiedPosition": "Verified position",
+    "whereToFindUs": "Where to find us",
+    "whereWeAre": "Where we are",
+    "getDirections": "Get directions"
+  },
+  "menu": {
+    "notAvailable": "Menu not available",
+    "notAvailableDesc": "Currently the digital menu is not visible.",
+    "title": "Our Menu",
+    "chefSelection": "Chef's Selection",
+    "limitedEdition": "Limited Edition",
+    "disclaimer1": "Images are for illustrative purposes. Ingredients may vary based on seasonality.",
+    "disclaimer2": "* Cover charge and drinks excluded unless otherwise specified."
+  },
+  "booking": {
+    "when": "When do you want to come?",
+    "preSelected": "The date has been pre-selected for you.",
+    "time": "At what time?",
+    "dateLabel": "Date",
+    "timeLabel": "Time",
+    "guestsLabel": "Number of guests",
+    "back": "Back",
+    "confirm": "Confirm",
+    "continue": "Continue",
+    "prenotaTitle": "Book",
+    "step": "Step",
+    "avgPrice": "Average price",
+    "perPerson": "/person",
+    "bookTable": "Book Table",
+    "completeSteps": "Complete in 3 steps"
+  },
+  "error": {
+    "loading": "Error loading."
+  },
+  "breadcrumb": {
+    "home": "Home",
+    "restaurants": "Restaurants"
+  },
+  "experience": {
+    "title": "The Experience"
+  },
+  "live_viewers": "{{count}} people are watching"
+}

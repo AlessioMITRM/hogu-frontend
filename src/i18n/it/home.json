@@ -2,12 +2,13 @@
   "selector": {
     "title": "Seleziona Lingua"
   },
+  "live_viewers": "{{count}} persone stanno guardando",
   "nav": {
     "restaurants": "Ristoranti",
     "bnb": "B&B",
     "club": "Club",
     "ncc": "NCC",
-    "luggage": "Luggage"
+    "luggage": "Bagagli"
   },
   "auth": {
     "login": "Accedi",
@@ -69,18 +70,41 @@
       "passengers": "Passeggeri",
       "search_button": "Cerca",
       "search_car_mobile": "Cerca",
-      "not_found": "Nessun ncc trovato",
-      "not_found_citys": "Nessuna città trovata"
+      "not_found": "Nessun NCC trovato",
+      "not_found_citys": "Nessuna città trovata",
+      "select_label": "Seleziona {{label}}",
+      "city_label": "Città",
+      "city_search_placeholder": "Cerca città...",
+      "address_label": "Indirizzo",
+      "address_placeholder": "Via / Civico / Aeroporto",
+      "suggested_label": "Suggeriti",
+      "confirm_selection": "Conferma Selezione",
+      "validation_error": "Per favore, compila tutti i campi richiesti.",
+      "invalid_city": "Seleziona città valide dall'elenco.",
+      "searching": "Cercando..."
     },
     "popular_routes": {
       "title": "Tratte popolari dall'aeroporto",
       "to": "verso {{destination}}",
-      "from": "da"
+      "from": "da",
+      "routes": {
+        "roma_centro": "Roma Centro",
+        "fiumicino": "Fiumicino (FCO)",
+        "milano_duomo": "Milano (Duomo)",
+        "malpensa": "Malpensa (MXP)",
+        "venezia": "Venezia (P.le Roma)",
+        "marco_polo": "Marco Polo (VCE)",
+        "roma_termini": "Roma Termini",
+        "milano_centrale": "Milano Centrale",
+        "ciampino": "Ciampino (CIA)",
+        "linate": "Linate (LIN)"
+      }
     },
     "results": {
       "available_vehicles": "veicoli disponibili",
-      "not_found": "Vehicles not found"
-
+      "not_found": "Nessun veicolo trovato",
+      "page_of": "Pagina {{current}} di {{total}}",
+      "no_results_retry": "Prova a modificare i parametri di ricerca."
     },
     "card": {
       "tag_executive": "Executive",
@@ -91,7 +115,11 @@
       "cancellation_policy": "Cancellazione gratuita fino a 24h",
       "estimated_rate": "Tariffa stimata",
       "details_button": "Dettagli",
-      "book_button": "Prenota"
+      "book_button": "Prenota",
+      "guaranteed": "Garantito",
+      "default_description": "Servizio professionale con autista privato. Comfort garantito.",
+      "hide": "Nascondi",
+      "info_prices": "Info & Prezzi"
     }
   },
   "breadcrumbs": {
@@ -103,7 +131,8 @@
     "bnb": "B&B",
     "club": "Club",
     "checkout": "Checkout",
-    "catalog": "Catalogo"
+    "catalog": "Catalogo",
+    "payment": "Pagamento"
   },
   "luggage_listing": {
     "service_type": "Deposito Bagagli",
@@ -120,7 +149,14 @@
       "pickup": "Ritiro",
       "luggage_label": "Bagagli",
       "search_button": "Cerca",
-      "not_found_citys": "Nessuna città trovata"
+      "not_found_citys": "Nessuna città trovata",
+      "select": "Seleziona",
+      "select_times": "Seleziona Orari",
+      "confirm_times": "Conferma Orari",
+      "date": "Data",
+      "time": "Ora",
+      "select_luggage": "Seleziona Bagagli",
+      "confirm_count": "Conferma ({{count}})"
     },
     "luggage_selector": {
       "size_s_label": "A Mano",
@@ -132,7 +168,9 @@
     },
     "results": {
       "available_deposits": "depositi disponibili",
-      "no_deposits_found": "Nessun deposito trovato con questi criteri."
+      "no_deposits_found": "Nessun deposito trovato con questi criteri.",
+      "page_of": "Pagina {{current}} di {{total}}",
+      "retry_search": "Prova a modificare i parametri di ricerca."
     },
     "card": {
       "img_fallback": "HOGU",
@@ -140,16 +178,20 @@
       "feature_cancellation": "Cancellazione free",
       "estimated_total": "Totale stimato",
       "per_day": "/giorno",
-      "view_details": "Visualizza Dettagli"
+      "view_details": "Visualizza Dettagli",
+      "luggage_count": "{{count}} Bagagli",
+      "hide": "Nascondi",
+      "info_prices": "Info & Prezzi",
+      "bag_per_day": "/ bagaglio / giorno"
     }
   },
   "restaurant_listing": {
     "service_type_label": "Ristorante",
     "header": {
       "subtitle": "HOGU Dining",
-      "title_part1": "Gustati il momento",
-      "title_part2": "assapora la vita.",
-      "description": "Dai bistrot nascosti agli stellati Michelin. Prenota il tavolo perfetto per ogni occasione."
+      "title_part1": "Esperienze",
+      "title_part2": "di Gusto.",
+      "description": "Gustati il momento, assapora la vita."
     },
     "search": {
       "location_label": "Dove vuoi mangiare?",
@@ -160,22 +202,33 @@
       "time_label": "A che ora?",
       "search_mobile_text": "Cerca",
       "not_found_citys": "Nessuna città trovata",
-      "not_found": "Nessun ristorante trovato"
+      "not_found": "Nessun ristorante trovato",
+      "all_times": "Tutti"
     },
     "popular": {
       "title": "Consigliati",
+      "scopri": "Scopri",
+      "roma": "Roma",
+      "milano": "Milano",
+      "firenze": "Firenze",
+      "venezia": "Venezia",
+      "lazio": "Lazio",
+      "lombardia": "Lombardia",
+      "toscana": "Toscana",
+      "veneto": "Veneto",
       "italian_cuisine": "Italiana",
       "japanese_cuisine": "Giapponese",
       "french_cuisine": "Francese",
       "mexican_cuisine": "Messicana",
       "roma_center": "Roma Centro",
       "milano_brera": "Milano Brera",
-      "firenze": "Firenze",
+      "firenze_city": "Firenze",
       "napoli": "Napoli"
     },
     "results": {
       "found": "ristoranti trovati",
-      "no_restaurants": "Nessun ristorante trovato"
+      "no_restaurants": "Nessun ristorante trovato",
+      "page_of": "Pagina {{current}} di {{total}}"
     },
     "card": {
       "img_fallback_popular": "Cibo",
@@ -183,7 +236,13 @@
       "feature_outdoor": "Tavoli all'aperto",
       "feature_vegan": "Opzioni Vegan",
       "menu_button": "Menu",
-      "book_table_button": "Prenota Tavolo"
+      "book_table_button": "Prenota Tavolo",
+      "hide": "Nascondi",
+      "info_prices": "Info & Prezzi",
+      "view_details": "Vedi Dettagli",
+      "address_not_available": "Indirizzo non disponibile",
+      "restaurant_placeholder": "Ristorante",
+      "avg_price_label": "Prezzo Medio"
     }
   },
   "bnb_listing": {
@@ -231,7 +290,11 @@
       "service_type_label": "B&B",
       "roma_center": "Roma, Centro Storico",
       "roma_trastevere": "Roma, Trastevere",
-      "roma_vaticano": "Roma, Vaticano"
+      "roma_vaticano": "Roma, Vaticano",
+      "page_of": "Pagina {{current}} di {{total}}",
+      "total_per_night": "Totale per {{nights}} {{unit}}",
+      "night": "notte",
+      "nights": "notti"
     },
     "card": {
       "exclusive_tag": "Esclusivo",
@@ -242,7 +305,10 @@
       "last_room_warning": "Ultima camera rimasta!",
       "currency": "€",
       "per_night": "/ notte",
-      "taxes_included": "Tasse e costi inclusi"
+      "taxes_included": "Tasse e costi inclusi",
+      "hide": "Nascondi",
+      "info_prices": "Info & Prezzi",
+      "location_not_available": "Posizione non disponibile"
     }
   },
   "club_listing": {
@@ -250,7 +316,7 @@
       "subtitle": "HOGU Nightlife",
       "title_part1": "Vivi la notte",
       "title_part2": "senza confini.",
-      "description": "Prenota ingressi, tavoli e privè nei club più esclusivi. Salta la fila e goditi il divertimento."
+      "description": "Prenota ingressi, tavoli e privé nei club più esclusivi. Salta la fila e goditi il divertimento."
     },
     "search": {
       "event_type_label": "Che serata cerchi?",
@@ -267,7 +333,6 @@
       "entry_only": "Solo Ingresso",
       "search_button": "Cerca",
       "not_found_citys": "Nessuna città trovata"
-
     },
     "events_today": {
       "title": "Stasera in città"
@@ -317,7 +382,7 @@
     "tab_bnb": "B&B",
     "tab_ncc": "NCC",
     "tab_club": "Club",
-    "tab_luggage": "Luggage",
+    "tab_luggage": "Bagagli",
     "restaurant": {
       "location_label": "Dove vuoi mangiare?",
       "location_placeholder": "Città, zona o nome...",
@@ -392,18 +457,18 @@
       "description": "Noleggio con conducente per spostamenti in massima discrezione."
     },
     "luggage": {
-      "title": "Luggage",
+      "title": "Bagagli",
       "description": "Servizio gestione bagagli per viaggiare senza pensieri."
     }
   },
   "how_it_works": {
-    "main_title": "Come funziona HOGU",
-    "step1_title": "Trovi",
-    "step1_desc": "Sfoglia i servizi esclusivi e di lusso, filtrati per le tue esigenze.",
-    "step2_title": "Prenoti",
-    "step2_desc": "Confermi la tua esperienza con un click, con pagamenti sicuri (Stripe/PayPal).",
-    "step3_title": "Vivi",
-    "step3_desc": "Goditi l'esperienza premium HOGU senza commissioni nascoste sul tuo conto."
+    "main_title": "Come funziona Hogu",
+    "step1_title": "Cerca e Confronta",
+    "step1_desc": "Trova il servizio perfetto per le tue esigenze tra centinaia di opzioni verificate.",
+    "step2_title": "Prenota in un Click",
+    "step2_desc": "Sistema di prenotazione diretto, sicuro e senza commissioni nascoste per gli utenti.",
+    "step3_title": "Goditi l'Esperienza",
+    "step3_desc": "Vivi il tuo evento o servizio senza pensieri. Supporto attivo 24/7."
   },
   "earnings": {
     "main_title": "Quanto guadagni con Hogu",
@@ -475,7 +540,7 @@
     },
     "help": {
       "title": "Algoritmo Hogu",
-      "description": "Le tariffe inserite sono 'Base'. Il sistema calcolerà automaticamente il prezzo finale per il cliente aggiungendo pedaggi e traffico stimato."
+      "description": "Le tariffe inserite sono 'Base'. Il sistema calcolerà automaticamente il prezzo finale per il cliente e si avrà la possibilita di confermare, rettificare o rifiutare la tariffa stimata."
     }
   },
   "unauthorizedPage": {
@@ -622,7 +687,7 @@
       "B&B",
       "NCC",
       "Club & Eventi",
-      "Luggage"
+      "Bagagli"
     ],
     "hoguTitle": "Hogu",
     "hoguLinks": [
@@ -655,7 +720,7 @@
       "bnb": "B&B",
       "club": "Club & Eventi",
       "ncc": "NCC",
-      "luggage": "Luggage"
+      "luggage": "Bagagli"
     },
     "auth": {
       "login": "Accedi",
@@ -693,6 +758,8 @@
     "view_details": "Vedi Dettagli Prenotazione",
     "back_home": "Torna alla Home",
     "confirmation_email": "Hai ricevuto una email di conferma all'indirizzo associato al tuo account.",
+    "request_sent": "Richiesta Inviata!",
+    "pending_message": "La tua prenotazione è stata inserita. Riceverai una conferma dal gestore a breve.",
     "homepage": "Homepage HOGU",
     "simulate_payment": "Simula nuovo pagamento",
     "booking_details": "Dettaglio Prenotazione",
@@ -704,68 +771,74 @@
     "failed_reason": "Motivo: Fondi insufficienti o carta rifiutata dalla banca.",
     "retry": "Riprova Pagamento",
     "cancel": "Annulla e torna indietro",
-    "contact_support": "Se il problema persiste, contatta la tua banca o l'assistenza HOGU."
+    "contact_support": "Se il problema persiste, contatta la tua banca o l'assistenza HOGU.",
+    "retry_payment_desc": "Riprova Pagamento",
+    "paypal_link_not_found": "Link PayPal non trovato.",
+    "unable_to_retry_payment": "Impossibile riprovare il pagamento.",
+    "waiting": "Attendere...",
+    "cancelling": "Cancellazione...",
+    "payment_status": "Stato Pagamento",
+    "booking_status": "Stato Prenotazione",
+    "no_booking_found": "Nessuna prenotazione trovata",
+    "service_booked": "Servizio Prenotato",
+    "hogu_provider": "Hogu Provider",
+    "hogu_service": "Servizio HOGU",
+    "hogu_partner": "Hogu Partner",
+    "payment_confirmed_status": "Pagamento Confermato",
+    "status": {
+      "pending": "In Attesa",
+      "completed": "Completato",
+      "authorized": "Autorizzato",
+      "failed": "Fallito",
+      "refunded": "Rimborsato",
+      "not_required": "Non Richiesto",
+      "deposit_paid": "Anticipo Pagato",
+      "payment_authorized": "Pagamento Autorizzato",
+      "cancelled_provider": "Annullata dal Fornitore",
+      "modified_provider": "Modificata dal Fornitore",
+      "refunded_admin": "Rimborsato dall'Admin",
+      "cancelled_admin": "Annullata dall'Admin",
+      "full_payment_completed": "Pagamento Completo Eseguito",
+      "waiting_provider": "In Attesa Conferma Fornitore",
+      "waiting_customer": "In Attesa Pagamento Cliente"
+    }
   },
-  "payment_summary": {
-      "summary": "Riepilogo",
-      "booking": "Prenotazione",
-      "secure_checkout": "Checkout sicuro e crittografato",
-      "billing_data": "Dati di Fatturazione",
-      "first_name": "Nome",
-      "first_name_placeholder": "Mario",
-      "last_name": "Cognome",
-      "last_name_placeholder": "Rossi",
-      "email": "Email",
-      "email_placeholder": "mario.rossi@example.com",
-      "address": "Indirizzo Completo",
-      "address_placeholder": "Via Roma 123, 00100 Roma (RM)",
-      "tax_code": "Codice Fiscale",
-      "tax_code_placeholder": "RSSMRA80A01H501U",
-      "vat": "Partita IVA",
-      "vat_placeholder": "Opzionale per privati",
-      "company_name": "Ragione Sociale",
-      "company_name_placeholder": "Opzionale (se Azienda)",
-      "payment_method": "Metodo di Pagamento",
-      "credit_card": "Carta di Credito",
-      "secure_ssl": "Transazione sicura SSL",
-      "payment_info": "Cliccando su \"Procedi al pagamento\" verrai reindirizzato alla piattaforma sicura selezionata per completare la transazione. Non memorizziamo i dati della tua carta."
-    },
-    "password_reset": {
-      "forgot_password": "Password dimenticata?",
-      "request_description": "Nessun problema. Inserisci la tua email e ti invieremo le istruzioni per reimpostarla.",
-      "email_placeholder": "Tua Email",
-      "send_reset_code": "Invia Codice Reset",
-      "sending": "Invio in corso...",
-      "remember_password": "Ti sei ricordato la password?",
-      "login": "Accedi",
-      "create_new_password": "Crea nuova password",
-      "code_sent_to": "Codice inviato a",
-      "otp_code": "Codice di verifica",
-      "new_password": "Nuova Password",
-      "confirm_password": "Conferma Password",
-      "reset_password": "Reset Password",
-      "updating": "Aggiornamento...",
-      "did_not_receive_code": "Non ho ricevuto il codice",
-      "resend_in": "Invia di nuovo tra {{seconds}}s",
-      "password_updated": "Password Aggiornata!",
-      "password_updated_message": "La tua password è stata reimpostata con successo. Ora puoi accedere con le nuove credenziali.",
-      "go_to_login": "Vai al Login",
-      "invalid_email": "Inserisci un indirizzo email valido.",
-      "reset_code_error": "Impossibile inviare il codice. Verifica l'email.",
-      "otp_length": "Il codice OTP deve essere di 6 cifre.",
-      "password_min": "La password deve essere di almeno 8 caratteri.",
-      "password_mismatch": "Le password non coincidono.",
-      "reset_failed": "Codice errato o scaduto, oppure password non valida.",
-      "resend_error": "Errore nel rinvio del codice."
-    },
-    "not_found": {
-      "title": "Pagina inesistente",
-      "description": "Il link che hai seguito potrebbe essere corrotto o la pagina è stata rimossa. Non c'è nulla da vedere qui.",
-      "back_button": "Indietro",
-      "home_button": "Vai alla Home",
-      "error_code": "Codice errore:"
-    },
-      "eventServiceEdit": {
+  "password_reset": {
+    "forgot_password": "Password dimenticata?",
+    "request_description": "Nessun problema. Inserisci la tua email e ti invieremo le istruzioni per reimpostarla.",
+    "email_placeholder": "Tua Email",
+    "send_reset_code": "Invia Codice Reset",
+    "sending": "Invio in corso...",
+    "remember_password": "Ti sei ricordato la password?",
+    "login": "Accedi",
+    "create_new_password": "Crea nuova password",
+    "code_sent_to": "Codice inviato a",
+    "otp_code": "Codice di verifica",
+    "new_password": "Nuova Password",
+    "confirm_password": "Conferma Password",
+    "reset_password": "Reset Password",
+    "updating": "Aggiornamento...",
+    "did_not_receive_code": "Non ho ricevuto il codice",
+    "resend_in": "Invia di nuovo tra {{seconds}}s",
+    "password_updated": "Password Aggiornata!",
+    "password_updated_message": "La tua password è stata reimpostata con successo. Ora puoi accedere con le nuove credenziali.",
+    "go_to_login": "Vai al Login",
+    "invalid_email": "Inserisci un indirizzo email valido.",
+    "reset_code_error": "Impossibile inviare il codice. Verifica l'email.",
+    "otp_length": "Il codice OTP deve essere di 6 cifre.",
+    "password_min": "La password deve essere di almeno 8 caratteri.",
+    "password_mismatch": "Le password non coincidono.",
+    "reset_failed": "Codice errato o scaduto, oppure password non valida.",
+    "resend_error": "Errore nel rinvio del codice."
+  },
+  "not_found": {
+    "title": "Pagina inesistente",
+    "description": "Il link che hai seguito potrebbe essere corrotto o la pagina è stata rimossa. Non c'è nulla da vedere qui.",
+    "back_button": "Indietro",
+    "home_button": "Vai alla Home",
+    "error_code": "Codice errore:"
+  },
+  "eventServiceEdit": {
     "title": "Modifica Club",
     "subtitle": "Gestisci le informazioni del locale, le serate e il listino prezzi.",
     "infoService": "Info Servizio",
@@ -790,8 +863,8 @@
       "customPlaceholder": "Es. Disco / Funk / Soul"
     }
   },
-   "EventServiceEditPage": {
-    "title": "Modifica Club",
+  "EventServiceEditPage": {
+    "title": "Modifica Evento",
     "subtitle": "Gestisci le informazioni del locale, le serate e il listino prezzi.",
     "serviceLabel": "Servizio Evento Club",
     "name": "Nome Locale / Evento",
@@ -945,6 +1018,97 @@
         "save_error": "Errore durante il salvataggio",
         "save_success": "Deposito salvato con successo!"
       }
+    }
+  },
+  "payment_summary": {
+    "summary": "Riepilogo",
+    "booking": "Prenotazione",
+    "secure_checkout": "Checkout Sicuro",
+    "billing_data": "Dati Fatturazione",
+    "billing_subtitle": "Inserisci i dati per la fattura",
+    "payment_method": "Metodo di Pagamento",
+    "payment_subtitle": "Scegli come vuoi pagare",
+    "credit_card": "Carta di Credito",
+    "credit_card_subtitle": "Visa, Mastercard, American Express.",
+    "paypal_subtitle": "Usa il tuo saldo PayPal o collega un conto.",
+    "security_guarantee": "Garanzia di Sicurezza HOGU",
+    "payment_info": "I tuoi dati di pagamento sono crittografati e processati in modo sicuro. Non salviamo i dati della tua carta sui nostri server.",
+    "confirm_pay": "Conferma e Paga",
+    "first_name": "Nome",
+    "first_name_placeholder": "Il tuo nome",
+    "last_name": "Cognome",
+    "last_name_placeholder": "Il tuo cognome",
+    "email": "Email",
+    "email_placeholder": "esempio@email.com",
+    "address": "Indirizzo Completo",
+    "address_placeholder": "Via Roma 123, 00100 Roma (RM)",
+    "tax_code": "Codice Fiscale",
+    "tax_code_placeholder": "RSSMRA80A01H501U",
+    "vat": "Partita IVA",
+    "vat_placeholder": "Opzionale per privati",
+    "company_name": "Ragione Sociale",
+    "company_name_placeholder": "Opzionale (se Azienda)",
+    "secure_ssl": "Transazione protetta SSL",
+    "date": "Data",
+    "time": "Orario",
+    "location": "Luogo",
+    "guests": "Ospiti",
+    "people": "Persone",
+    "total_amount": "Importo Totale",
+    "taxes_included": "Tasse incluse",
+    "secure_transaction": "Transazione sicura al 100%"
+  },
+  "cities": {
+    "roma": "Roma",
+    "milano": "Milano",
+    "venezia": "Venezia",
+    "firenze": "Firenze",
+    "napoli": "Napoli",
+    "lombardia": "Lombardia",
+    "lazio": "Lazio",
+    "toscana": "Toscana",
+    "veneto": "Veneto"
+  },
+  "ncc_detail": {
+    "error_payment": "Impossibile procedere al pagamento.",
+    "error_unknown": "Errore sconosciuto",
+    "breadcrumb_detail": "Dettaglio Servizio",
+    "tag_premium": "NCC Premium",
+    "location_not_available": "Posizione non disponibile",
+    "no_description": "Nessuna descrizione disponibile.",
+    "error_load": "Impossibile caricare il servizio richiesto.",
+    "route_title": "Il tuo percorso",
+    "provider_title": "Chi offre il servizio",
+    "estimated_total": "Totale stimato",
+    "all_included": "/ tutto incluso",
+    "date": "Data",
+    "time": "Orario",
+    "passengers": "Passeggeri",
+    "people": "Persone",
+    "free_cancellation": "Cancellazione gratuita fino a 24h prima",
+    "instant_confirmation": "Conferma immediata",
+    "processing": "Elaborazione...",
+    "book_now": "Prenota ora",
+    "no_charge_info": "Non ti verrà addebitato nulla in questa fase",
+    "route": {
+      "loading": "Caricamento mappa...",
+      "error_route": "Impossibile trovare il percorso. Verifica gli indirizzi.",
+      "departure": "Partenza",
+      "arrival": "Arrivo",
+      "destination": "Destinazione",
+      "one_way": "Solo Andata",
+      "round_trip": "A/R",
+      "return": "Ritorno",
+      "total": "Totale",
+      "duration": "Durata",
+      "estimation": "Stima",
+      "osm_info": "* Percorso e stime basati su OpenStreetMap/OSRM."
+    },
+    "provider": {
+      "info_title": "Informazioni sul servizio",
+      "fleet_details": "Flotta & Dettagli",
+      "see_all": "Vedi tutte",
+      "reviews": "recensioni"
     }
   }
 }

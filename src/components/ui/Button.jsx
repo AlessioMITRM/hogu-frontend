@@ -4,22 +4,22 @@ import { HOGU_THEME, HOGU_COLORS } from '../../config/theme.js'; // .js
 // ... (il resto del codice di tutti i bottoni rimane invariato)
 // Bottone Primario Standard (per tutte le aree tranne Hero CTA)
 export const PrimaryButton = ({ children, onClick, className = '' }) => (
-    <button
-        onClick={onClick}
-        className={`
+  <button
+    onClick={onClick}
+    className={`
             bg-[#68B49B] hover:bg-[#599c86] text-white font-bold py-4 px-6
             rounded-2xl shadow-lg shadow-[#68B49B]/20 transition-all
             active:scale-95 w-full ${className}
         `}
-    >
-        {children}
-    </button>
+  >
+    {children}
+  </button>
 );
 
 export const PrimaryEmphasis = ({ children, onClick, className = '' }) => (
-    <button
-        onClick={onClick}
-        className={`
+  <button
+    onClick={onClick}
+    className={`
             w-full
             py-4 px-6
             font-bold text-white
@@ -29,8 +29,8 @@ export const PrimaryEmphasis = ({ children, onClick, className = '' }) => (
             transition-all active:scale-95
             ${className}
         `}>
-        {children}
-    </button>
+    {children}
+  </button>
 );
 
 export const SecondaryButton = ({
@@ -99,16 +99,16 @@ export const DarkPrimaryButton = ({ children, onClick, className = '', disabled 
     type={type}
     onClick={onClick}
     disabled={disabled}
-    style={{ 
-        backgroundColor: HOGU_COLORS.primaryHeroCTA, 
-        // Ombra personalizzata che usa il colore scuro
-        boxShadow: `0 4px 15px 0px rgba(51, 89, 76, 0.7)`,
-        ...style
+    style={{
+      backgroundColor: HOGU_COLORS.primaryHeroCTA,
+      // Ombra personalizzata che usa il colore scuro
+      boxShadow: `0 4px 15px 0px rgba(51, 89, 76, 0.7)`,
+      ...style
     }}
     className={`
       ${HOGU_THEME.primaryText} ${HOGU_THEME.fontFamily}
-      px-6 py-3 text-lg font-semibold rounded-xl transition-all 
-      hover:opacity-90 hover:scale-[1.03] disabled:opacity-50 disabled:cursor-not-allowed
+      px-5 py-2.5 md:px-8 md:py-4 text-sm md:text-lg font-bold rounded-xl md:rounded-2xl transition-all 
+      hover:opacity-90 hover:scale-[1.02] active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed
       ${className}
     `}
   >

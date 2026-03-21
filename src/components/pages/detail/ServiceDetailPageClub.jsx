@@ -1,12 +1,11 @@
 import React, { useState, useEffect, useRef, useMemo } from 'react';
 import L from "leaflet";
 import "leaflet/dist/leaflet.css";
-import { 
-    Clock, 
-    Calendar, 
-    Users, 
-    Shirt, 
-    Check, 
+import {
+    Clock,
+    Users,
+    Shirt,
+    Check,
     Info,
     Music,
     Armchair,
@@ -14,9 +13,11 @@ import {
     ChevronRight,
     Sparkles,
     MapPin,
-    AlertCircle
+    AlertCircle,
+    Navigation,
+    User
 } from 'lucide-react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useSearchParams } from 'react-router-dom';
 
 // --- IMPORT COMPONENTI UI ---
 import { Breadcrumbs } from '../../../components/ui/Breadcrumbs.jsx';
@@ -25,115 +26,33 @@ import { ServiceHeaderDetail } from '../../../components/ui/ServiceHeaderDetail.
 import { PrimaryButton } from '../../../components/ui/Button.jsx';
 import { ServiceImageGallery } from '../../../components/ui/ServiceImageGallery.jsx';
 import { LocationAddress } from '../../../components/ui/LocationAddress.jsx';
+import { InfoCard } from '../../../components/ui/InfoCard.jsx';
+import { ExpandableText } from '../../../components/ui/ExpandableText.jsx';
+import LeafletMap from '../../../components/ui/LeafletMap.jsx';
 import LoadingScreen from '../../ui/LoadingScreen.jsx';
 import ErrorModal from '../../ui/ErrorModal.jsx';
+import MapLoadingSkeleton from '../../ui/MapLoadingSkeleton.jsx';
 import { HOGU_THEME, HOGU_COLORS } from '../../../config/theme.js';
-import { ServiceUnavailableOverlay } from './ServiceUnavailableOverlay.jsx';
+import ServiceUnavailablePage from '../ServiceUnavailablePage.jsx';
 
 // --- API ---
 import { clubService, mapService, infoService } from '../../../api/apiClient.js';
 
-// Base URL immagini
-const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:8080';
-const IMG_BASE_URL = `${API_BASE_URL}/uploads/`;
+import { getServiceLocalization, formatServiceDateTimes } from '../../../utils/dateUtils.js';
+
+import { LiveViewersFloatingBadge } from '../../../components/ui/LiveViewersBadge.jsx';
+import { MUSIC_THEMES, parseThemeFromAPI } from '../../utils/musicThemes.js';
 
 // --- COMPONENTI UTILITY LOCALI ---
 
-// InfoCard ottimizzata per Mobile
-const InfoCard = ({ icon: Icon, label, value, subValue, highlight = false }) => (
-    <div className={`
-        flex items-center gap-3 p-3 rounded-xl border transition-all
-        ${highlight ? 'bg-[#F0FDF9] border-[#68B49B]/30' : 'bg-gray-50 border-gray-100'}
-    `}>
-        <div className={`p-2.5 rounded-lg shadow-sm ${highlight ? 'bg-[#68B49B] text-white' : 'bg-white text-[#68B49B]'}`}>
-            <Icon size={20} strokeWidth={2.5} />
-        </div>
-        <div>
-            <p className="text-[10px] font-bold text-gray-400 uppercase tracking-wider leading-tight">{label}</p>
-            <p className={`text-base font-bold leading-tight ${highlight ? 'text-[#33594C]' : 'text-[#1A202C]'}`}>{value}</p>
-            {subValue && <p className="text-[10px] text-gray-500 mt-0.5">{subValue}</p>}
-        </div>
-    </div>
-);
-
-// --- COMPONENTE MAPPA (LEAFLET - Stile Ristorante con Ref) ---
-const LeafletMapClub = ({ lat, lon, name }) => {
-    const mapContainerRef = useRef(null);
-    const mapInstanceRef = useRef(null);
-
-    useEffect(() => {
-        if (!lat || !lon || !mapContainerRef.current) return;
-
-        // Cleanup istanza precedente se esiste
-        if (mapInstanceRef.current) {
-            mapInstanceRef.current.remove();
-            mapInstanceRef.current = null;
-        }
-
-        const position = [lat, lon];
-        
-        // Inizializza mappa
-        const map = L.map(mapContainerRef.current, {
-            scrollWheelZoom: false,
-            zoomControl: false
-        }).setView(position, 16);
-
-        L.tileLayer('https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}.png', {
-            attribution: '&copy; CARTO',
-            subdomains: 'abcd',
-            maxZoom: 20
-        }).addTo(map);
-
-        L.control.zoom({ position: 'topleft' }).addTo(map);
-
-        const customIcon = L.divIcon({
-            className: 'bg-transparent',
-            html: `<div style="background-color: ${HOGU_COLORS.primary || '#68B49B'}; width: 28px; height: 28px; border-radius: 50%; border: 3px solid white; box-shadow: 0 4px 8px rgba(0,0,0,0.4);"></div>`
-        });
-
-        L.marker(position, { icon: customIcon }).addTo(map)
-            .bindPopup(`<div style="font-family: sans-serif; text-align: center; padding: 5px;"><strong>${name}</strong></div>`)
-            .openPopup();
-
-        mapInstanceRef.current = map;
-
-        return () => {
-            if (mapInstanceRef.current) {
-                mapInstanceRef.current.remove();
-                mapInstanceRef.current = null;
-            }
-        };
-    }, [lat, lon, name]);
-
-    if (!lat || !lon) return (
-        <div className="h-72 md:h-[480px] w-full rounded-2xl bg-gray-50 flex flex-col items-center justify-center border border-dashed border-gray-300 animate-pulse mb-6">
-            <MapPin className="text-gray-300 w-12 h-12 mb-3" />
-            <span className="text-gray-400 text-sm font-medium">Caricamento mappa...</span>
-        </div>
-    );
-
-    return (
-        <div className="relative group rounded-3xl overflow-hidden shadow-lg border border-gray-100 mb-6 mt-4 transition-all duration-300 hover:shadow-xl">
-            <div ref={mapContainerRef} className="h-72 md:h-[480px] w-full z-0" />
-            <div className="absolute bottom-0 left-0 right-0 bg-white/95 backdrop-blur-md px-5 py-3 text-xs text-gray-500 border-t border-gray-100 flex items-center justify-between z-[400]">
-                <div className="flex items-center gap-2">
-                    <div className={`w-2 h-2 rounded-full bg-[${HOGU_COLORS.primary || '#68B49B'}] animate-pulse`}></div>
-                    <span className="font-medium">Posizione verificata</span>
-                </div>
-                <span className="opacity-60 text-[10px] uppercase tracking-wider">Stadia Maps ©</span>
-            </div>
-        </div>
-    );
-};
-
 // --- TICKET OPTION UI ---
 const TicketOption = ({ type, title, subtitle, price, icon: Icon, isSelected, onClick, children }) => (
-    <div 
+    <div
         onClick={onClick}
         className={`
             relative overflow-hidden rounded-2xl border-2 transition-all duration-300 cursor-pointer group
-            ${isSelected 
-                ? 'border-[#68B49B] bg-white shadow-lg shadow-[#68B49B]/10 scale-[1.01]' 
+            ${isSelected
+                ? 'border-[#68B49B] bg-white shadow-lg shadow-[#68B49B]/10 scale-[1.01]'
                 : 'border-transparent bg-gray-50 hover:bg-white hover:border-gray-200 hover:shadow-md'}
         `}
     >
@@ -153,10 +72,10 @@ const TicketOption = ({ type, title, subtitle, price, icon: Icon, isSelected, on
                     <p className="text-xs text-gray-400 mt-0.5">{subtitle}</p>
                 </div>
             </div>
-            
+
             <div className="text-right">
                 <div className={`font-bold text-lg ${isSelected ? 'text-[#68B49B]' : 'text-gray-900'}`}>
-                    {typeof price === 'number' ? `€ ${price}` : price}
+                    {typeof price === 'number' ? `€ ${price.toFixed(2)}` : price}
                 </div>
                 {isSelected && (
                     <div className="absolute top-2 right-2">
@@ -169,7 +88,7 @@ const TicketOption = ({ type, title, subtitle, price, icon: Icon, isSelected, on
         </div>
         <div className={`
             overflow-hidden transition-all duration-300 ease-in-out border-t border-dashed
-            ${isSelected ? 'max-h-24 opacity-100 border-[#68B49B]/20 bg-[#F0FDF9]/30' : 'max-h-0 opacity-0 border-transparent'}
+            ${isSelected ? 'max-h-[500px] opacity-100 border-[#68B49B]/20 bg-[#F0FDF9]/30' : 'max-h-0 opacity-0 border-transparent'}
         `}>
             <div className="p-3 pl-6">
                 {children}
@@ -179,21 +98,32 @@ const TicketOption = ({ type, title, subtitle, price, icon: Icon, isSelected, on
 );
 
 // --- COMPONENTE PRINCIPALE ---
-export const ServiceDetailPageClub = ({ id, table }) => {
+export const ServiceDetailPageClub = ({ id, table, guests }) => {
     const navigate = useNavigate();
-    
+    const [searchParams] = useSearchParams();
+
     // Stati Dati
     const [service, setService] = useState(null);
     const [urgencyCount, setUrgencyCount] = useState(0);
     const [mapCoordinates, setMapCoordinates] = useState({ lat: null, lon: null });
-    
+
     // Stati UI/Loading
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
-    
+
     // Stati Booking
-    const [guestCount, setGuestCount] = useState(1);
-    const [bookingType, setBookingType] = useState('list'); // 'list' | 'table'
+    const [guestCount, setGuestCount] = useState(() => {
+        if (guests) return Math.max(1, parseInt(guests, 10));
+        const guestsParam = searchParams.get('guests') || searchParams.get('people') || searchParams.get('totalPersons');
+        return guestsParam ? Math.max(1, parseInt(guestsParam, 10)) : 1;
+    });
+
+    const [bookingType, setBookingType] = useState(() => {
+        const typeParam = searchParams.get('type');
+        const tableParam = searchParams.get('table');
+        const isTable = tableParam === 'true' || typeParam === 'table' || table === true;
+        return isTable ? 'table' : 'list';
+    });
 
     // Ref per evitare chiamate doppie
     const loadedId = useRef(null);
@@ -207,7 +137,7 @@ export const ServiceDetailPageClub = ({ id, table }) => {
         const fetchAllData = async () => {
             try {
                 setLoading(true);
-                
+
                 // Fetch parallelo
                 const [clubResponse, infoData] = await Promise.all([
                     clubService.getEventDetail(id),
@@ -219,30 +149,9 @@ export const ServiceDetailPageClub = ({ id, table }) => {
 
                 if (!clubData) throw new Error("Dati non trovati");
 
-                // Geocoding Safely
-                let coords = { lat: null, lon: null };
-                let addressToGeocode = "";
-                
-                // Safe access a serviceLocale (gestisce null, undefined o array vuoto)
-                if (clubData.serviceLocale && Array.isArray(clubData.serviceLocale) && clubData.serviceLocale.length > 0) {
-                    const locale = clubData.serviceLocale.find(l => l.language === 'it') || clubData.serviceLocale[0];
-                    if (locale) addressToGeocode = `${locale.address}, ${locale.city}`;
-                } 
-
-                if (addressToGeocode) {
-                    try {
-                        const mapData = await mapService.getCoordinatesFromAddress(addressToGeocode);
-                        if (mapData && mapData.latitude) {
-                            coords = { lat: mapData.latitude, lon: mapData.longitude };
-                        }
-                    } catch (mapError) {
-                        console.warn("Mappa non caricata:", mapError);
-                    }
-                }
-
                 setService(clubData);
                 setUrgencyCount(infoData);
-                setMapCoordinates(coords);
+                setMapCoordinates({ lat: null, lon: null });
 
                 if (table) {
                     setBookingType('table');
@@ -260,30 +169,124 @@ export const ServiceDetailPageClub = ({ id, table }) => {
         fetchAllData();
     }, [id, table]);
 
+    // Nuovo useEffect mappa
+    useEffect(() => {
+        if (!service) return;
+
+        const fetchCoordinates = async () => {
+            let addressToGeocode = "";
+
+            // Safe access a serviceLocale (gestisce null, undefined o array vuoto)
+            if (service.serviceLocale && Array.isArray(service.serviceLocale) && service.serviceLocale.length > 0) {
+                const locale = service.serviceLocale.find(l => l.language === 'it') || service.serviceLocale[0];
+                if (locale) addressToGeocode = `${locale.address}, ${locale.city}`;
+            }
+
+            if (addressToGeocode) {
+                try {
+                    const mapData = await mapService.getCoordinatesFromAddress(addressToGeocode);
+                    if (mapData && mapData.latitude) {
+                        setMapCoordinates({ lat: mapData.latitude, lon: mapData.longitude });
+                    }
+                } catch (mapError) {
+                    console.warn("Mappa non caricata:", mapError);
+                }
+            }
+        };
+        fetchCoordinates();
+    }, [service]);
+
+    // --- STATE AGGIUNTIVI PER SELEZIONE GENERE ---
+    const [selectedGender, setSelectedGender] = useState('MALE'); // Default MALE o null se necessario
+
     // --- PARSING DATI (SAFE & ROBUST) ---
     const parsedData = useMemo(() => {
         if (!service) return null;
 
-        // Estrazione sicura del locale
-        const locale = (service.serviceLocale && Array.isArray(service.serviceLocale))
-            ? (service.serviceLocale.find(l => l.language === 'it') || service.serviceLocale[0])
-            : (service.serviceLocale || {}); // Fallback oggetto vuoto se non è array
+        // 1. & 2. Gestione Localizzazione Centralizzata (Utils)
+        const { displayLocale, timeZone, userFullLang } = getServiceLocalization(service.serviceLocale);
 
-        const displayAddress = locale.address 
-            ? `${locale.address}, ${locale.city || ''}, ${locale.country || ''}` 
+        const displayAddress = displayLocale.address
+            ? `${displayLocale.address}, ${displayLocale.city || ''}, ${displayLocale.country || ''}`
             : (service.address ? `${service.address}, ${service.city || ''}` : "Indirizzo non disponibile");
-        
+
         // Immagini sicure
         const rawImages = service.images || [];
+
+        // Recupero clubId per path immagini (allineato con ServiceListingClub e EventServiceEditPage)
+        const clubId = service.clubServiceId || service.clubId || service.providerId || service.userId || service.club?.id;
+
         const images = rawImages.length > 0
-            ? rawImages.map(img => img.startsWith('http') ? img : `${IMG_BASE_URL}${img}`)
+            ? rawImages.map(img => {
+                if (img.startsWith('http')) return img;
+                if (clubId) return `/files/club/${clubId}/event/${service.id}/${img}`;
+                return `https://placehold.co/1200x800/2D3748/A0AEC0?text=${encodeURIComponent(service.name)}`;
+            })
             : ['https://placehold.co/1200x800/2D3748/A0AEC0?text=Club+Image'];
 
-        // Date Mock (Logica mantenuta)
-        const nextDate = new Date();
-        nextDate.setDate(nextDate.getDate() + (5 - nextDate.getDay() + 7) % 7);
-        const dateStr = nextDate.toLocaleDateString('it-IT', { day: 'numeric', month: 'short' });
-        const dayStr = nextDate.toLocaleDateString('it-IT', { weekday: 'long' });
+        // 3. Gestione Date e Orari Reali (Centralizzata)
+        let { dateStr, dayStr, startTimeStr, endTimeStr } = formatServiceDateTimes(
+            service.startTime,
+            service.endTime,
+            timeZone,
+            userFullLang
+        );
+
+        // Opzioni per formato Data + Ora
+        const fullDateTimeOptions = {
+            day: 'numeric',
+            month: 'short',
+            hour: '2-digit',
+            minute: '2-digit',
+            timeZone
+        };
+
+        // Sovrascrivi SEMPRE startTimeStr per includere la data (perché abbiamo rimosso il box "Prossima Data")
+        if (service.startTime) {
+            const startObj = new Date(service.startTime);
+            startTimeStr = startObj.toLocaleString(userFullLang, fullDateTimeOptions);
+        }
+
+        // Gestione eventi lunghi (Date diverse)
+        if (service.startTime && service.endTime) {
+            const startObj = new Date(service.startTime);
+            const endObj = new Date(service.endTime);
+
+            // Verifica se sono giorni diversi
+            const startDay = startObj.toLocaleDateString(userFullLang, { timeZone });
+            const endDay = endObj.toLocaleDateString(userFullLang, { timeZone });
+
+            if (startDay !== endDay) {
+                endTimeStr = endObj.toLocaleString(userFullLang, fullDateTimeOptions);
+            }
+        }
+
+        // --- GESTIONE PREZZI DINAMICA (MALE/FEMALE) ---
+        // Recuperiamo le configurazioni di prezzo attive
+        const pricingConfigs = service.pricingConfigurations?.filter(p => p.isActive) || [];
+
+        // Cerchiamo i prezzi specifici per genere
+        const malePriceConfig = pricingConfigs.find(p => p.pricingType === 'MALE');
+        const femalePriceConfig = pricingConfigs.find(p => p.pricingType === 'FEMALE');
+        const vipTableConfig = pricingConfigs.find(p => p.pricingType === 'VIP_TABLE');
+
+        // Determina se abbiamo opzioni miste (sia MALE che FEMALE disponibili)
+        const hasGenderSelection = !!(malePriceConfig && femalePriceConfig);
+
+        // Se non c'è distinzione, usa un prezzo base generico (fallback)
+        const basePrice = service.basePrice ?? service.price ?? 25;
+
+        // Calcola il prezzo di ingresso corrente in base alla selezione
+        let currentEntryPrice = basePrice;
+        if (hasGenderSelection) {
+            // Se c'è selezione, usa il prezzo del genere selezionato (gestito nello state del componente padre, ma qui calcoliamo i valori disponibili)
+            // Nota: 'selectedGender' è nello scope del componente, lo useremo nel render o in un useMemo separato se necessario.
+            // Qui restituiamo le opzioni disponibili.
+        } else if (malePriceConfig) {
+            currentEntryPrice = malePriceConfig.price;
+        } else if (femalePriceConfig) {
+            currentEntryPrice = femalePriceConfig.price;
+        }
 
         return {
             title: service.name || service.title || "Evento Senza Nome",
@@ -291,11 +294,66 @@ export const ServiceDetailPageClub = ({ id, table }) => {
             displayAddress,
             images,
             available: service.available !== false, // Default true se undefined
-            entryPrice: service.basePrice ?? service.price ?? 25, // Nullish coalescing per il prezzo
-            tablePrice: service.tablePrice ?? 300,
-            nextEvent: { date: dateStr, day: dayStr }
+
+            // Prezzi
+            entryPrice: currentEntryPrice, // Prezzo di default o base
+            tablePrice: vipTableConfig ? vipTableConfig.price : (service.tablePrice ?? 300),
+
+            // Configurazione Prezzi Avanzata
+            pricing: {
+                hasGenderSelection,
+                malePrice: malePriceConfig?.price,
+                femalePrice: femalePriceConfig?.price,
+                vipTablePrice: vipTableConfig?.price,
+                malePriceId: malePriceConfig?.id,
+                femalePriceId: femalePriceConfig?.id,
+                vipTablePriceId: vipTableConfig?.id,
+                malePriceConfig: malePriceConfig,
+                femalePriceConfig: femalePriceConfig,
+                vipTablePriceConfig: vipTableConfig,
+                // Se non c'è distinzione di genere, prendiamo il primo prezzo disponibile come default (es. ingresso unico)
+                defaultPriceId: (!hasGenderSelection && pricingConfigs.length > 0) ? pricingConfigs[0].id : null,
+                defaultPriceConfig: (!hasGenderSelection && pricingConfigs.length > 0) ? pricingConfigs[0] : null
+            },
+
+            eventTime: startTimeStr,
+            eventEndTime: endTimeStr,
+            nextEvent: { date: dateStr, day: dayStr },
+            // Campi raw per il checkout
+            clubServiceId: clubId,
+            rawStartTime: service.startTime,
+            address: service.address,
+            city: service.city,
+            theme: service.theme,
+            djName: service.djName
         };
     }, [service]);
+
+    // --- THEME RESOLUTION ---
+    const themeObj = useMemo(() => {
+        if (!parsedData?.theme) return null;
+        const themes = parseThemeFromAPI(parsedData.theme);
+        if (!themes.length) return null;
+
+        const mainTheme = themes[0].toLowerCase();
+
+        const themeKey = Object.keys(MUSIC_THEMES).find(key => {
+            const t = MUSIC_THEMES[key];
+            return t.value.toLowerCase() === mainTheme ||
+                t.subThemes.some(sub => sub.toLowerCase() === mainTheme);
+        });
+
+        return themeKey ? MUSIC_THEMES[themeKey] : null;
+    }, [parsedData?.theme]);
+
+    // Effetto per impostare il genere di default se necessario
+    useEffect(() => {
+        if (parsedData?.pricing?.hasGenderSelection) {
+            // Se non è ancora settato o è invalido, resettiamo a MALE (o altro default)
+            if (!selectedGender) setSelectedGender('MALE');
+        }
+    }, [parsedData?.pricing?.hasGenderSelection]);
+
 
     // --- HANDLERS ---
     const handleGuestChange = (delta) => {
@@ -304,25 +362,66 @@ export const ServiceDetailPageClub = ({ id, table }) => {
     };
 
     const handleProceedToCheckout = () => {
-        const total = bookingType === 'table' ? parsedData.tablePrice : (guestCount * parsedData.entryPrice);
-        
-        navigate('/payment/summary', { 
-            state: { 
+        // Calcolo prezzo dinamico in base alla selezione e ID configurazione
+        let finalPrice = parsedData.entryPrice;
+        let selectedPricingId = parsedData.pricing.defaultPriceId;
+        let selectedPricingConfig = parsedData.pricing.defaultPriceConfig;
+
+        if (bookingType === 'list') {
+            if (parsedData.pricing.hasGenderSelection) {
+                finalPrice = selectedGender === 'MALE' ? parsedData.pricing.malePrice : parsedData.pricing.femalePrice;
+                selectedPricingId = selectedGender === 'MALE' ? parsedData.pricing.malePriceId : parsedData.pricing.femalePriceId;
+                selectedPricingConfig = selectedGender === 'MALE' ? parsedData.pricing.malePriceConfig : parsedData.pricing.femalePriceConfig;
+            }
+        } else if (bookingType === 'table') {
+            finalPrice = parsedData.tablePrice;
+            selectedPricingId = parsedData.pricing.vipTablePriceId;
+            selectedPricingConfig = parsedData.pricing.vipTablePriceConfig;
+        }
+
+        const total = bookingType === 'table' ? parsedData.tablePrice : (guestCount * finalPrice);
+
+        navigate('/payment/summary', {
+            state: {
                 booking: {
-                    type: bookingType,
+                    serviceId: service.id,
+                    date: parsedData.nextEvent.date,
+                    time: parsedData.rawStartTime,
                     guests: guestCount,
                     total: total,
-                    date: parsedData.nextEvent.date
-                }, 
-                service: parsedData,
-                serviceId: id
-            } 
+                    serviceType: 'CLUB',
+                    type: bookingType === 'list' ? 'entry' : bookingType,
+                    gender: bookingType === 'list' && parsedData.pricing.hasGenderSelection ? selectedGender : null,
+                    pricingConfigurationId: selectedPricingId,
+                    pricingConfiguration: selectedPricingConfig,
+                    specialRequests: "Nessuna richiesta" // Default value to avoid "non deve essere spazio" error
+                },
+                service: {
+                    id: service.id,
+                    name: parsedData.title,
+                    category: 'CLUB',
+                    address: parsedData.displayAddress,
+                    image: parsedData.images[0],
+                    providerId: parsedData.clubServiceId,
+                    clubServiceId: parsedData.clubServiceId,
+                    city: parsedData.city
+                }
+            }
         });
     };
 
+    // Calcola il prezzo attuale da visualizzare nel componente TicketOption (e nel riepilogo)
+    const currentListPrice = useMemo(() => {
+        if (!parsedData) return 0;
+        if (parsedData.pricing.hasGenderSelection) {
+            return selectedGender === 'MALE' ? parsedData.pricing.malePrice : parsedData.pricing.femalePrice;
+        }
+        return parsedData.entryPrice;
+    }, [parsedData, selectedGender]);
+
     // --- RENDER ---
     if (loading) return <LoadingScreen isLoading={true} />;
-    
+
     if (error) return (
         <div className="min-h-screen flex items-center justify-center bg-gray-50 p-4">
             <ErrorModal message={error} onClose={() => navigate('/service/club')} />
@@ -331,7 +430,11 @@ export const ServiceDetailPageClub = ({ id, table }) => {
 
     if (!parsedData) return null;
 
-    const currentPrice = bookingType === 'table' ? parsedData.tablePrice : (guestCount * parsedData.entryPrice);
+    if (!parsedData.available) {
+        return <ServiceUnavailablePage />;
+    }
+
+    const currentPrice = bookingType === 'table' ? parsedData.tablePrice : (guestCount * currentListPrice);
 
     const breadcrumbsItems = [
         { label: 'Home', href: '/' },
@@ -340,145 +443,177 @@ export const ServiceDetailPageClub = ({ id, table }) => {
     ];
 
     return (
-        <div className={`max-w-7xl mx-auto px-4 py-6 md:py-12 ${HOGU_THEME.fontFamily}`}>
-          
-            {/* Breadcrumbs */}
-            <div className="mb-4 hidden md:block">
-                <Breadcrumbs items={breadcrumbsItems} />
-            </div>
+        <div className={`min-h-screen bg-white ${HOGU_THEME.fontFamily} pb-24 md:pb-0`}>
+            {/* Sfondo sfumato */}
+            <div className="absolute top-0 left-0 w-full h-96 bg-gradient-to-b from-gray-50 to-white -z-10"></div>
 
-            {/* HEADER CON TAGS */}
-            <ServiceHeaderDetail 
-                title={parsedData.title}
-                urgencyCount={urgencyCount}
-                tags={
-                    <>
-                        <span className="bg-[#E6F5F0] text-[#33594C] px-3 py-1 rounded-full text-xs font-bold flex items-center gap-1 border border-[#68B49B]/30">
-                            <Music size={12} /> DJ Set
-                        </span>
-                        <Tag>Esclusivo</Tag>
-                    </>
-                }
-            />
+            <div className="max-w-7xl mx-auto px-4 py-6 lg:px-8 lg:py-10">
 
-            {/* Gallery (Stile aggiornato) */}
-            <div className="rounded-3xl overflow-hidden shadow-sm border border-gray-100 mb-8">
-                <ServiceImageGallery images={parsedData.images} />
-            </div>
-
-            <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 lg:gap-12 relative mt-8">
-            
-                {/* --- COLONNA SINISTRA (INFO) --- */}
-                <div className="lg:col-span-2 space-y-8 md:space-y-12">
-                    
-                    {/* Intro */}
-                    <section>
-                        <h2 className="text-xl md:text-2xl font-bold text-[#1A202C] mb-3">About the Night</h2>
-                        <p className="text-gray-600 leading-relaxed text-base md:text-lg whitespace-pre-line">
-                            {parsedData.description}
-                        </p>
-                    </section>
-
-                    {/* ORARI & INFO (Dynamic) */}
-                    <section>
-                        <h3 className="text-lg font-bold text-[#1A202C] mb-4 flex items-center gap-2">
-                            <Clock size={20} className="text-[#68B49B]" /> Info Serata
-                        </h3>
-                        <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
-                            <InfoCard 
-                                icon={Calendar} 
-                                label="Prossima Data" 
-                                value={parsedData.nextEvent.date} 
-                                subValue={parsedData.nextEvent.day} 
-                                highlight={true} 
-                            />
-                            <InfoCard icon={Clock} label="Apertura" value="23:00" />
-                            <InfoCard icon={Clock} label="Chiusura" value="05:00" />
-                        </div>
-                    </section>
-
-                    {/* DRESS CODE & VIBE (Statico/Visuale per Club Context) */}
-                    <section className="bg-gradient-to-br from-[#1A202C] to-[#2D3748] rounded-2xl p-6 text-white shadow-xl relative overflow-hidden">
-                        <div className="absolute top-0 right-0 w-32 h-32 bg-[#68B49B] rounded-full blur-[60px] opacity-20"></div>
-                        
-                        <div className="relative z-10">
-                            <h3 className="text-lg font-bold mb-6 flex items-center gap-2 text-white">
-                                <Sparkles size={20} className="text-[#68B49B]" /> Vibe & Accesso
-                            </h3>
-                            
-                            <div className="flex flex-col md:flex-row gap-6 md:gap-12">
-                                {/* Dress Code */}
-                                <div className="flex-1">
-                                    <div className="flex items-center gap-3 mb-2">
-                                        <div className="bg-white/10 p-2 rounded-lg">
-                                            <Shirt size={20} className="text-[#68B49B]" />
-                                        </div>
-                                        <span className="text-xs font-bold text-gray-400 uppercase tracking-widest">Dress Code</span>
-                                    </div>
-                                    <p className="text-xl font-bold mb-1">Smart Casual / Elegant</p>
-                                    <p className="text-sm text-gray-400 leading-snug">
-                                        Camicia gradita per gli uomini. No abbigliamento sportivo. Selezione all'ingresso.
-                                    </p>
-                                </div>
-
-                                <div className="h-px w-full bg-white/10 md:hidden"></div>
-
-                                {/* Crowd Mix (Visual Element) */}
-                                <div className="flex-1">
-                                    <div className="flex items-center justify-between mb-3">
-                                        <div className="flex items-center gap-3">
-                                            <div className="bg-white/10 p-2 rounded-lg">
-                                                <Users size={20} className="text-[#68B49B]" />
-                                            </div>
-                                            <span className="text-xs font-bold text-gray-400 uppercase tracking-widest">Crowd Mix</span>
-                                        </div>
-                                        <span className="text-xs bg-[#68B49B] text-white px-2 py-0.5 rounded text-bold">Bilanciato</span>
-                                    </div>
-                                    
-                                    <div className="space-y-2">
-                                        <div className="h-3 w-full bg-white/10 rounded-full overflow-hidden flex">
-                                            <div style={{ width: `50%` }} className="bg-blue-500 h-full"></div>
-                                            <div className="flex-1 bg-pink-500 h-full"></div>
-                                        </div>
-                                        <div className="flex justify-between text-xs font-medium text-gray-300">
-                                            <span>50% Uomo</span>
-                                            <span>50% Donna</span>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </section>
-
-                    <section>
-                        <div className="flex items-center gap-3 mb-6">
-                            <div className={`p-3 rounded-xl bg-[${HOGU_COLORS.primary || '#68B49B'}]/10`}>
-                                <MapPin className={`w-6 h-6 text-[${HOGU_COLORS.primary || '#68B49B'}]`} />
-                            </div>
-                            <h2 className="text-2xl font-bold tracking-tight text-gray-900">Dove trovarci</h2>
-                        </div>
-                        <LeafletMapClub 
-                            lat={mapCoordinates.lat} 
-                            lon={mapCoordinates.lon} 
-                            name={parsedData.title} 
-                        />
-                        <div className="pl-2 border-l-4 border-gray-200">
-                             <LocationAddress address={parsedData.displayAddress} />
-                        </div>
-                    </section>
-
+                {/* Breadcrumbs */}
+                <div className="mb-4">
+                    <Breadcrumbs items={breadcrumbsItems} />
                 </div>
 
-                {/* --- COLONNA DESTRA (PRENOTAZIONE) --- */}
-                <div className="lg:col-span-1">
-                    <div className="sticky top-24">
-                        
-                        {!parsedData.available ? (
-                            <ServiceUnavailableOverlay 
-                                onSearchSimilar={() => navigate('/service/club')} 
-                                onGoBack={() => window.history.back()}
+                {/* HEADER CON TAGS */}
+                <ServiceHeaderDetail
+                    title={parsedData.title}
+                    tags={
+                        <div className="flex items-center gap-3 mt-1 md:mt-0 flex-wrap">
+                            {themeObj && (
+                                <div className="inline-flex items-center gap-2 pl-1 pr-3 py-1 rounded-full border border-gray-200 bg-white/80 backdrop-blur-sm shadow-[0_2px_8px_rgba(0,0,0,0.04)]">
+                                    <div className="w-5 h-5 rounded-full bg-[#1A202C] flex items-center justify-center text-white text-[10px]">
+                                        {themeObj.icon}
+                                    </div>
+                                    <span className="text-[10px] font-bold text-gray-600 uppercase tracking-[0.15em]">{themeObj.value}</span>
+                                </div>
+                            )}
+
+                            {parsedData.djName && (
+                                <div className="inline-flex items-center gap-2 pl-1 pr-3 py-1 rounded-full border border-gray-200 bg-white/80 backdrop-blur-sm shadow-[0_2px_8px_rgba(0,0,0,0.04)]">
+                                    <div className="w-5 h-5 rounded-full bg-[#E6F5F0] flex items-center justify-center text-[#33594C]">
+                                        <User size={10} strokeWidth={3} />
+                                    </div>
+                                    <span className="text-[10px] font-bold text-[#33594C] uppercase tracking-[0.15em]">{parsedData.djName}</span>
+                                </div>
+                            )}
+                        </div>
+                    }
+                />
+
+                {/* Gallery (Stile aggiornato) */}
+                <div className="-mx-4 md:mx-0 rounded-none md:rounded-3xl overflow-hidden shadow-none md:shadow-sm border-y md:border border-gray-100 md:border-gray-100 mb-8">
+                    <ServiceImageGallery images={parsedData.images} mainImageHeight="h-64 md:h-96" />
+                </div>
+
+                <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 lg:gap-12 relative mt-8">
+
+                    {/* --- COLONNA SINISTRA (INFO) --- */}
+                    <div className="lg:col-span-2 space-y-8 md:space-y-12">
+
+                        {/* Intro */}
+                        <section>
+                            <div className="flex items-center gap-3 mb-4 md:mb-6">
+                                <div className={`p-2 md:p-3 rounded-xl bg-[${HOGU_COLORS.primary}]/10`}>
+                                    <Info className={`w-5 h-5 md:w-6 md:h-6 text-[${HOGU_COLORS.primary}]`} />
+                                </div>
+                                <h2 className="text-lg md:text-2xl font-bold tracking-tight text-gray-900">About the Night</h2>
+                            </div>
+                            <ExpandableText text={parsedData.description} />
+                        </section>
+
+                        {/* ORARI & INFO (Dynamic) */}
+                        <section>
+                            <div className="flex items-center gap-3 mb-4 md:mb-6">
+                                <div className={`p-2 md:p-3 rounded-xl bg-[${HOGU_COLORS.primary}]/10`}>
+                                    <Clock className={`w-5 h-5 md:w-6 md:h-6 text-[${HOGU_COLORS.primary}]`} />
+                                </div>
+                                <h2 className="text-lg md:text-2xl font-bold tracking-tight text-gray-900">Info Serata</h2>
+                            </div>
+                            <div className="grid grid-cols-2 gap-3">
+                                <InfoCard icon={Clock} label="Apertura" value={parsedData.eventTime} />
+                                <InfoCard icon={Clock} label="Chiusura" value={parsedData.eventEndTime} />
+                            </div>
+                        </section>
+
+                        {/* DRESS CODE & VIBE (Statico/Visuale per Club Context) */}
+                        <section className="bg-gradient-to-br from-[#1A202C] to-[#2D3748] rounded-2xl p-6 text-white shadow-xl relative overflow-hidden">
+                            <div className="absolute top-0 right-0 w-32 h-32 bg-[#68B49B] rounded-full blur-[60px] opacity-20"></div>
+
+                            <div className="relative z-10">
+                                <h3 className="text-lg font-bold mb-6 flex items-center gap-2 text-white">
+                                    <Sparkles size={20} className="text-[#68B49B]" /> Vibe & Accesso
+                                </h3>
+
+                                <div className="flex flex-col md:flex-row gap-6 md:gap-12">
+                                    {/* Dress Code */}
+                                    <div className="flex-1">
+                                        <div className="flex items-center gap-3 mb-2">
+                                            <div className="bg-white/10 p-2 rounded-lg">
+                                                <Shirt size={20} className="text-[#68B49B]" />
+                                            </div>
+                                            <span className="text-xs font-bold text-gray-400 uppercase tracking-widest">Dress Code</span>
+                                        </div>
+                                        <p className="text-xl font-bold mb-1">Smart Casual / Elegant</p>
+                                        <p className="text-sm text-gray-400 leading-snug">
+                                            Camicia gradita per gli uomini. No abbigliamento sportivo. Selezione all'ingresso.
+                                        </p>
+                                    </div>
+
+                                    <div className="h-px w-full bg-white/10 md:hidden"></div>
+
+                                    {/* Crowd Mix (Visual Element) */}
+                                    <div className="flex-1">
+                                        <div className="flex items-center justify-between mb-3">
+                                            <div className="flex items-center gap-3">
+                                                <div className="bg-white/10 p-2 rounded-lg">
+                                                    <Users size={20} className="text-[#68B49B]" />
+                                                </div>
+                                                <span className="text-xs font-bold text-gray-400 uppercase tracking-widest">Crowd Mix</span>
+                                            </div>
+                                            <span className="text-xs bg-[#68B49B] text-white px-2 py-0.5 rounded text-bold">Bilanciato</span>
+                                        </div>
+
+                                        <div className="space-y-2">
+                                            <div className="h-3 w-full bg-white/10 rounded-full overflow-hidden flex">
+                                                <div style={{ width: `50%` }} className="bg-blue-500 h-full"></div>
+                                                <div className="flex-1 bg-pink-500 h-full"></div>
+                                            </div>
+                                            <div className="flex justify-between text-xs font-medium text-gray-300">
+                                                <span>50% Uomo</span>
+                                                <span>50% Donna</span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </section>
+
+                        <section className="pt-8 border-t border-gray-100">
+                            <div className="flex items-center gap-3 mb-4 md:mb-6">
+                                <div className={`p-2 md:p-3 rounded-xl bg-[${HOGU_COLORS.primary}]/10`}>
+                                    <MapPin className={`w-5 h-5 md:w-6 md:h-6 text-[${HOGU_COLORS.primary}]`} />
+                                </div>
+                                <h2 className="text-lg md:text-2xl font-bold tracking-tight text-gray-900">Dove trovarci</h2>
+                            </div>
+                            <LeafletMap
+                                lat={mapCoordinates.lat}
+                                lon={mapCoordinates.lon}
+                                name={parsedData.title}
                             />
-                        ) : (
+
+                            {/* Address Card Elegante (Responsive) */}
+                            <div className="mt-4 md:mt-6">
+                                <div className="bg-white rounded-2xl p-5 shadow-[0_8px_30px_rgba(0,0,0,0.06)] border border-gray-100 flex flex-col md:flex-row md:items-center md:justify-between gap-4">
+                                    <div className="flex items-start gap-4">
+                                        <div className={`p-3 rounded-2xl bg-[${HOGU_COLORS.primary}]/10 shrink-0`}>
+                                            <MapPin className={`w-6 h-6 text-[${HOGU_COLORS.primary}]`} />
+                                        </div>
+                                        <div className="flex flex-col gap-1">
+                                            <span className="text-[11px] font-bold uppercase tracking-wider text-gray-400">Dove siamo</span>
+                                            <p className="text-gray-900 font-medium leading-relaxed text-sm md:text-base">
+                                                {parsedData.displayAddress}
+                                            </p>
+                                        </div>
+                                    </div>
+                                    <a
+                                        href={`https://www.google.com/maps/dir/?api=1&destination=${encodeURIComponent(parsedData.displayAddress)}`}
+                                        target="_blank"
+                                        rel="noopener noreferrer"
+                                        className={`w-full md:w-auto md:min-w-[200px] py-3 md:px-6 rounded-xl bg-gray-50 hover:bg-gray-100 text-gray-900 font-semibold text-sm flex items-center justify-center gap-2 transition-colors border border-gray-200 active:scale-[0.98]`}
+                                    >
+                                        <span>Ottieni indicazioni</span>
+                                        <Navigation className="w-4 h-4" />
+                                    </a>
+                                </div>
+                            </div>
+                        </section>
+
+                    </div>
+
+                    {/* --- COLONNA DESTRA (PRENOTAZIONE) --- */}
+                    <div className="lg:col-span-1">
+                        <div className="sticky top-24">
+
                             <div className={`bg-white rounded-[2rem] shadow-sm border border-gray-100 p-5 md:p-6 overflow-hidden relative shadow-xl ring-1 ring-black/5`}>
                                 <div className="flex items-center justify-between mb-6">
                                     <div>
@@ -491,40 +626,75 @@ export const ServiceDetailPageClub = ({ id, table }) => {
                                 </div>
 
                                 <div className="space-y-4 mb-6">
-                                    
+
                                     {/* Opzione 1: Lista */}
-                                    <TicketOption 
+                                    <TicketOption
                                         type="list"
                                         title="Mettiti in Lista"
                                         subtitle="Ingresso prioritario + Drink"
-                                        price={parsedData.entryPrice}
+                                        price={currentListPrice}
                                         icon={Users}
                                         isSelected={bookingType === 'list'}
                                         onClick={() => setBookingType('list')}
                                     >
-                                        <div className="flex items-center justify-between">
-                                            <span className="text-sm font-bold text-gray-700">Numero Ospiti</span>
-                                            <div className="flex items-center gap-3 bg-white rounded-lg border border-gray-200 p-1 shadow-sm">
-                                                <button 
-                                                    onClick={(e) => { e.stopPropagation(); handleGuestChange(-1); }}
-                                                    className="w-8 h-8 flex items-center justify-center rounded-md hover:bg-gray-100 text-gray-600 transition-colors"
-                                                    disabled={guestCount <= 1}
-                                                >
-                                                    -
-                                                </button>
-                                                <span className="w-6 text-center font-bold text-lg">{guestCount}</span>
-                                                <button 
-                                                    onClick={(e) => { e.stopPropagation(); handleGuestChange(1); }}
-                                                    className="w-8 h-8 flex items-center justify-center rounded-md hover:bg-gray-100 text-[#68B49B] transition-colors"
-                                                >
-                                                    +
-                                                </button>
+                                        <div className="space-y-4">
+                                            {/* SELEZIONE GENERE */}
+                                            {parsedData.pricing.hasGenderSelection && (
+                                                <div className="bg-white p-3 rounded-xl border border-gray-100 shadow-sm">
+                                                    <label className="text-[10px] font-bold text-gray-400 uppercase tracking-wider mb-2 block">Seleziona Genere</label>
+                                                    <div className="flex gap-2">
+                                                        <button
+                                                            onClick={(e) => { e.stopPropagation(); setSelectedGender('MALE'); }}
+                                                            className={`flex-1 py-2 px-2 rounded-lg border flex flex-col items-center justify-center gap-1 transition-all ${selectedGender === 'MALE'
+                                                                ? 'border-blue-500 bg-blue-50 text-blue-700 shadow-sm ring-1 ring-blue-200'
+                                                                : 'border-gray-100 bg-gray-50 text-gray-500 hover:border-gray-200'
+                                                                }`}
+                                                        >
+                                                            <span className="font-bold text-xs">Uomo</span>
+                                                            <span className="bg-blue-200 text-blue-800 text-[10px] font-bold px-1.5 rounded-full">€{parsedData.pricing.malePrice}</span>
+                                                        </button>
+                                                        <button
+                                                            onClick={(e) => { e.stopPropagation(); setSelectedGender('FEMALE'); }}
+                                                            className={`flex-1 py-2 px-2 rounded-lg border flex flex-col items-center justify-center gap-1 transition-all ${selectedGender === 'FEMALE'
+                                                                ? 'border-pink-500 bg-pink-50 text-pink-700 shadow-sm ring-1 ring-pink-200'
+                                                                : 'border-gray-100 bg-gray-50 text-gray-500 hover:border-gray-200'
+                                                                }`}
+                                                        >
+                                                            <span className="font-bold text-xs">Donna</span>
+                                                            <span className="bg-pink-200 text-pink-800 text-[10px] font-bold px-1.5 rounded-full">€{parsedData.pricing.femalePrice}</span>
+                                                        </button>
+                                                    </div>
+                                                    <div className="flex items-center gap-1 mt-2 text-[10px] text-gray-400">
+                                                        <Info size={12} />
+                                                        <span>Prezzi differenti per genere</span>
+                                                    </div>
+                                                </div>
+                                            )}
+
+                                            <div className="flex items-center justify-between">
+                                                <span className="text-sm font-bold text-gray-700">Numero Ospiti</span>
+                                                <div className="flex items-center gap-3 bg-white rounded-lg border border-gray-200 p-1 shadow-sm">
+                                                    <button
+                                                        onClick={(e) => { e.stopPropagation(); handleGuestChange(-1); }}
+                                                        className="w-8 h-8 flex items-center justify-center rounded-md hover:bg-gray-100 text-gray-600 transition-colors"
+                                                        disabled={guestCount <= 1}
+                                                    >
+                                                        -
+                                                    </button>
+                                                    <span className="w-6 text-center font-bold text-lg">{guestCount}</span>
+                                                    <button
+                                                        onClick={(e) => { e.stopPropagation(); handleGuestChange(1); }}
+                                                        className="w-8 h-8 flex items-center justify-center rounded-md hover:bg-gray-100 text-[#68B49B] transition-colors"
+                                                    >
+                                                        +
+                                                    </button>
+                                                </div>
                                             </div>
                                         </div>
                                     </TicketOption>
 
                                     {/* Opzione 2: Tavolo */}
-                                    <TicketOption 
+                                    <TicketOption
                                         type="table"
                                         title="Prenota Tavolo"
                                         subtitle="Zona VIP • Max 6 pax"
@@ -541,14 +711,14 @@ export const ServiceDetailPageClub = ({ id, table }) => {
 
                                 </div>
 
-                                <div className="pt-4 border-t border-dashed border-gray-200">
+                                <div className="hidden lg:block pt-4 border-t border-dashed border-gray-200">
                                     <div className="flex justify-between items-end mb-4">
                                         <div>
                                             <p className="text-xs text-gray-400 font-bold uppercase">Totale Stimato</p>
                                             <p className="text-[10px] text-gray-400">Pagamento in cassa</p>
                                         </div>
                                         <div className="text-3xl font-extrabold text-[#1A202C]">
-                                            € {currentPrice}
+                                            € {typeof currentPrice === 'number' ? currentPrice.toFixed(2) : currentPrice}
                                         </div>
                                     </div>
 
@@ -560,8 +730,31 @@ export const ServiceDetailPageClub = ({ id, table }) => {
                                     </PrimaryButton>
                                 </div>
                             </div>
-                        )}
+                        </div>
                     </div>
+                </div>
+
+                {/* LIVE VIEWERS BADGE - FIXED & ELEGANT */}
+                <LiveViewersFloatingBadge count={urgencyCount} />
+
+            </div>
+
+            {/* MOBILE FIXED BOTTOM BAR */}
+            <div className="fixed bottom-0 left-0 right-0 bg-white border-t border-gray-100 p-4 shadow-[0_-4px_20px_rgba(0,0,0,0.08)] lg:hidden pb-6 safe-area-bottom" style={{ zIndex: 40 }}>
+                <div className="flex items-center gap-4 max-w-7xl mx-auto">
+                    <div className="flex flex-col min-w-[80px]">
+                        <span className="text-[10px] text-gray-400 font-bold uppercase tracking-wider">Totale</span>
+                        <span className="text-xl font-extrabold text-[#1A202C]">
+                            € {typeof currentPrice === 'number' ? currentPrice.toFixed(2) : currentPrice}
+                        </span>
+                    </div>
+                    <PrimaryButton
+                        onClick={handleProceedToCheckout}
+                        className="flex-1 py-3 text-base shadow-lg shadow-[#68B49B]/20 flex justify-center items-center gap-2 rounded-xl"
+                    >
+                        <span>Procedi</span>
+                        <ChevronRight size={18} />
+                    </PrimaryButton>
                 </div>
             </div>
         </div>

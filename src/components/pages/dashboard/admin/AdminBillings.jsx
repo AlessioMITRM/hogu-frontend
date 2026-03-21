@@ -24,6 +24,8 @@ import {
   Map
 } from 'lucide-react';
 import { HOGU_COLORS, HOGU_THEME } from '../../../../config/theme.js';
+import SafeImage from '../../../ui/SafeImage.jsx';
+
 
 
 // --- MOCK DATA (VISTA ADMIN) ---
@@ -164,7 +166,7 @@ const AdminBookingCard = ({ booking, onClick }) => (
 
     {/* Immagine / ID */}
     <div className="relative w-full lg:w-40 h-32 lg:h-28 flex-shrink-0 rounded-2xl overflow-hidden bg-gray-50">
-        <img 
+        <SafeImage 
             src={booking.image} 
             alt={booking.serviceName}
             className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110 opacity-90"

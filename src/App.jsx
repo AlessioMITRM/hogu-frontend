@@ -1,12 +1,14 @@
-import React from "react";
+import React, { useState, useEffect, useLayoutEffect } from "react";
 // 1. Aggiungo useSearchParams agli import
-import { Routes, Route, useParams, useSearchParams } from "react-router-dom";
+import { Routes, Route, useParams, useSearchParams, useLocation } from "react-router-dom";
 import { I18nextProvider } from "react-i18next";
-import i18n from "./i18n"; 
+import i18n from "./i18n";
 import { useAuth } from "./components/context/AuthContext.jsx";
+import { bookingService } from "./api/apiClient";
 
 // Common
 import CookieConsent from "./components/common/CookieConsent.jsx";
+import PendingBookingModal from "./components/common/PendingBookingModal.jsx";
 
 // Layout
 import Header from "./components/layout/Header.jsx";
@@ -19,13 +21,16 @@ import { AuthForm } from "./components/pages/auth/AuthForm.jsx";
 import { AdminAuth } from "./components/pages/auth/AdminAuth.jsx";
 import PasswordResetAuth from "./components/pages/auth/PasswordReset.jsx";
 import { ProfileSecurityPage } from "./components/pages/auth/ProfileSecurityPage.jsx";
-import   UnauthorizedPage  from "./components/pages/auth/UnauthorizedPage.jsx";
+import UnauthorizedPage from "./components/pages/auth/UnauthorizedPage.jsx";
+import BookingAuthRequiredPage from "./components/pages/auth/BookingAuthRequiredPage.jsx";
 import PaymentSummary from "./components/pages/payment/PaymentSummary.jsx";
 import PaymentSuccess from "./components/pages/payment/PaymentSuccess.jsx";
 import PaymentFailed from "./components/pages/payment/PaymentFailed.jsx";
+import PaymentCallbackPage from "./components/pages/payment/PaymentCallbackPage.jsx";
 
 // Common pages
 import NotFoundPage from "./components/pages/NotFoundPage.jsx";
+import ServiceUnavailablePage from "./components/pages/ServiceUnavailablePage.jsx";
 
 // Catalog pages
 import ServiceListingLuggage from "./components/pages/service/ServiceListingLuggage.jsx";
@@ -43,11 +48,13 @@ import ServiceDetailPageBnB from "./components/pages/detail/ServiceDetailPageBnB
 
 // Provider Dashboard
 import { CoreDashboard } from "./components/pages/dashboard/provider/principal/CoreDashboard.jsx";
+import RestaurantCommissions from "./components/pages/dashboard/provider/principal/RestaurantCommissions.jsx";
 import ClubServiceEditPage from "./components/pages/dashboard/provider/ClubServiceEditPage.jsx";
 import EventServiceEditPage from "./components/pages/dashboard/provider/EventServiceEditPage.jsx";
 import { LuggageServiceEditPage } from "./components/pages/dashboard/provider/LuggageServiceEditPage.jsx";
 import { NCCServiceEditPage } from "./components/pages/dashboard/provider/NCCServiceEditPage.jsx";
-import { ServiceEditPageBnB } from "./components/pages/dashboard/provider/ServiceEditPageBnB.jsx";
+import { BnBServiceEdit } from "./components/pages/dashboard/provider/BnBServiceEdit.jsx";
+import { RoomBnBServiceEdit } from "./components/pages/dashboard/provider/RoomBnBServiceEdit.jsx";
 import QRValidatorPage from "./components/pages/dashboard/provider/QRValidatorPage.jsx";
 
 // Customer Dashboard
@@ -72,7 +79,70 @@ export const App = () => (
 );
 
 const AppRouter = () => {
-  const { isAuthenticated, role, user, isLoading } = useAuth();
+  const { isAuthenticated, role, user, isLoading: isAuthLoading } = useAuth();
+  const location = useLocation();
+  const [pendingBooking, setPendingBooking] = useState(null);
+  const [hasCheckedPending, setHasCheckedPending] = useState(false);
+
+  // Stato per gestire il caricamento durante la navigazione tra pagine
+  const [isRouteLoading, setIsRouteLoading] = useState(false);
+
+  useLayoutEffect(() => {
+    // Attiva il loader ad ogni cambio di rotta principale (non query params)
+    setIsRouteLoading(true);
+
+    // Disattiva il loader dopo un breve ritardo per permettere al JS di caricarsi e alla UI di stabilizzarsi
+    const timer = setTimeout(() => {
+      setIsRouteLoading(false);
+    }, 200); // 1 secondo di transizione fluida
+
+    return () => clearTimeout(timer);
+  }, [location.pathname]); // Scatta solo quando cambia il percorso (es. da /home a /service/luggage)
+
+  useEffect(() => {
+    // Eseguiamo il controllo SOLO se:
+    // 1. L'utente è autenticato
+    // 2. Il caricamento iniziale dell'auth è finito
+    // 3. Il profilo è un CUSTOMER (non PROVIDER)
+    // 4. Non siamo già in pagine di pagamento o login
+    // 5. NON abbiamo già fatto il controllo in questa sessione (hasCheckedPending)
+
+    if (isAuthLoading || !isAuthenticated) return;
+
+    if (!user || user.role !== 'CUSTOMER') return;
+
+    // Se siamo su pagine di pagamento, NON controlliamo, MA resettiamo il flag
+    // così appena l'utente esce da queste pagine (es. va in Home), il controllo scatterà di nuovo.
+    if (location.pathname.startsWith('/payment/') || location.pathname === '/login') {
+      if (hasCheckedPending) setHasCheckedPending(false);
+      return;
+    }
+
+    // Se abbiamo già controllato, ci fermiamo
+    if (hasCheckedPending) return;
+
+    const checkPending = async () => {
+      try {
+        const booking = await bookingService.getPendingPaymentBooking();
+        setPendingBooking(booking);
+      } catch (e) {
+        // Ignora errori silenziosamente
+      } finally {
+        // Segniamo che il controllo è stato fatto, indipendentemente dall'esito
+        setHasCheckedPending(true);
+      }
+    };
+
+    checkPending();
+  }, [isAuthenticated, isAuthLoading, user, hasCheckedPending, location.pathname]); // Riaggiunto location.pathname per rilevare i cambi rotta
+
+  // Se l'utente fa logout, resettiamo il flag così al prossimo login ricontrolla
+  useEffect(() => {
+    if (!isAuthenticated) {
+      setHasCheckedPending(false);
+      setPendingBooking(null);
+    }
+  }, [isAuthenticated]);
 
   // Nota: Questa funzione navigateTo è definita ma non passata/usata nel return di questo snippet.
   // Se la usi altrove tramite context, ricorda di aggiornare anche lì la logica per includere i parametri dateFrom/dateTo.
@@ -86,73 +156,103 @@ const AppRouter = () => {
     navigate("/" + page);
   };
 
+  const isLoading = isAuthLoading || isRouteLoading;
+
   return (
     <div className="min-h-screen bg-gray-50">
-      <Header key={`header-${isAuthenticated}`} /> 
-
-      <Routes>
-        {/* Principal pages */}
-        <Route path="/" element={<HomePage />} />
-        <Route path="/login" element={<AuthForm type="login" />} />
-        <Route path="/register" element={<AuthForm type="register" />} />
-        <Route path="/adminpanel-secure" element={<AdminAuth type="login" />} />
-        <Route path="/password-reset" element={<PasswordResetAuth />} />
-        <Route path="/payment/summary" element={<PaymentSummary />} />
-        <Route path="/payment/success" element={<PaymentSuccess />} />
-        <Route path="/payment/failed" element={<PaymentFailed />} />
-        <Route path="/unauthorized-page" element={<UnauthorizedPage />} />
-
-        {/* COMMON PAGE */}
-        <Route path="/not-found" element={<NotFoundPage />} />
-
-        {/* SERVICE */}
-        <Route path="/service/club" element={<ServiceListingClub />} />
-        <Route path="/service/restaurant" element={<ServiceListingRestaurant />} />
-        <Route path="/service/bnb" element={<ServiceListingBnB />} />
-        <Route path="/service/ncc" element={<ServiceListingNCC />} />
-        <Route path="/service/luggage" element={<ServiceListingLuggage />} />
-
-        {/* DETAIL SEO */}
-        <Route path="/:serviceType/:slugAndId" element={<DetailRouter />} />
-
-        {/* PROVIDER ACCESS */}
-        <Route path="/provider/dashboard" element={<CoreDashboard />} />
-        <Route path="/provider/edit/ncc/:id" element={<NCCServiceEditPage />} />
-        <Route path="/provider/edit/bnb/:id" element={<ServiceEditPageBnB />} />
-        <Route path="/provider/edit/club/event/:id" element={<EventServiceEditPage />} />
-        <Route path="/provider/edit/luggage/:id" element={<LuggageServiceEditPage />} />
-        <Route path="/provider/edit/restaurant/:id" element={<RestaurantServiceEditPage />} />
-        <Route path="/provider/qr-validator" element={<QRValidatorPage />} />
-        <Route path="/provider/credential-reset" element={<ProfileSecurityPage />} />
-
-        {/* CUSTOMER DASHBOARD */}
-        <Route path="/customer/dashboard" element={<CustomerDashboard />} />
-        <Route path="/customer/credential-reset" element={<ProfileSecurityPage />} />
-
-        {/* ADMIN DASHBOARD */}
-        <Route path="/admin/dashboard" element={<AdminDashboard />} />
-        <Route path="/admin/commision" element={<AdminCommissions />} />
-        <Route path="/admin/billing" element={<AdminBillings />} />
-
-        {/* LEGAL */}
-        <Route path="/legal/privacy-policy" element={<PrivacyPolicyPage />} />
-        <Route path="/legal/terms" element={<TermsPage />} />
-
-        {/* Catch-all route */}
-        <Route path="*" element={<NotFoundPage />} />
-      </Routes>
-
-      <Footer />
       <LoadingScreen isLoading={isLoading} />
+
+      {/* Nascondiamo il contenuto durante il caricamento per evitare flash del nuovo contenuto */}
+      <div style={{ display: isLoading ? 'none' : 'block' }}>
+        <Header key={`header-${isAuthenticated}`} />
+
+        {/* Mostriamo la modale SOLO se c'è una prenotazione pendente E NON siamo nelle pagine di gestione pagamento.
+            Questo evita che la modale appaia sopra la callback di PayPal mentre sta processando. */}
+        {pendingBooking && !location.pathname.startsWith('/payment/') && (
+          <PendingBookingModal
+            booking={pendingBooking}
+            onResolved={() => {
+              setPendingBooking(null);
+              // Opzionale: ricarica per aggiornare stato globale se necessario
+              window.location.reload();
+            }}
+            onPaymentStart={() => {
+              // Se inizia il pagamento, resettiamo il flag così al ritorno (se fallisce o annulla) 
+              setHasCheckedPending(false);
+            }}
+          />
+        )}
+
+        <Routes>
+          {/* Principal pages */}
+          <Route path="/" element={<HomePage />} />
+          <Route path="/login" element={<AuthForm type="login" />} />
+          <Route path="/register" element={<AuthForm type="register" />} />
+          <Route path="/adminpanel-secure" element={<AdminAuth type="login" />} />
+          <Route path="/password-reset" element={<PasswordResetAuth />} />
+          <Route path="/payment/summary" element={<PaymentSummary />} />
+          <Route path="/payment/callback" element={<PaymentCallbackPage />} />
+          <Route path="/payment/success" element={<PaymentSuccess />} />
+          <Route path="/payment/failed" element={<PaymentFailed />} />
+          <Route path="/payment/cancel" element={<PaymentFailed />} />
+          <Route path="/unauthorized-page" element={<UnauthorizedPage />} />
+          <Route path="/booking-auth-required" element={<BookingAuthRequiredPage />} />
+
+          {/* COMMON PAGE */}
+          <Route path="/not-found" element={<NotFoundPage />} />
+          <Route path="/service-unavailable" element={<ServiceUnavailablePage />} />
+
+          {/* SERVICE */}
+          <Route path="/service/club" element={<ServiceListingClub />} />
+          <Route path="/service/restaurant" element={<ServiceListingRestaurant />} />
+          <Route path="/service/bnb" element={<ServiceListingBnB />} />
+          <Route path="/service/ncc" element={<ServiceListingNCC />} />
+          <Route path="/service/luggage" element={<ServiceListingLuggage />} />
+
+          {/* DETAIL SEO */}
+          <Route path="/:serviceType/:slugAndId" element={<DetailRouter />} />
+
+          {/* PROVIDER ACCESS */}
+          <Route path="/provider/dashboard" element={<CoreDashboard />} />
+          <Route path="/provider/restaurant/commissions" element={<RestaurantCommissions />} />
+          <Route path="/provider/edit/ncc/:id" element={<NCCServiceEditPage />} />
+          <Route path="/provider/edit/bnb/:id" element={<BnBServiceEdit />} />
+          <Route path="/provider/bnb/room/create" element={<RoomBnBServiceEdit />} />
+          <Route path="/provider/edit/bnb/room/:id" element={<RoomBnBServiceEdit />} />
+          <Route path="/provider/edit/club/event/:id" element={<EventServiceEditPage />} />
+          <Route path="/provider/edit/luggage/:id" element={<LuggageServiceEditPage />} />
+          <Route path="/provider/edit/restaurant/:id" element={<RestaurantServiceEditPage />} />
+          <Route path="/provider/qr-validator" element={<QRValidatorPage />} />
+          <Route path="/provider/credential-reset" element={<ProfileSecurityPage />} />
+
+          {/* CUSTOMER DASHBOARD */}
+          <Route path="/customer/dashboard" element={<CustomerDashboard />} />
+          <Route path="/customer/credential-reset" element={<ProfileSecurityPage />} />
+
+          {/* ADMIN DASHBOARD */}
+          <Route path="/admin/dashboard" element={<AdminDashboard />} />
+          <Route path="/admin/commision" element={<AdminCommissions />} />
+          <Route path="/admin/billing" element={<AdminBillings />} />
+
+          {/* LEGAL */}
+          <Route path="/legal/privacy-policy" element={<PrivacyPolicyPage />} />
+          <Route path="/legal/terms" element={<TermsPage />} />
+
+          {/* Catch-all route */}
+          <Route path="*" element={<NotFoundPage />} />
+        </Routes>
+
+        <Footer />
+      </div>
     </div>
   );
 };
 
 const DetailRouter = () => {
   const { serviceType, slugAndId } = useParams();
-  
+
   const [searchParams] = useSearchParams();
-  
+
   const dateFrom = searchParams.get("dateFrom");
   const dateTo = searchParams.get("dateTo");
   const timeFrom = searchParams.get("timeFrom");
@@ -166,35 +266,35 @@ const DetailRouter = () => {
 
   // 3. Passaggio delle props ai componenti di dettaglio
   switch (serviceType.toLowerCase()) {
-    case "restaurant": 
+    case "restaurant":
       return <ServiceDetailPageRestaurant id={id} dateFrom={dateFrom} timeFrom={timeFrom} totalPersons={totalPersons} />;
-    
-    case "club": 
-      const table = searchParams.get("table");
 
-      return <ServiceDetailPageClub id={id} table={table} />;
-    
-    case "bnb": 
+    case "club":
+      const isTable = searchParams.get("table") === 'true';
+
+      return <ServiceDetailPageClub id={id} table={isTable} guests={totalPersons} />;
+
+    case "bnb":
       return <ServiceDetailPageBnB id={id} dateFrom={dateFrom} dateTo={dateTo} />;
-    
-    case "ncc": 
+
+    case "ncc":
       const nccParams = {
-          from: searchParams.get("fromCity"), // URL usa 'fromCity', componente vuole 'from'
-          fromAddress: searchParams.get("fromAddress"),
-          to: searchParams.get("toCity"),     // URL usa 'toCity', componente vuole 'to'
-          toAddress: searchParams.get("toAddress"),
-          date: dateFrom,                     // URL usa 'dateFrom', componente vuole 'date'
-          time: timeFrom,                     // URL usa 'timeFrom', componente vuole 'time'
-          passengers: totalPersons,           // URL usa 'totalPersons', componente vuole 'passengers'
-          tripType: "oneway",                 // Default o da recuperare se presente nell'URL
-          distanceKm: searchParams.get("distanceKm")
+        from: searchParams.get("fromCity"), // URL usa 'fromCity', componente vuole 'from'
+        fromAddress: searchParams.get("fromAddress"),
+        to: searchParams.get("toCity"),     // URL usa 'toCity', componente vuole 'to'
+        toAddress: searchParams.get("toAddress"),
+        date: dateFrom,                     // URL usa 'dateFrom', componente vuole 'date'
+        time: timeFrom,                     // URL usa 'timeFrom', componente vuole 'time'
+        passengers: totalPersons,           // URL usa 'totalPersons', componente vuole 'passengers'
+        tripType: "oneway",                 // Default o da recuperare se presente nell'URL
+        distanceKm: searchParams.get("distanceKm")
       };
-      
+
       return <ServiceDetailPageNCC id={id} searchParams={nccParams} />;
-    
-    case "luggage": 
+
+    case "luggage":
       return <ServiceDetailPageLuggage id={id} dateFrom={dateFrom} dateTo={dateTo} />;
-    
+
     default: return <NotFoundPage />;
   }
 };

@@ -1,3 +1,5 @@
+import { HOGU_COLORS } from '../../config/theme.js';
+
 export const MUSIC_THEMES = {
   HOUSE: {
     id: 'HOUSE',

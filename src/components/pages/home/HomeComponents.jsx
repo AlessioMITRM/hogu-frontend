@@ -25,23 +25,23 @@ export const EarningComparisonCard = ({ title, metric, annualHogu, annualOther, 
     const formatCurrency = (value) => `€ ${value.toLocaleString('it-IT', { minimumFractionDigits: 0, maximumFractionDigits: 0 })}`;
 
     return (
-        <div className="p-6 bg-white rounded-2xl shadow-lg border border-gray-100 flex flex-col transition-all duration-300 hover:shadow-xl">
-            <h3 className={`text-2xl font-bold mb-1 ${HOGU_THEME.text}`}>{title}</h3>
-            <p className={`text-sm mb-4 ${HOGU_THEME.subtleText}`}>{metric}</p>
+        <div className="p-4 md:p-6 bg-white rounded-2xl shadow-lg border border-gray-100 flex flex-col transition-all duration-300 hover:shadow-xl">
+            <h3 className={`text-lg md:text-2xl font-bold mb-1 ${HOGU_THEME.text}`}>{title}</h3>
+            <p className={`text-xs md:text-sm mb-4 ${HOGU_THEME.subtleText}`}>{metric}</p>
 
             {/* Grafico a Barre (Mock) */}
             <div className="space-y-4 mb-6">
                 {/* Hogu Bar */}
                 <div>
                     <div 
-                        className={`h-4 rounded-lg bg-[${HOGU_COLORS.primary}] shadow-md`}
+                        className={`h-3 md:h-4 rounded-lg bg-[${HOGU_COLORS.primary}] shadow-md`}
                         style={{ width: `${hoguPercent}%` }}
                     />
                 </div>
                 {/* Altri Portali Bar */}
                 <div>
                     <div 
-                        className={`h-4 rounded-lg bg-gray-300 shadow-md`}
+                        className={`h-3 md:h-4 rounded-lg bg-gray-300 shadow-md`}
                         style={{ width: `${otherPercent}%` }}
                     />
                 </div>
@@ -50,20 +50,20 @@ export const EarningComparisonCard = ({ title, metric, annualHogu, annualOther, 
             {/* Riepilogo Dati */}
             <div className="space-y-3 pt-2">
                 {/* Hogu */}
-                <div className="flex justify-between items-center text-base">
+                <div className="flex justify-between items-center text-sm md:text-base">
                     <span className={`font-semibold ${HOGU_THEME.text}`}>Hogu (8%)</span>
                     <span className={`font-bold text-[${HOGU_COLORS.primary}]`}>{formatCurrency(annualHogu)}</span>
                 </div>
                 {/* Altri */}
-                <div className="flex justify-between items-center text-base">
+                <div className="flex justify-between items-center text-sm md:text-base">
                     <span className={`font-semibold ${HOGU_THEME.subtleText}`}>Altri (18%)</span>
                     <span className={`font-semibold text-[${HOGU_COLORS.subtleText}]`}>{formatCurrency(annualOther)}</span>
                 </div>
                
                 {/* Risparmio */}
                 <div className="flex items-center space-x-2 pt-3 border-t border-gray-100">
-                    <TrendingUp className="w-5 h-5 text-green-600" />
-                    <span className="text-green-600 font-bold text-sm">
+                    <TrendingUp className="w-4 h-4 md:w-5 md:h-5 text-green-600" />
+                    <span className="text-green-600 font-bold text-xs md:text-sm">
                         Risparmio annuo: {formatCurrency(saving)}
                     </span>
                 </div>

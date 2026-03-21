@@ -1,20 +1,22 @@
-import React, { useState, useEffect, useMemo, useRef } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
+import { createPortal } from 'react-dom';
+import { useNavigate, useSearchParams } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
-import { useNavigate, useSearchParams } from 'react-router-dom'; 
-import { Search, MapPin, Luggage, Minus, Plus, Calendar, Clock, ArrowRight, CheckCircle2, ChevronLeft, ChevronRight, Loader2 } from 'lucide-react';
-import { Breadcrumbs } from '../../ui/Breadcrumbs.jsx'; 
+import {
+    ArrowRight, MapPin, Calendar, Clock, Search,
+    ChevronLeft, ChevronRight, ChevronDown, Loader2, Minus, Plus, Luggage, CheckCircle2
+} from 'lucide-react';
+import { PageHeader } from '../../ui/PageHeader.jsx';
+import { PopularDestinations } from '../../ui/PopularDestinations.jsx';
+import { CityAutocomplete } from '../../ui/CityAutocomplete.jsx';
+import SafeImage from '../../ui/SafeImage.jsx';
 
-// ** IMPORTA I TUOI FILE JSON QUI **
-import italianLocationsData from '../../../assets/data/italian_locations.json'; 
-import englishLocationsData from '../../../assets/data/english_locations.json'; 
 import { HOGU_COLORS, HOGU_THEME } from '../../../config/theme.js';
-
-// ** IMPORTA IL CLIENT API E COMPONENTI UI CONDIVISI **
-import { listingService } from '../../../api/apiClient.js';
-import LoadingScreen from "../../ui/LoadingScreen.jsx"; 
+import { luggageService } from '../../../api/apiClient.js';
+import { createLocationPayload } from "../../../utils/locationUtils.js";
+import { calculateLuggageTotal } from "../../../utils/pricingUtils.js";
+import LoadingScreen from "../../ui/LoadingScreen.jsx";
 import ErrorModal from "../../ui/ErrorModal.jsx";
-
-// ** UTILS **
 import { slugify } from '../../../utils/slugify.js';
 
 const breadcrumbsItems = [
@@ -22,227 +24,30 @@ const breadcrumbsItems = [
     { labelKey: 'breadcrumbs.luggage', href: '/service/luggage' }
 ];
 
-// --- DATI DESTINAZIONI POPOLARI ---
-const POPULAR_DESTINATIONS = [
-  {
-    city: "Roma",
-    country: "Italia",
-    searchLocation: "Roma, Lazio", 
-    img: "https://images.unsplash.com/photo-1552832230-c0197dd311b5?auto=format&fit=crop&w=600&q=80",
-  },
-  {
-    city: "Milano",
-    country: "Italia",
-    searchLocation: "Milano, Lombardia",
-    img: "https://images.unsplash.com/photo-1513581166391-887a96ddeafd?auto=format&fit=crop&w=600&q=80",
-  },
-  {
-    city: "Firenze",
-    country: "Italia",
-    searchLocation: "Firenze, Toscana",
-    img: "https://images.unsplash.com/photo-1541963463532-d68292c34b19?auto=format&fit=crop&w=600&q=80",
-  },
-  {
-    city: "Palermo", 
-    country: "Italia",
-    searchLocation: "Palermo, Sicilia", 
-    img: "https://images.unsplash.com/photo-1597913943622-540c49733072?auto=format&fit=crop&w=600&q=80",
-  },
-];
-
-// --- UTILITY PER GESTIRE I DATI GEOGRAFICI ---
-const processLocations = (data) => {
-    if (!data) return [];
-    const flatLocations = [];
-    data.forEach(region => {
-        region.provinces.forEach(province => {
-            province.cities.forEach(city => {
-                const mapFriendlyString = `${city}, ${province.name}, ${region.region}`;
-                flatLocations.push({
-                    city: city,
-                    province: province.name,
-                    region: region.region,
-                    fullLabel: mapFriendlyString,
-                    searchString: mapFriendlyString.toLowerCase()
-                });
-            });
-        });
-    });
-    return flatLocations;
-};
-
-// --- COMPONENTE AUTOCOMPLETE CITTA' ---
-const CityAutocompleteSearch = ({ label, value, onChange, icon: Icon }) => {
-    const { i18n, t } = useTranslation();
-    const [suggestions, setSuggestions] = useState([]);
-    const [showSuggestions, setShowSuggestions] = useState(false);
-    const wrapperRef = useRef(null);
-    
-    // Stato locale per l'input visivo
-    const [inputValue, setInputValue] = useState(value || "");
-
-    // Sincronizza input locale se cambia value dall'esterno
-    useEffect(() => {
-        setInputValue(value || "");
-    }, [value]);
-
-    const locationData = useMemo(() => {
-        const isItalian = i18n.language && i18n.language.startsWith('it');
-        const rawData = isItalian ? italianLocationsData : (englishLocationsData || italianLocationsData);
-        return processLocations(rawData);
-    }, [i18n.language]);
-
-    useEffect(() => {
-        const handleClickOutside = (event) => {
-            if (wrapperRef.current && !wrapperRef.current.contains(event.target)) {
-                setShowSuggestions(false);
-            }
-        };
-        document.addEventListener("mousedown", handleClickOutside);
-        return () => document.removeEventListener("mousedown", handleClickOutside);
-    }, []);
-
-    const handleInputChange = (e) => {
-        const userInput = e.target.value;
-        setInputValue(userInput);
-        const lowerInput = userInput.toLowerCase();
-        
-        onChange(userInput);
-
-        if (userInput.length > 2) {
-            const filtered = locationData
-                .filter(item => item.searchString.includes(lowerInput))
-                .sort((a, b) => {
-                    const aCity = a.city.toLowerCase();
-                    const bCity = b.city.toLowerCase();
-                    if (aCity === lowerInput && bCity !== lowerInput) return -1;
-                    if (bCity === lowerInput && aCity !== lowerInput) return 1;
-                    const aStarts = aCity.startsWith(lowerInput);
-                    const bStarts = bCity.startsWith(lowerInput);
-                    if (aStarts && !bStarts) return -1;
-                    if (!aStarts && bStarts) return 1;
-                    return aCity.localeCompare(bCity);
-                })
-                .slice(0, 8);
-
-            setSuggestions(filtered);
-            setShowSuggestions(true);
-        } else {
-            setSuggestions([]);
-            setShowSuggestions(false);
-        }
-    };
-
-    const handleSelect = (item) => {
-        const formattedLocation = `${item.city}, ${item.region}`;
-        setInputValue(formattedLocation);
-        onChange(formattedLocation); 
-        setShowSuggestions(false);
-    };
-
-    return (
-        <div className="flex flex-col gap-3 flex-[1.5] min-w-[200px] relative" ref={wrapperRef}>
-            <label className={`flex items-center gap-2 text-xs font-bold uppercase tracking-wide text-[${HOGU_COLORS.subtleText}] ml-1`}>
-                <Icon size={14} className={`text-[${HOGU_COLORS.primary}]`} />
-                {label}
-            </label>
-            <div className="flex gap-2 bg-white p-1.5 rounded-2xl border border-gray-100 shadow-sm focus-within:ring-2 focus-within:ring-[#68B49B]/20 focus-within:border-[#68B49B] transition-all h-[60px] items-center relative">
-                <input 
-                    type="text"
-                    value={inputValue}
-                    onChange={handleInputChange}
-                    onFocus={() => inputValue.length > 2 && setShowSuggestions(true)}
-                    placeholder={t('luggage_listing.search.location_placeholder', "Dove ti serve il deposito?")}
-                    className="w-full h-full px-3 bg-transparent border-none focus:ring-0 text-base font-medium text-gray-700 outline-none placeholder:text-gray-300"
-                    autoComplete="off"
-                />
-                
-                {showSuggestions && suggestions.length > 0 && (
-                    <div className="absolute top-full left-0 mt-2 w-full bg-white rounded-xl shadow-xl border border-gray-100 max-h-60 overflow-y-auto z-50">
-                        {suggestions.map((item, idx) => (
-                            <button
-                                key={idx}
-                                type="button"
-                                onClick={() => handleSelect(item)}
-                                className="w-full text-left px-4 py-3 hover:bg-[#F0FDF9] hover:text-[#33594C] transition-colors border-b border-gray-50 last:border-0 group"
-                            >
-                                <div className="font-bold text-sm text-gray-800 group-hover:text-[#33594C]">{item.city}</div>
-                                <div className="text-xs text-gray-400 group-hover:text-[#68B49B]/70">{item.province}, {item.region}</div>
-                            </button>
-                        ))}
-                    </div>
-                )}
-                 {showSuggestions && inputValue.length > 2 && suggestions.length === 0 && (
-                      <div className="absolute top-full left-0 mt-2 w-full bg-white rounded-xl shadow-xl border border-gray-100 p-4 text-center text-gray-400 text-sm z-50">
-                        {t('luggage_listing.search.not_found_citys')}
-                      </div>
-                )}
-            </div>
+// --- CONTAINER INPUT ---
+const SearchInputContainer = ({ label, icon: Icon, children, className = '', required = false }) => (
+    <div className={`flex flex-col gap-1 lg:gap-3 flex-1 min-w-0 md:min-w-[200px] ${className}`}>
+        <label className={`flex items-center gap-1.5 text-[9px] md:text-xs font-bold uppercase tracking-wide text-[${HOGU_COLORS.subtleText}] ml-1`}>
+            <Icon size={12} className={`text-[${HOGU_COLORS.primary}]`} />
+            {label} {required && <span className="text-red-500">*</span>}
+        </label>
+        <div className="flex gap-2 bg-white p-1 rounded-xl lg:rounded-2xl border border-gray-100 shadow-sm focus-within:ring-2 focus-within:ring-[#68B49B]/20 focus-within:border-[#68B49B] transition-all h-[42px] md:h-[60px] items-center">
+            {children}
         </div>
-    );
-};
-
-// --- COMPONENTE CARD DESTINAZIONE ---
-const DestinationCard = ({ city, country, img, onClick }) => {
-    return (
-      <div 
-        onClick={onClick}
-        className="flex-shrink-0 w-60 snap-start group cursor-pointer relative"
-      >
-        <div className="relative rounded-3xl overflow-hidden aspect-[3/4] shadow-md transition-all duration-500 group-hover:shadow-xl group-hover:-translate-y-2">
-          <img
-            src={img}
-            alt={city}
-            className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
-            onError={(e) => { e.target.src = 'https://placehold.co/400x600/E6F5F0/68B49B?text=HOGU'; }}
-          />
-          <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent opacity-80 group-hover:opacity-90 transition-opacity" />
-          <div className="absolute bottom-0 left-0 p-6 text-white transform translate-y-2 group-hover:translate-y-0 transition-transform duration-300">
-            <p className="text-xs font-medium uppercase tracking-wider opacity-80 mb-1">
-              {country}
-            </p>
-            <h3 className="text-xl font-bold">{city}</h3>
-            <div className="w-8 h-1 bg-[#68B49B] rounded-full mt-3 opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
-          </div>
-        </div>
-      </div>
-    );
-};
+    </div>
+);
 
 // --- COMPONENTI UI BASE ---
-function PrimaryButton({ children, onClick, className = '', disabled = false, type = 'button', style = {} }) {
-  return (
-    <button
-      type={type}
-      onClick={onClick}
-      disabled={disabled}
-      style={style}
-      className={`
-        bg-[#68B49B] text-white ${HOGU_THEME.fontFamily}
-        px-6 py-3 lg:px-8 lg:py-4 text-base lg:text-lg font-bold rounded-2xl transition-all duration-300 ease-out
-        shadow-[0_8px_20px_-6px_rgba(104,180,155,0.5)] 
-        hover:shadow-[0_12px_25px_-8px_rgba(104,180,155,0.7)]
-        hover:-translate-y-0.5 active:translate-y-0
-        disabled:opacity-50 disabled:cursor-not-allowed disabled:shadow-none disabled:translate-y-0
-        flex items-center justify-center gap-2
-        ${className}
-      `}
-    >
-      {children}
-    </button>
-  );
-}
-
-function IconButton({ onClick, icon: Icon, disabled, colorClass = "text-gray-600" }) {
+function IconButton({ onClick, icon: Icon, disabled, colorClass = "text-gray-600", sizeClass = "w-8 h-8" }) {
     return (
-        <button 
+        <button
             onClick={(e) => { e.stopPropagation(); onClick(); }}
             disabled={disabled}
             type="button"
             className={`
-                w-8 h-8 rounded-full flex items-center justify-center transition-all duration-200
-                ${disabled 
-                    ? 'bg-gray-100 text-gray-300 cursor-not-allowed' 
+                ${sizeClass} rounded-full flex items-center justify-center transition-all duration-200
+                ${disabled
+                    ? 'bg-gray-100 text-gray-300 cursor-not-allowed'
                     : `bg-gray-50 hover:bg-[#68B49B] hover:text-white ${colorClass} shadow-sm hover:shadow-md`
                 }
             `}
@@ -252,109 +57,593 @@ function IconButton({ onClick, icon: Icon, disabled, colorClass = "text-gray-600
     );
 }
 
-const SearchInputContainer = ({ label, icon: Icon, children, className = '' }) => (
-    <div className={`flex flex-col gap-3 flex-1 min-w-[200px] ${className}`}>
-      <label className={`flex items-center gap-2 text-xs font-bold uppercase tracking-wide text-[${HOGU_COLORS.subtleText}] ml-1`}>
-        <Icon size={14} className={`text-[${HOGU_COLORS.primary}]`} />
-        {label}
-      </label>
-      <div className="flex gap-2 bg-white p-1.5 rounded-2xl border border-gray-100 shadow-sm focus-within:ring-2 focus-within:ring-[#68B49B]/20 focus-within:border-[#68B49B] transition-all h-[60px] items-center">
-        {children}
-      </div>
-    </div>
-);
+function PrimaryButton({ children, onClick, className = '', disabled = false, type = 'button', style = {} }) {
+    return (
+        <button type={type} onClick={onClick} disabled={disabled} style={style}
+            className={`bg-[#68B49B] text-white ${HOGU_THEME.fontFamily}
+        px-6 py-3 lg:px-8 lg:py-4 text-base lg:text-lg font-bold rounded-2xl transition-all duration-300 ease-out
+        shadow-[0_8px_20px_-6px_rgba(104,180,155,0.5)] hover:shadow-[0_12px_25px_-8px_rgba(104,180,155,0.7)]
+        hover:-translate-y-0.5 active:translate-y-0 disabled:opacity-50 disabled:cursor-not-allowed
+        flex items-center justify-center gap-2 ${className}`}>
+            {children}
+        </button>
+    );
+}
 
-// --- DATI MOCK ---
+// --- COMPONENTI LUGGAGE SPECIFICI ---
 const LUGGAGE_SIZES_MOCK = [
-  { value: 'S', labelKey: 'luggage_listing.luggage_selector.size_s_label', descKey: 'luggage_listing.luggage_selector.size_s_desc' },
-  { value: 'M', labelKey: 'luggage_listing.luggage_selector.size_m_label', descKey: 'luggage_listing.luggage_selector.size_m_desc' },
-  { value: 'L', labelKey: 'luggage_listing.luggage_selector.size_l_label', descKey: 'luggage_listing.luggage_selector.size_l_desc' },
+    { value: 'S', labelKey: 'luggage_listing.luggage_selector.size_s_label', descKey: 'luggage_listing.luggage_selector.size_s_desc' },
+    { value: 'M', labelKey: 'luggage_listing.luggage_selector.size_m_label', descKey: 'luggage_listing.luggage_selector.size_m_desc' },
+    { value: 'L', labelKey: 'luggage_listing.luggage_selector.size_l_label', descKey: 'luggage_listing.luggage_selector.size_l_desc' },
 ];
 
-// --- COMPONENTE PRINCIPALE ---
-
-function ServiceListingLuggage() {
+const LuggageSelectorCard = ({ bag, onUpdateQuantity }) => {
     const { t } = useTranslation("home");
+    const isSelected = bag.quantity > 0;
+
+    const handleUpdate = (id, change) => {
+        if (onUpdateQuantity) onUpdateQuantity(id, change);
+    };
+
+    return (
+        <div
+            onClick={() => handleUpdate(bag.id, 1)}
+            className={`
+              relative p-2 sm:p-3 rounded-2xl border transition-all duration-200 cursor-pointer select-none group 
+              flex flex-col items-center justify-center text-center gap-1 sm:gap-0
+              ${isSelected
+                    ? 'bg-[#F0FDF9] border-[#68B49B] shadow-md'
+                    : 'bg-white border-gray-100 hover:border-[#68B49B]/50 hover:shadow-lg'
+                }
+           `}
+        >
+            <div className="flex flex-col items-center gap-1 sm:gap-0 flex-1">
+                <div className={`w-10 h-10 flex items-center justify-center rounded-full sm:mb-1 shrink-0 ${isSelected ? 'bg-[#68B49B] text-white' : 'bg-gray-50 text-gray-400'}`}>
+                    <Luggage size={bag.id === 'S' ? 18 : bag.id === 'M' ? 22 : 26} />
+                </div>
+                <div>
+                    <p className={`text-xs sm:text-sm font-bold ${isSelected ? 'text-[#33594C]' : 'text-gray-700'}`}>{t(bag.labelKey)}</p>
+                    <p className="hidden sm:block text-[10px] text-gray-400 sm:mt-0.5 leading-tight">{t(bag.descKey)}</p>
+                </div>
+            </div>
+
+            <div className="flex items-center gap-1 sm:gap-2 mt-1 sm:mt-2 shrink-0">
+                <IconButton icon={Minus} onClick={() => handleUpdate(bag.id, -1)} disabled={bag.quantity <= 0} sizeClass="w-6 h-6 sm:w-8 sm:h-8" />
+                <span className="text-xs sm:text-sm font-bold w-3 text-center">{bag.quantity}</span>
+                <IconButton icon={Plus} onClick={() => handleUpdate(bag.id, 1)} colorClass="text-[#68B49B]" sizeClass="w-6 h-6 sm:w-8 sm:h-8" />
+            </div>
+        </div>
+    );
+};
+
+const DesktopLuggageSelector = ({ bags, onUpdateQuantity, className = '' }) => {
+    const { t } = useTranslation("home");
+    const [isOpen, setIsOpen] = useState(false);
+    const containerRef = useRef(null);
+    const totalBags = bags.reduce((acc, b) => acc + b.quantity, 0);
+
+    useEffect(() => {
+        const handleClickOutside = (event) => {
+            if (containerRef.current && !containerRef.current.contains(event.target)) {
+                setIsOpen(false);
+            }
+        };
+        document.addEventListener("mousedown", handleClickOutside);
+        return () => document.removeEventListener("mousedown", handleClickOutside);
+    }, []);
+
+    return (
+        <div className={`relative flex flex-col gap-3 flex-1 min-w-0 md:min-w-[200px] ${className}`} ref={containerRef}>
+            <label className={`hidden lg:flex items-center gap-2 text-[10px] md:text-xs font-bold uppercase tracking-wide text-[${HOGU_COLORS.subtleText}] ml-1`}>
+                <Luggage size={14} className={`text-[${HOGU_COLORS.primary}]`} />
+                {t('luggage_listing.search.luggage_label')}
+            </label>
+            <button
+                type="button"
+                onClick={() => setIsOpen(!isOpen)}
+                className={`
+                    w-full h-[48px] md:h-[60px] bg-white rounded-2xl border border-gray-100 shadow-sm 
+                    flex items-center justify-between px-4 transition-all hover:border-[#68B49B]/50
+                    ${isOpen ? 'ring-2 ring-[#68B49B]/20 border-[#68B49B]' : ''}
+                `}
+            >
+                <span className="font-medium text-gray-700 text-sm truncate">
+                    {totalBags > 0 ? t('luggage_listing.card.luggage_count', { count: totalBags }) : t('luggage_listing.search.select')}
+                </span>
+                <ChevronDown size={16} className={`text-gray-400 transition-transform ${isOpen ? 'rotate-180' : ''}`} />
+            </button>
+
+            {isOpen && (
+                <div className="absolute top-full right-0 mt-2 w-80 bg-white rounded-2xl shadow-xl border border-gray-100 p-4 z-[60]">
+                    <div className="flex flex-col gap-3">
+                        {bags.map(bag => (
+                            <LuggageSelectorCard
+                                key={bag.id}
+                                bag={bag}
+                                onUpdateQuantity={onUpdateQuantity}
+                            />
+                        ))}
+                    </div>
+                </div>
+            )}
+        </div>
+    );
+};
+
+function MobileCombinedScheduleSelector({
+    depositDate, depositTime,
+    pickupDate, pickupTime,
+    onUpdate,
+    minDate
+}) {
+    const { t, i18n } = useTranslation("home");
+    const [isOpen, setIsOpen] = useState(false);
+
+    // Formatting for display
+    const formatDateTime = (date, time) => {
+        if (!date) return '-';
+        const d = new Date(date).toLocaleDateString(i18n.language === 'en' ? 'en-US' : 'it-IT', { day: '2-digit', month: 'short' });
+        return `${d} ${time || ''}`;
+    };
+
+    return (
+        <>
+            <div className="w-full h-full px-2 text-left flex items-center justify-between cursor-pointer" onClick={() => setIsOpen(true)}>
+                <div className="flex items-center justify-between w-full">
+                    <span className="font-bold text-[11px] text-gray-800 truncate flex-1 text-left leading-tight">{formatDateTime(depositDate, depositTime)}</span>
+                    <ArrowRight size={12} className="text-gray-400 mx-1 flex-shrink-0" />
+                    <span className="font-bold text-[11px] text-gray-800 truncate flex-1 text-right leading-tight">{formatDateTime(pickupDate, pickupTime)}</span>
+                </div>
+                <ChevronDown size={14} className="text-gray-400 flex-shrink-0 ml-1" />
+            </div>
+
+            {isOpen && createPortal(
+                <div className="fixed inset-0 z-[9999] bg-gray-50 flex flex-col animate-in fade-in slide-in-from-bottom-10 duration-200">
+                    <div className="px-4 py-4 bg-white border-b border-gray-100 flex items-center gap-3 shadow-sm z-10">
+                        <button onClick={() => setIsOpen(false)} className="p-2 -ml-2 rounded-full hover:bg-gray-100 transition-colors">
+                            <ChevronLeft size={24} className="text-gray-700" />
+                        </button>
+                        <h3 className="text-lg font-bold text-gray-800">{t('luggage_listing.search.select_times')}</h3>
+                    </div>
+
+                    <div className="p-4 flex flex-col gap-4 overflow-y-auto flex-1">
+                        {/* Deposit Card */}
+                        <div className="bg-white p-5 rounded-3xl shadow-sm border border-gray-100">
+                            <h4 className="font-bold text-[#68B49B] flex items-center gap-2 mb-2 text-sm uppercase tracking-wide">
+                                <Calendar size={18} /> {t('luggage_listing.search.deposit')}
+                            </h4>
+                            <div className="grid grid-cols-2 gap-3">
+                                <div className="flex flex-col gap-1.5 min-w-0">
+                                    <label className={`text-[10px] md:text-xs font-bold uppercase tracking-wide text-[${HOGU_COLORS.subtleText}] ml-1`}>{t('luggage_listing.search.date')}</label>
+                                    <div className="relative w-full">
+                                        <input
+                                            type="date"
+                                            className="w-full h-[56px] px-3 bg-gray-50 rounded-2xl border-transparent focus:bg-white focus:border-[#68B49B] focus:ring-4 focus:ring-[#68B49B]/10 outline-none font-bold text-gray-700 transition-all text-sm sm:text-base cursor-pointer"
+                                            value={depositDate}
+                                            min={minDate}
+                                            onChange={(e) => onUpdate('depositDate', e.target.value)}
+                                            onClick={(e) => e.target.showPicker?.()}
+                                        />
+                                        <Calendar className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 pointer-events-none" size={18} />
+                                    </div>
+                                </div>
+                                <div className="flex flex-col gap-1.5 min-w-0">
+                                    <label className={`text-[10px] md:text-xs font-bold uppercase tracking-wide text-[${HOGU_COLORS.subtleText}] ml-1`}>{t('luggage_listing.search.time')}</label>
+                                    <div className="relative w-full">
+                                        <input
+                                            type="time"
+                                            className="w-full h-[56px] px-3 bg-gray-50 rounded-2xl border-transparent focus:bg-white focus:border-[#68B49B] focus:ring-4 focus:ring-[#68B49B]/10 outline-none font-bold text-gray-700 transition-all text-sm sm:text-base cursor-pointer"
+                                            value={depositTime}
+                                            onChange={(e) => onUpdate('depositTime', e.target.value)}
+                                            onClick={(e) => e.target.showPicker?.()}
+                                        />
+                                        <Clock className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 pointer-events-none" size={18} />
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        {/* Connector */}
+                        <div className="flex justify-center -my-2 relative z-0">
+                            <div className="bg-gray-200 text-gray-400 rounded-full p-1.5 ring-4 ring-gray-50">
+                                <ArrowRight size={16} className="rotate-90" />
+                            </div>
+                        </div>
+
+                        {/* Pickup Card */}
+                        <div className="bg-white p-5 rounded-3xl shadow-sm border border-gray-100">
+                            <h4 className="font-bold text-[#68B49B] flex items-center gap-2 mb-2 text-sm uppercase tracking-wide">
+                                <Clock size={18} /> {t('luggage_listing.search.pickup')}
+                            </h4>
+                            <div className="grid grid-cols-2 gap-3">
+                                <div className="flex flex-col gap-1.5 min-w-0">
+                                    <label className={`text-[10px] md:text-xs font-bold uppercase tracking-wide text-[${HOGU_COLORS.subtleText}] ml-1`}>{t('luggage_listing.search.date')}</label>
+                                    <div className="relative w-full">
+                                        <input
+                                            type="date"
+                                            className="w-full h-[56px] px-3 bg-gray-50 rounded-2xl border-transparent focus:bg-white focus:border-[#68B49B] focus:ring-4 focus:ring-[#68B49B]/10 outline-none font-bold text-gray-700 transition-all text-sm sm:text-base cursor-pointer"
+                                            value={pickupDate}
+                                            min={depositDate || minDate}
+                                            onChange={(e) => onUpdate('pickupDate', e.target.value)}
+                                            onClick={(e) => e.target.showPicker?.()}
+                                        />
+                                        <Calendar className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 pointer-events-none" size={18} />
+                                    </div>
+                                </div>
+                                <div className="flex flex-col gap-1.5 min-w-0">
+                                    <label className={`text-[10px] md:text-xs font-bold uppercase tracking-wide text-[${HOGU_COLORS.subtleText}] ml-1`}>{t('luggage_listing.search.time')}</label>
+                                    <div className="relative w-full">
+                                        <input
+                                            type="time"
+                                            className="w-full h-[56px] px-3 bg-gray-50 rounded-2xl border-transparent focus:bg-white focus:border-[#68B49B] focus:ring-4 focus:ring-[#68B49B]/10 outline-none font-bold text-gray-700 transition-all text-sm sm:text-base cursor-pointer"
+                                            value={pickupTime}
+                                            onChange={(e) => onUpdate('pickupTime', e.target.value)}
+                                            onClick={(e) => e.target.showPicker?.()}
+                                        />
+                                        <Clock className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 pointer-events-none" size={18} />
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div className="mt-auto p-4 border-t border-gray-100 bg-white safe-area-bottom shadow-[0_-4px_20px_-8px_rgba(0,0,0,0.1)] z-10">
+                        <PrimaryButton onClick={() => setIsOpen(false)} className="w-full !rounded-xl !py-4 text-lg shadow-lg shadow-[#68B49B]/30">
+                            {t('luggage_listing.search.confirm_times')}
+                        </PrimaryButton>
+                    </div>
+                </div>,
+                document.body
+            )}
+        </>
+    );
+}
+
+function MobileLuggageSelector({ bags, onUpdateQuantity }) {
+    const { t } = useTranslation("home");
+    const [isOpen, setIsOpen] = useState(false);
+    const totalBags = bags.reduce((acc, b) => acc + b.quantity, 0);
+
+    return (
+        <>
+            <div className="w-full h-full px-2 text-left flex items-center justify-between cursor-pointer" onClick={() => setIsOpen(true)}>
+                <span className="text-xs font-bold text-gray-800 shrink-0">
+                    {totalBags > 0 ? t('luggage_listing.card.luggage_count', { count: totalBags }) : t('luggage_listing.search.select')}
+                </span>
+                <div className="flex items-center gap-1 overflow-hidden justify-end flex-1 ml-2">
+                    <div className="flex gap-1 overflow-hidden justify-end">
+                        {bags.map(b => b.quantity > 0 && (
+                            <span key={b.id} className="text-[9px] bg-gray-100 px-1 py-0.5 rounded text-gray-500 font-medium whitespace-nowrap">
+                                {b.quantity}x{b.size}
+                            </span>
+                        ))}
+                    </div>
+                    <ChevronDown size={14} className="text-gray-400 shrink-0" />
+                </div>
+            </div>
+            {isOpen && createPortal(
+                <div className="fixed inset-0 z-[99999] bg-white flex flex-col animate-in fade-in slide-in-from-bottom-10 duration-200">
+                    <div className="px-4 py-4 border-b border-gray-100 flex items-center gap-3">
+                        <button onClick={() => setIsOpen(false)} className="p-2 -ml-2 rounded-full hover:bg-gray-100">
+                            <ChevronLeft size={24} className="text-gray-700" />
+                        </button>
+                        <h3 className="text-lg font-bold text-gray-800">{t('luggage_listing.search.select_luggage')}</h3>
+                    </div>
+
+                    <div className="p-6 flex flex-col bg-white">
+                        {bags.map((bag, idx) => {
+                            const isSelected = bag.quantity > 0;
+                            const iconSize = bag.id === 'S' ? 18 : bag.id === 'M' ? 26 : 34;
+
+                            return (
+                                <div key={bag.id} className={`flex items-center justify-between py-5 ${idx !== bags.length - 1 ? 'border-b border-gray-100' : ''}`}>
+                                    <div className="flex items-center gap-4">
+                                        <div className={`w-12 h-12 flex items-center justify-center rounded-full transition-colors ${isSelected ? 'bg-[#68B49B]/10 text-[#68B49B]' : 'bg-gray-50 text-gray-400'}`}>
+                                            <Luggage size={iconSize} />
+                                        </div>
+                                        <div>
+                                            <p className="font-bold text-gray-800 text-base">{t(bag.labelKey)}</p>
+                                            <p className="text-xs text-gray-500 font-medium">{t(bag.descKey)}</p>
+                                        </div>
+                                    </div>
+                                    <div className="flex items-center gap-4">
+                                        <button type="button" onClick={() => onUpdateQuantity(bag.id, -1)} disabled={bag.quantity <= 0}
+                                            className="w-10 h-10 rounded-full border border-gray-200 text-gray-500 flex items-center justify-center transition-colors disabled:opacity-30">
+                                            <Minus size={18} strokeWidth={3} />
+                                        </button>
+                                        <span className="text-lg font-black text-gray-800 w-5 text-center">{bag.quantity}</span>
+                                        <button type="button" onClick={() => onUpdateQuantity(bag.id, 1)}
+                                            className="w-10 h-10 rounded-full bg-[#68B49B] text-white flex items-center justify-center transition-transform active:scale-90 shadow-md">
+                                            <Plus size={18} strokeWidth={3} />
+                                        </button>
+                                    </div>
+                                </div>
+                            );
+                        })}
+                    </div>
+
+                    <div className="mt-auto p-4 border-t border-gray-100 bg-white safe-area-bottom">
+                        <PrimaryButton onClick={() => setIsOpen(false)} className="w-full !rounded-xl !py-3">
+                            {t('luggage_listing.search.confirm_count', { count: totalBags })}
+                        </PrimaryButton>
+                    </div>
+                </div>,
+                document.body
+            )}
+        </>
+    )
+}
+
+const LuggageResultCard = ({ service, totalBags, onClick, searchCriteria }) => {
+    const { t } = useTranslation("home");
+    const [isExpanded, setIsExpanded] = useState(true);
+
+    const bagsS = searchCriteria?.luggage?.find(l => l.id === 'S')?.quantity || 0;
+    const bagsM = searchCriteria?.luggage?.find(l => l.id === 'M')?.quantity || 0;
+    const bagsL = searchCriteria?.luggage?.find(l => l.id === 'L')?.quantity || 0;
+
+    // --- NORMALIZZAZIONE SIZE PRICES (Stessa logica di ServiceDetailPageLuggage) ---
+    let normalizedSizePrices = service.sizePrices ? [...service.sizePrices] : [];
+
+    if (normalizedSizePrices.length > 0) {
+        normalizedSizePrices = normalizedSizePrices.map(sp => {
+            const pPerHour = sp.pricePerHour || 0;
+            let pPerDay = sp.pricePerDay || 0;
+
+            // FIX: Se il prezzo giornaliero è 0 ma c'è un prezzo orario,
+            // impostiamo il giornaliero a (orario * 24) per evitare che il calcolo (Math.min) dia 0.
+            if (pPerDay === 0 && pPerHour > 0) {
+                pPerDay = pPerHour * 24;
+            }
+
+            // Fallback inverso: se manca orario, usa giornaliero
+            const finalHourly = pPerHour > 0 ? pPerHour : pPerDay;
+
+            return {
+                ...sp,
+                size: sp.size || sp.sizeLabel, // Supporto per sizeLabel (da API)
+                pricePerDay: pPerDay,
+                pricePerHour: finalHourly
+            };
+        });
+    } else {
+        // Se sizePrices è vuoto, costruiscilo dai prezzi flat
+        const base = service.basePrice || 0;
+        const pSmall = service.priceSmall || base;
+        const pMedium = service.priceMedium || base;
+        const pLarge = service.priceLarge || base;
+
+        normalizedSizePrices = [
+            { size: 'SMALL', pricePerDay: pSmall, pricePerHour: pSmall },
+            { size: 'MEDIUM', pricePerDay: pMedium, pricePerHour: pMedium },
+            { size: 'LARGE', pricePerDay: pLarge, pricePerHour: pLarge }
+        ];
+    }
+
+    // Use shared pricing utility
+    const { total, pricePerDay } = calculateLuggageTotal(
+        searchCriteria?.depositDate,
+        searchCriteria?.depositTime,
+        searchCriteria?.pickupDate,
+        searchCriteria?.pickupTime,
+        { small: bagsS, medium: bagsM, large: bagsL },
+        normalizedSizePrices
+    );
+
+    let totalPriceVal = total;
+    let pricePerBagVal = 0;
+
+    if (totalBags > 0) {
+        pricePerBagVal = pricePerDay / totalBags;
+    } else {
+        // Fallback: Show minimum daily rate from sizePrices or basePrice
+        const prices = service.sizePrices?.map(p => p.pricePerDay) || [];
+        const minPrice = prices.length > 0 ? Math.min(...prices) : (service.basePrice || 0);
+        totalPriceVal = minPrice;
+        pricePerBagVal = minPrice;
+    }
+
+    const totalPrice = totalPriceVal.toFixed(2);
+    const pricePerBag = pricePerBagVal.toFixed(2);
+
+    const mainImage = (() => {
+        const img = (service.images && service.images.length > 0) ? service.images[0] : service.imageUrl;
+        if (!img) return `https://placehold.co/800x600/${HOGU_COLORS.dark.substring(1)}/${HOGU_COLORS.primary.substring(1)}?text=${encodeURIComponent(service.name)}`;
+        if (img.startsWith('http')) return img;
+        return `/files/luggage/${service.id}/${img}`;
+    })();
+
+    return (
+        <div
+            className={`
+            group bg-white rounded-none md:rounded-3xl overflow-hidden flex flex-col md:flex-row border-y md:border border-gray-100 
+            ${HOGU_THEME.shadowCard} transition-all duration-300 hover:-translate-y-1 cursor-pointer
+            min-h-[180px] md:min-h-[240px]
+          `}
+            onClick={onClick}
+        >
+            <div className="md:w-1/3 h-40 md:h-72 relative overflow-hidden bg-gray-50 flex items-center justify-center md:p-4">
+                <SafeImage
+                    src={mainImage}
+                    alt={service.name}
+                    className="w-full h-full object-cover md:object-contain md:mix-blend-multiply transition-transform duration-700 scale-105 md:scale-100 md:group-hover:scale-105 drop-shadow-none md:drop-shadow-xl max-h-none md:max-h-[200px] rounded-none md:rounded-2xl block"
+                />
+            </div>
+
+            <div className="px-3 pb-3 pt-1.5 md:p-8 flex-1 flex flex-col">
+                <div className="flex justify-between items-start mb-2">
+                    <h3 className={`text-base md:text-2xl font-bold ${HOGU_THEME.text} group-hover:text-[#68B49B] transition-colors uppercase leading-tight`}>{service.name}</h3>
+                </div>
+                <p className={`text-[11px] md:text-sm mt-0 flex items-center gap-1 text-[${HOGU_COLORS.subtleText}]`}>
+                    <MapPin size={14} /> {service.location || service.address}
+                </p>
+
+                <div className={`mt-1 mb-1 md:my-2 ${isExpanded ? 'block' : 'hidden md:block'}`}>
+                    <p className="text-gray-500 text-xs md:text-sm leading-relaxed line-clamp-2 md:line-clamp-3">
+                        {service.description}
+                    </p>
+                    <div className="flex flex-wrap gap-x-4 gap-y-2 mb-4 mt-3 text-xs text-gray-500 font-medium">
+                        <span className="flex items-center gap-1"><CheckCircle2 size={12} className="text-[#68B49B]" /> {t('luggage_listing.card.feature_insurance')}</span>
+                        <span className="flex items-center gap-1"><CheckCircle2 size={12} className="text-[#68B49B]" /> {t('luggage_listing.card.feature_cancellation')}</span>
+                    </div>
+
+                    {/* Mobile Price */}
+                    <div className="mt-2 md:hidden">
+                        <p className="text-[10px] text-gray-400 uppercase font-bold tracking-wider mb-0.5">
+                            {t('luggage_listing.card.estimated_total')}
+                        </p>
+                        <div className="flex items-baseline gap-1">
+                            <span className={`text-xl font-extrabold text-[${HOGU_COLORS.dark}]`}>€{totalPrice}</span>
+                            <span className="text-xs text-gray-400 font-medium ml-1">
+                                (€{pricePerBag} {t('luggage_listing.card.bag_per_day', '/ bag / day')})
+                            </span>
+                        </div>
+                    </div>
+                </div>
+
+                <div className="flex-grow" />
+
+                {/* Mobile Toggle & Arrow */}
+                <div className="md:hidden w-full flex items-center justify-between mt-2">
+                    <button
+                        onClick={(e) => {
+                            e.stopPropagation();
+                            setIsExpanded(!isExpanded);
+                        }}
+                        className="flex items-center gap-1 text-[11px] font-bold text-[#68B49B] uppercase tracking-wide bg-gray-50 px-3 py-1.5 rounded-full hover:bg-gray-100 transition-colors"
+                    >
+                        {isExpanded ? (
+                            <>
+                                <ChevronDown size={14} className="rotate-180 transition-transform" />
+                                {t('luggage_listing.card.hide')}
+                            </>
+                        ) : (
+                            <>
+                                <ChevronDown size={14} className="transition-transform" />
+                                {t('luggage_listing.card.info_prices')}
+                            </>
+                        )}
+                    </button>
+
+                    <button
+                        className="w-9 h-9 md:w-10 md:h-10 rounded-full bg-[#68B49B] flex items-center justify-center text-white shadow-md active:scale-95 transition-all"
+                    >
+                        <ArrowRight size={20} />
+                    </button>
+                </div>
+
+                {/* Desktop Footer */}
+                <div className="hidden md:flex mt-auto pt-2 md:pt-3 border-t border-gray-50 justify-between items-end">
+                    <div>
+                        <p className="text-[10px] text-gray-400 uppercase font-bold tracking-wider mb-0.5">
+                            {t('luggage_listing.card.estimated_total')}
+                        </p>
+                        <div className="flex items-baseline gap-1">
+                            <span className={`text-3xl font-extrabold text-[${HOGU_COLORS.dark}]`}>€{totalPrice}</span>
+                            <span className="text-sm text-gray-400 font-medium ml-1">
+                                (€{pricePerBag} {t('luggage_listing.card.bag_per_day', '/ bag / day')})
+                            </span>
+                        </div>
+                    </div>
+                    <button
+                        className="w-12 h-12 rounded-full bg-gray-50 flex items-center justify-center text-[#68B49B] group-hover:bg-[#68B49B] group-hover:text-white transition-all duration-300 shadow-sm"
+                    >
+                        <ArrowRight size={24} />
+                    </button>
+                </div>
+            </div>
+        </div>
+    );
+};
+
+// --- COMPONENTE PRINCIPALE ---
+function ServiceListingLuggage() {
     const navigate = useNavigate();
     const [urlSearchParams] = useSearchParams();
+    const { t } = useTranslation("home");
 
     // 1. INIZIALIZZAZIONE STATO DA URL
     const today = new Date().toISOString().split('T')[0];
-    
+    const currentTime = new Date().toTimeString().slice(0, 5);
+
     const initialLocation = urlSearchParams.get('location') || '';
     const initialDepositDate = urlSearchParams.get('dateFrom') || today;
     const initialPickupDate = urlSearchParams.get('dateTo') || today;
     const initialDepositTime = urlSearchParams.get('timeFrom') || '09:00';
     const initialPickupTime = urlSearchParams.get('timeTo') || '18:00';
-    
-    // Luggage initialization (simplified for URL params, could be expanded)
+
     const initialBagsS = parseInt(urlSearchParams.get('bagsS')) || 0;
     const initialBagsM = parseInt(urlSearchParams.get('bagsM')) || 1;
     const initialBagsL = parseInt(urlSearchParams.get('bagsL')) || 0;
-    
+
     const [services, setServices] = useState([]);
     const [hasSearched, setHasSearched] = useState(false);
-    
-    // Loading & Error
+
     const [isLoading, setIsLoading] = useState(false);
     const [error, setError] = useState(null);
-    
-    // Paginazione
+
     const [currentPage, setCurrentPage] = useState(1);
     const [totalPages, setTotalPages] = useState(0);
     const pageSize = 5;
-  
-    // Stato Criteri Ricerca
-    const [searchCriteria, setSearchCriteria] = useState({
-      location: initialLocation, 
-      depositDate: initialDepositDate,
-      depositTime: initialDepositTime,
-      pickupDate: initialPickupDate,
-      pickupTime: initialPickupTime,
-      luggage: [
-        { id: 'S', size: 'S', labelKey: LUGGAGE_SIZES_MOCK[0].labelKey, descKey: LUGGAGE_SIZES_MOCK[0].descKey, quantity: initialBagsS },
-        { id: 'M', size: 'M', labelKey: LUGGAGE_SIZES_MOCK[1].labelKey, descKey: LUGGAGE_SIZES_MOCK[1].descKey, quantity: initialBagsM },
-        { id: 'L', size: 'L', labelKey: LUGGAGE_SIZES_MOCK[2].labelKey, descKey: LUGGAGE_SIZES_MOCK[2].descKey, quantity: initialBagsL },
-      ], 
-    });
+    const [totalElements, setTotalElements] = useState(0); // Added for consistency with NCC
 
-    const totalBags = searchCriteria.luggage.reduce((acc, curr) => acc + curr.quantity, 0);
-    
     // RIFERIMENTO PER SCROLL AUTOMATICO
     const resultsSectionRef = useRef(null);
+
+    // Stato Criteri Ricerca
+    const [searchCriteria, setSearchCriteria] = useState({
+        location: initialLocation,
+        depositDate: initialDepositDate,
+        depositTime: initialDepositTime,
+        pickupDate: initialPickupDate,
+        pickupTime: initialPickupTime,
+        luggage: [
+            { id: 'S', size: 'S', labelKey: LUGGAGE_SIZES_MOCK[0].labelKey, descKey: LUGGAGE_SIZES_MOCK[0].descKey, quantity: initialBagsS },
+            { id: 'M', size: 'M', labelKey: LUGGAGE_SIZES_MOCK[1].labelKey, descKey: LUGGAGE_SIZES_MOCK[1].descKey, quantity: initialBagsM },
+            { id: 'L', size: 'L', labelKey: LUGGAGE_SIZES_MOCK[2].labelKey, descKey: LUGGAGE_SIZES_MOCK[2].descKey, quantity: initialBagsL },
+        ],
+    });
+
+    const minDepositTime = searchCriteria.depositDate === today ? currentTime : '';
+    let minPickupTime = '';
+    if (searchCriteria.pickupDate === searchCriteria.depositDate && searchCriteria.depositTime) {
+        minPickupTime = searchCriteria.depositTime;
+    } else if (searchCriteria.pickupDate === today) {
+        minPickupTime = currentTime;
+    }
+
+    const totalBags = searchCriteria.luggage.reduce((acc, curr) => acc + curr.quantity, 0);
 
     // Format UTC con "Z"
     const combineDateTime = (date, time) => {
         if (!date || !time) return null;
-        return `${date}T${time}:00Z`; 
+        return `${date}T${time}:00Z`;
     };
 
-    // Helper per calcolare la data di domani
     const getTomorrowDateString = () => {
         const tomorrow = new Date();
         tomorrow.setDate(tomorrow.getDate() + 1);
         return tomorrow.toISOString().split('T')[0];
     };
 
-    // --- FUNZIONE FETCH PURA (MODIFICATA CON SCROLL) ---
     const executeSearch = async (params, shouldScroll = false) => {
         const rawLocation = params.location;
-        const cleanLocation = rawLocation ? rawLocation.split(',')[0].trim() : '';
+        const locationPayload = rawLocation ? createLocationPayload(rawLocation, "", "LUGGAGE")[0] : null;
 
-        if (!cleanLocation) {
-             setError({
+        if (!locationPayload) {
+            setError({
                 title: t('errors.missing_location_title', 'Attenzione'),
                 message: t('errors.missing_location', 'Inserisci una città per cercare.')
-             });
-             return;
+            });
+            return;
         }
 
         setIsLoading(true);
         setError(null);
-        
+
         try {
             const requestParams = {
-                location: cleanLocation, 
+                locale: locationPayload,
                 page: (params.page || 1) - 1,
                 size: pageSize,
                 dropOff: combineDateTime(params.depositDate, params.depositTime),
@@ -364,31 +653,32 @@ function ServiceListingLuggage() {
                 bagsL: params.luggage.find(l => l.id === 'L')?.quantity || 0
             };
 
-            const response = await listingService.searchLuggage(requestParams);
-            
+            const response = await luggageService.searchLuggage(requestParams);
+
             if (response && response.content) {
                 setServices(response.content);
                 setTotalPages(response.totalPages);
+                setTotalElements(response.totalElements || response.content.length);
             } else if (Array.isArray(response)) {
                 setServices(response);
                 setTotalPages(1);
+                setTotalElements(response.length);
             } else {
                 setServices([]);
                 setTotalPages(0);
+                setTotalElements(0);
             }
-            
+
             setCurrentPage(params.page || 1);
             setHasSearched(true);
-            
-            // LOGICA DI SCROLL AUTOMATICO
+
             if (shouldScroll) {
                 setTimeout(() => {
                     if (resultsSectionRef.current) {
-                        const yOffset = -120; // Offset per non attaccare troppo in alto
+                        const yOffset = -120;
                         const element = resultsSectionRef.current;
                         const y = element.getBoundingClientRect().top + window.pageYOffset + yOffset;
-                        
-                        window.scrollTo({top: y, behavior: 'smooth'});
+                        window.scrollTo({ top: y, behavior: 'smooth' });
                     }
                 }, 100);
             }
@@ -405,7 +695,6 @@ function ServiceListingLuggage() {
         }
     };
 
-    // --- AUTO START DA URL ---
     useEffect(() => {
         if (initialLocation && !hasSearched) {
             const payload = {
@@ -414,10 +703,9 @@ function ServiceListingLuggage() {
                 depositTime: initialDepositTime,
                 pickupDate: initialPickupDate,
                 pickupTime: initialPickupTime,
-                luggage: searchCriteria.luggage, 
+                luggage: searchCriteria.luggage,
                 page: 1
             };
-            // Scroll attivo all'avvio
             executeSearch(payload, true);
         }
         // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -428,14 +716,13 @@ function ServiceListingLuggage() {
     };
 
     const handleSearchClick = (e) => {
-        e.preventDefault();
-        
+        if (e) e.preventDefault();
+
         const payload = {
             ...searchCriteria,
             page: 1
         };
 
-        // Aggiorna URL
         const bagsS = searchCriteria.luggage.find(l => l.id === 'S')?.quantity || 0;
         const bagsM = searchCriteria.luggage.find(l => l.id === 'M')?.quantity || 0;
         const bagsL = searchCriteria.luggage.find(l => l.id === 'L')?.quantity || 0;
@@ -452,16 +739,12 @@ function ServiceListingLuggage() {
         }).toString();
 
         navigate(`/service/luggage?${urlParams}`, { replace: true });
-
-        // Cerca con scroll
         executeSearch(payload, true);
     };
 
-    // Handler per il click sulle card (Destinazioni Popolari)
     const handleDestinationClick = (locationStr) => {
         const tomorrowStr = getTomorrowDateString();
-        
-        // Aggiorna stato
+
         setSearchCriteria(prev => ({
             ...prev,
             location: locationStr,
@@ -477,7 +760,6 @@ function ServiceListingLuggage() {
             page: 1
         };
 
-        // Aggiorna URL
         const bagsS = searchCriteria.luggage.find(l => l.id === 'S')?.quantity || 0;
         const bagsM = searchCriteria.luggage.find(l => l.id === 'M')?.quantity || 0;
         const bagsL = searchCriteria.luggage.find(l => l.id === 'L')?.quantity || 0;
@@ -494,8 +776,6 @@ function ServiceListingLuggage() {
         }).toString();
 
         navigate(`/service/luggage?${urlParams}`, { replace: true });
-
-        // Cerca con scroll
         executeSearch(payload, true);
     };
 
@@ -504,81 +784,44 @@ function ServiceListingLuggage() {
             ...searchCriteria,
             page: newPageNumber
         };
-        // Scroll al cambio pagina
         executeSearch(payload, true);
     };
 
     const updateCriteria = (field, value) => {
-      setSearchCriteria(prev => ({ ...prev, [field]: value }));
+        setSearchCriteria(prev => ({ ...prev, [field]: value }));
     };
-  
+
     const updateLuggageQuantity = (id, change) => {
-      setSearchCriteria(prev => ({
-        ...prev,
-        luggage: prev.luggage.map(item => {
-          if (item.id === id) {
-            const newQuantity = Math.max(0, item.quantity + change);
-            return { ...item, quantity: newQuantity };
-          }
-          return item;
-        }),
-      }));
+        setSearchCriteria(prev => ({
+            ...prev,
+            luggage: prev.luggage.map(item => {
+                if (item.id === id) {
+                    const newQuantity = Math.max(0, item.quantity + change);
+                    return { ...item, quantity: newQuantity };
+                }
+                return item;
+            }),
+        }));
     };
 
     const handleServiceClick = (service) => {
         if (service && service.id) {
             const slug = slugify(service.name ? service.name : 'luggage-storage');
-            
             const urlParams = new URLSearchParams({
                 dateFrom: searchCriteria.depositDate,
                 timeFrom: searchCriteria.depositTime,
                 dateTo: searchCriteria.pickupDate,
                 timeTo: searchCriteria.pickupTime,
-                // Aggiungi qui altri dettagli se necessario per la pagina dettaglio
+                bagsS: searchCriteria.luggage.find(l => l.id === 'S')?.quantity || 0,
+                bagsM: searchCriteria.luggage.find(l => l.id === 'M')?.quantity || 0,
+                bagsL: searchCriteria.luggage.find(l => l.id === 'L')?.quantity || 0,
             }).toString();
-
             navigate(`/luggage/${slug}-${service.id}?${urlParams}`);
         }
     };
 
-    // Card Bagaglio
-    const LuggageSelectorCard = ({ bag }) => {
-        const isSelected = bag.quantity > 0;
-        return (
-          <div 
-              onClick={() => updateLuggageQuantity(bag.id, 1)}
-              className={`
-                  relative p-3 rounded-2xl border transition-all duration-200 cursor-pointer select-none group 
-                  flex flex-row sm:flex-col items-center justify-between sm:justify-center text-left sm:text-center gap-3 sm:gap-0
-                  ${isSelected 
-                      ? 'bg-[#F0FDF9] border-[#68B49B] shadow-md' 
-                      : 'bg-white border-gray-100 hover:border-[#68B49B]/50 hover:shadow-lg'
-                  }
-               `}
-          >
-              <div className="flex items-center sm:flex-col gap-3 sm:gap-0 flex-1">
-                  <div className={`p-2 rounded-full sm:mb-1 shrink-0 ${isSelected ? 'bg-[#68B49B] text-white' : 'bg-gray-50 text-gray-400'}`}>
-                      <Luggage size={18} />
-                  </div>
-                  <div>
-                      <p className={`text-sm font-bold ${isSelected ? 'text-[#33594C]' : 'text-gray-700'}`}>{t(bag.labelKey)}</p>
-                      <p className="text-[10px] text-gray-400 sm:mt-0.5 leading-tight">{t(bag.descKey)}</p>
-                  </div>
-              </div>
-              
-              <div className="flex items-center gap-2 sm:mt-2 shrink-0">
-                  <IconButton icon={Minus} onClick={() => updateLuggageQuantity(bag.id, -1)} disabled={bag.quantity <= 0} />
-                  <span className="text-sm font-bold w-3 text-center">{bag.quantity}</span>
-                  <IconButton icon={Plus} onClick={() => updateLuggageQuantity(bag.id, 1)} colorClass="text-[#68B49B]" />
-              </div>
-          </div>
-        );
-    };
-
-    // Paginazione
     const Pagination = () => {
         if (totalPages <= 1) return null;
-        const pages = Array.from({ length: totalPages }, (_, i) => i + 1);
         return (
             <div className="flex items-center justify-center gap-2 mt-12">
                 <button
@@ -589,7 +832,7 @@ function ServiceListingLuggage() {
                     <ChevronLeft size={20} />
                 </button>
                 <div className="flex items-center gap-1">
-                    {pages.map((number) => (
+                    {Array.from({ length: totalPages }, (_, i) => i + 1).map((number) => (
                         <button
                             key={number}
                             onClick={() => handlePageChange(number)}
@@ -610,224 +853,211 @@ function ServiceListingLuggage() {
         );
     };
 
-  return (
-    <div className={`min-h-screen bg-[#F8FAFC] pb-20 ${HOGU_THEME.fontFamily}`}>
-      <LoadingScreen isLoading={isLoading} />
-      {error && (
-        <ErrorModal 
-          isOpen={!!error} 
-          title={error.title} 
-          message={error.message} 
-          onClose={handleCloseError} 
-        />
-      )}
+    return (
+        <div className={`min-h-screen bg-[#F8FAFC] pb-20 ${HOGU_THEME.fontFamily}`}>
+            <PageHeader
+                breadcrumbs={breadcrumbsItems.map(item => ({ ...item, label: t(item.labelKey) }))}
+                subtitle={t('luggage_listing.header.subtitle')}
+                titlePart1={t('luggage_listing.header.title_part1')}
+                titlePart2={t('luggage_listing.header.title_part2')}
+                description={t('luggage_listing.header.description')}
+            />
 
-      <div className="bg-white pt-12 pb-24 px-4 lg:px-8 relative overflow-hidden">
-        <div className="absolute top-0 left-0 w-96 h-96 bg-blue-500/5 rounded-full blur-3xl -translate-y-1/2 -translate-x-1/3"></div>
-        <div className="absolute top-0 right-0 w-96 h-96 bg-[#68B49B]/10 rounded-full blur-3xl -translate-y-1/2 translate-x-1/3"></div>
-         <div className="max-w-7xl mx-auto relative z-10">
-            <Breadcrumbs items={breadcrumbsItems.map(item => ({...item, label: t(item.labelKey)}))} />
-            <span className={`text-[${HOGU_COLORS.primary}] mt-6 font-bold tracking-wider text-xs uppercase mb-3 block flex items-center gap-2`}>
-                <div className="w-8 h-[1px] bg-[#68B49B]"></div> {t('luggage_listing.header.subtitle')}
-            </span>
-            <h1 className={`text-4xl md:text-6xl font-extrabold text-[${HOGU_COLORS.dark}] mb-6 tracking-tight leading-tight`}>
-              {t('luggage_listing.header.title_part1')}, <br/>
-              <span className="text-[#68B49B]">{t('luggage_listing.header.title_part2')}</span>
-            </h1>
-            <p className={`text-lg text-[${HOGU_COLORS.subtleText}] max-w-xl leading-relaxed`}>
-              {t('luggage_listing.header.description')}
-            </p>
-         </div>
-      </div>
+            <div className="max-w-7xl mx-auto px-4 lg:px-8 -mt-20 md:-mt-16 lg:-mt-12 relative z-20">
+                <div className={`relative z-50 bg-[#F1F5F9] rounded-[2rem] p-4 lg:p-8 ${HOGU_THEME.shadowFloat} border border-white/50 backdrop-blur-sm`}>
+                    <form onSubmit={handleSearchClick} className="flex flex-col gap-1 lg:gap-6">
+                        <div className="flex flex-col gap-2 lg:gap-4">
 
-      <div className="max-w-7xl mx-auto px-4 lg:px-8 -mt-16 relative z-20">
-        <div className={`bg-white rounded-[2rem] p-6 lg:p-8 ${HOGU_THEME.shadowFloat} border border-white/50 backdrop-blur-sm`}>
-            <div className="flex flex-col gap-6">
-                <div className="flex flex-col lg:flex-row gap-4 lg:gap-6">
-                    <CityAutocompleteSearch 
-                        label={t('luggage_listing.search.where_are_you')} 
-                        value={searchCriteria.location}
-                        onChange={(val) => updateCriteria('location', val)}
-                        icon={MapPin}
-                    />
-                    <SearchInputContainer label={t('luggage_listing.search.deposit')} icon={Calendar}>
-                        <input
-                            type="date"
-                            value={searchCriteria.depositDate}
-                            onChange={(e) => updateCriteria('depositDate', e.target.value)}
-                            className="w-full h-full px-2 bg-transparent border-none focus:ring-0 text-sm font-medium text-gray-700 outline-none cursor-pointer"
-                        />
-                        <input
-                            type="time"
-                            value={searchCriteria.depositTime}
-                            onChange={(e) => updateCriteria('depositTime', e.target.value)}
-                            className="w-20 h-full px-0 bg-transparent border-none focus:ring-0 text-sm font-medium text-gray-700 outline-none cursor-pointer text-right"
-                        />
-                    </SearchInputContainer>
-                    <SearchInputContainer label={t('luggage_listing.search.pickup')} icon={Clock}>
-                        <input
-                            type="date"
-                            value={searchCriteria.pickupDate}
-                            onChange={(e) => updateCriteria('pickupDate', e.target.value)}
-                            className="w-full h-full px-2 bg-transparent border-none focus:ring-0 text-sm font-medium text-gray-700 outline-none cursor-pointer"
-                        />
-                        <input
-                            type="time"
-                            value={searchCriteria.pickupTime}
-                            onChange={(e) => updateCriteria('pickupTime', e.target.value)}
-                            className="w-20 h-full px-0 bg-transparent border-none focus:ring-0 text-sm font-medium text-gray-700 outline-none cursor-pointer text-right"
-                        />
-                    </SearchInputContainer>
-                </div>
-                <div className="h-px w-full bg-gray-100 lg:hidden"></div>
-                <div className="flex flex-col lg:flex-row gap-6 items-start lg:items-center">
-                    <div className="flex-1 w-full">
-                        <label className={`block text-xs font-bold uppercase tracking-wide text-[${HOGU_COLORS.subtleText}] mb-3 ml-1`}>
-                            {t('luggage_listing.search.luggage_label')}
-                        </label>
-                        <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
-                            {searchCriteria.luggage.map(bag => (
-                                <LuggageSelectorCard key={bag.id} bag={bag} />
-                            ))}
+                            {/* DESKTOP: Flex Row Layout matching NCC */}
+                            <div className="hidden lg:flex lg:flex-row gap-2 lg:gap-4 items-end">
+                                {/* Location Group */}
+                                <div className="flex-1 min-w-0 md:min-w-[200px]">
+                                    <CityAutocomplete
+                                        label={t('luggage_listing.search.where_are_you')}
+                                        value={searchCriteria.location}
+                                        onChange={(val) => updateCriteria('location', val)}
+                                        icon={MapPin}
+                                        className="w-full h-full"
+                                        inputClassName="text-left"
+                                        labelClassName={`!text-[${HOGU_COLORS.subtleText}]`}
+                                        placeholder={t('luggage_listing.search.location_placeholder', "Dove ti serve il deposito?")}
+                                    />
+                                </div>
+
+                                <SearchInputContainer label={t('luggage_listing.search.deposit')} icon={Calendar} className="w-full">
+                                    <input
+                                        type="date"
+                                        min={new Date().toISOString().split("T")[0]}
+                                        value={searchCriteria.depositDate}
+                                        onChange={(e) => updateCriteria('depositDate', e.target.value)}
+                                        onClick={(e) => e.target.showPicker?.()}
+                                        className="flex-1 min-w-[110px] px-2 bg-transparent border-none focus:ring-0 text-sm font-medium text-gray-700 outline-none cursor-pointer"
+                                    />
+                                    <div className="w-[1px] h-6 bg-gray-200 mx-1"></div>
+                                    <input
+                                        type="time"
+                                        value={searchCriteria.depositTime}
+                                        min={minDepositTime}
+                                        onChange={(e) => updateCriteria('depositTime', e.target.value)}
+                                        onClick={(e) => e.target.showPicker?.()}
+                                        className="min-w-[85px] bg-transparent border-none focus:ring-0 text-sm font-medium text-gray-700 outline-none cursor-pointer"
+                                    />
+                                </SearchInputContainer>
+
+                                <SearchInputContainer label={t('luggage_listing.search.pickup')} icon={Clock} className="w-full">
+                                    <input
+                                        type="date"
+                                        min={searchCriteria.depositDate || new Date().toISOString().split("T")[0]}
+                                        value={searchCriteria.pickupDate}
+                                        onChange={(e) => updateCriteria('pickupDate', e.target.value)}
+                                        onClick={(e) => e.target.showPicker?.()}
+                                        className="flex-1 min-w-[110px] px-2 bg-transparent border-none focus:ring-0 text-sm font-medium text-gray-700 outline-none cursor-pointer"
+                                    />
+                                    <div className="w-[1px] h-6 bg-gray-200 mx-1"></div>
+                                    <input
+                                        type="time"
+                                        value={searchCriteria.pickupTime}
+                                        min={minPickupTime}
+                                        onChange={(e) => updateCriteria('pickupTime', e.target.value)}
+                                        onClick={(e) => e.target.showPicker?.()}
+                                        className="min-w-[85px] bg-transparent border-none focus:ring-0 text-sm font-medium text-gray-700 outline-none cursor-pointer"
+                                    />
+                                </SearchInputContainer>
+
+                                <DesktopLuggageSelector bags={searchCriteria.luggage} onUpdateQuantity={updateLuggageQuantity} />
+
+                                <div className="flex flex-col gap-3 w-auto min-w-[140px]">
+                                    <label className="hidden lg:flex items-center gap-2 text-[10px] md:text-xs font-bold uppercase tracking-wide text-transparent select-none ml-1">
+                                        <Search size={14} />
+                                        {t('luggage_listing.search.search_button')}
+                                    </label>
+                                    <PrimaryButton
+                                        type="submit"
+                                        disabled={isLoading}
+                                        className="w-full !h-[48px] md:!h-[60px] !rounded-2xl !px-6 flex items-center justify-center shadow-sm hover:shadow-md"
+                                    >
+                                        {isLoading ? (
+                                            <>
+                                                <Loader2 className="animate-spin" size={20} />
+                                                <span className="ml-2">{t('luggage_listing.search.searching', 'Cerca')}</span>
+                                            </>
+                                        ) : (
+                                            <>
+                                                <Search size={20} />
+                                                <span className="ml-2 font-bold">{t('luggage_listing.search.search_button', 'Cerca')}</span>
+                                            </>
+                                        )}
+                                    </PrimaryButton>
+                                </div>
+                            </div>
+
+                            {/* MOBILE: Layout compatto */}
+                            <div className="lg:hidden w-full flex flex-col gap-2">
+                                <div className="z-[100]">
+                                    <CityAutocomplete
+                                        label={t('luggage_listing.search.where_are_you')}
+                                        value={searchCriteria.location}
+                                        onChange={(val) => updateCriteria('location', val)}
+                                        icon={MapPin}
+                                        className="w-full z-[100]"
+                                        inputClassName="text-left text-sm"
+                                        labelClassName={`!text-[${HOGU_COLORS.subtleText}] !text-[9px]`}
+                                        placeholder={t('luggage_listing.search.location_placeholder', "Dove ti serve il deposito?")}
+                                    />
+                                </div>
+
+                                <div className="grid grid-cols-2 gap-2">
+                                    <SearchInputContainer label={t('luggage_listing.search.deposit')} icon={Calendar}>
+                                        <MobileCombinedScheduleSelector
+                                            depositDate={searchCriteria.depositDate}
+                                            depositTime={searchCriteria.depositTime}
+                                            pickupDate={searchCriteria.pickupDate}
+                                            pickupTime={searchCriteria.pickupTime}
+                                            onUpdate={updateCriteria}
+                                            minDate={new Date().toISOString().split("T")[0]}
+                                        />
+                                    </SearchInputContainer>
+                                    <SearchInputContainer label={t('luggage_listing.search.luggage_label')} icon={Luggage}>
+                                        <MobileLuggageSelector
+                                            bags={searchCriteria.luggage}
+                                            onUpdateQuantity={updateLuggageQuantity}
+                                        />
+                                    </SearchInputContainer>
+                                </div>
+
+                                <PrimaryButton
+                                    type="submit"
+                                    disabled={isLoading}
+                                    className="w-full h-[42px] !rounded-xl !text-sm !py-0"
+                                >
+                                    {isLoading ? (
+                                        <><Loader2 className="animate-spin" size={16} />{t('luggage_listing.search.searching', 'Cercando...')}</>
+                                    ) : (
+                                        <><Search size={16} />{t('luggage_listing.search.search_button')}</>
+                                    )}
+                                </PrimaryButton>
+                            </div>
+
                         </div>
-                    </div>
-                    <div className="w-full lg:w-auto flex self-stretch lg:self-end pt-2">
-                        <PrimaryButton 
-                            onClick={handleSearchClick} 
-                            disabled={isLoading}
-                            className="w-full lg:w-auto h-full min-h-[60px] !rounded-2xl shadow-lg shadow-[#68B49B]/20 hover:shadow-[#68B49B]/40"
-                        >
-                            <span className="ml-2">{t('luggage_listing.search.search_button')}</span>
-                            <Search size={22} />
-                        </PrimaryButton>
-                    </div>
+                    </form>
                 </div>
+
+                {!hasSearched && !isLoading && (
+                    <PopularDestinations onDestinationClick={(dest) => handleDestinationClick(dest.searchLocation)} />
+                )}
+
+                {hasSearched && (
+                    <div className="mt-6 md:mt-12" id="results-section" ref={resultsSectionRef}>
+                        <div className="flex items-center justify-between mb-4 md:mb-8">
+                            <h2 className="text-lg md:text-2xl font-bold text-slate-800">
+                                <span className="text-[#68B49B]">{totalElements}</span> {t('luggage_listing.results.available_deposits', { count: totalElements })}
+                            </h2>
+                            <span className="text-sm text-gray-400 font-medium">
+                                {t('luggage_listing.results.page_of', { current: currentPage, total: totalPages > 0 ? totalPages : 1 })}
+                            </span>
+                        </div>
+
+                        {services.length === 0 ? (
+                            <div className="text-center py-10 md:py-20 bg-white rounded-2xl md:rounded-3xl border border-gray-100">
+                                <div className="inline-block p-4 rounded-full bg-gray-50 mb-4">
+                                    <Search className="text-gray-300" size={40} />
+                                </div>
+                                <h3 className="text-xl font-bold text-gray-600">{t('luggage_listing.results.no_deposits_found')}</h3>
+                                <p className="text-gray-400">{t('luggage_listing.results.retry_search')}</p>
+                            </div>
+                        ) : (
+                            <div className={`${isLoading ? 'opacity-50 pointer-events-none' : 'opacity-100'} transition-opacity duration-200`}>
+                                <div className="flex flex-col gap-3 md:gap-6">
+                                    {services.map((service) => (
+                                        <LuggageResultCard
+                                            key={service.id}
+                                            service={service}
+                                            totalBags={totalBags}
+                                            searchCriteria={searchCriteria}
+                                            onClick={() => handleServiceClick(service)}
+                                        />
+                                    ))}
+                                </div>
+
+                                <Pagination />
+                            </div>
+                        )}
+                    </div>
+                )}
             </div>
-        </div>
 
-        {/* SEZIONE DESTINAZIONI POPOLARI */}
-        {!hasSearched && !isLoading && (
-            <section className="mt-16 mb-12 relative z-10">
-                <div className="flex items-center justify-between mb-8">
-                    <h2 className={`text-2xl font-bold text-[${HOGU_COLORS.dark}]`}>
-                        Destinazioni Popolari
-                    </h2>
-                    <div className="flex gap-2">
-                        <button className="w-10 h-10 rounded-full border border-gray-200 flex items-center justify-center hover:bg-gray-50 text-gray-400 hover:text-gray-600">
-                            <ArrowRight className="rotate-180" size={18} />
-                        </button>
-                        <button className="w-10 h-10 rounded-full border border-gray-200 flex items-center justify-center hover:bg-gray-50 text-gray-400 hover:text-gray-600">
-                            <ArrowRight size={18} />
-                        </button>
-                    </div>
-                </div>
-                <div className="flex gap-6 overflow-x-auto snap-x snap-mandatory pb-8 no-scrollbar" style={{ scrollbarWidth: "none" }}>
-                    {POPULAR_DESTINATIONS.map((dest) => (
-                        <DestinationCard 
-                            key={dest.city} 
-                            {...dest} 
-                            onClick={() => handleDestinationClick(dest.searchLocation)}
-                        />
-                    ))}
-                </div>
-            </section>
-        )}
+            <LoadingScreen isLoading={isLoading} />
 
-        <div className="mt-16 mb-12" id="results-section" ref={resultsSectionRef}>
-            {!isLoading && hasSearched && !error && (
-                 <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-2 mb-6 sm:mb-8">
-                  <h2 className={`text-xl sm:text-2xl font-bold text-[${HOGU_COLORS.dark}]`}>
-                      <span className="text-[#68B49B]">{services.length}</span> {t('luggage_listing.results.available_deposits', { count: services.length })}
-                  </h2>
-                  {services.length > 0 && (
-                      <span className="text-xs sm:text-sm text-gray-400 font-medium">
-                          Pagina {currentPage} di {totalPages}
-                      </span>
-                  )}
-                 </div>
-            )}
-
-            {!isLoading && services.length === 0 && hasSearched && !error && (
-              <div className="text-center py-20 bg-white rounded-3xl border border-gray-100">
-                <div className="inline-block p-4 rounded-full bg-gray-50 mb-4">
-                   <Search className="text-gray-300" size={40} />
-                </div>
-                <p className="text-gray-500 font-medium">{t('luggage_listing.results.no_deposits_found')}</p>
-              </div>
-            )}
-
-            {!isLoading && services.length > 0 && !error && (
-              <>
-                <div className="flex flex-col gap-6">
-                  {services.map(service => {
-                    const basePrice = parseFloat(service.price || 0);
-                    const days = 1; 
-                    const totalPrice = (basePrice * (totalBags || 1) * days).toFixed(2);
-
-                    return (
-                    <div 
-                      key={service.id} 
-                      className={`
-                        group bg-white rounded-3xl overflow-hidden flex flex-col md:flex-row border border-gray-100 
-                        ${HOGU_THEME.shadowCard} transition-all duration-300 hover:-translate-y-1 cursor-pointer
-                        min-h-[240px]
-                      `}
-                      onClick={() => handleServiceClick(service)}
-                    >
-                      <div className="md:w-1/3 h-64 md:h-auto relative overflow-hidden bg-gray-50 flex items-center justify-center p-4">
-                        <img 
-                          src={service.imageUrl || `https://placehold.co/800x600/${HOGU_COLORS.dark.substring(1)}/${HOGU_COLORS.primary.substring(1)}?text=${encodeURIComponent(service.name)}`}
-                          alt={service.name}
-                          className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
-                          onError={(e) => { e.target.src = `https://placehold.co/600x400/EEE/CCC?text=${t('luggage_listing.card.img_fallback')}`; }}
-                        />
-                      </div>
-
-                      <div className="p-6 md:p-8 flex-1 flex flex-col">
-                        <div className="flex justify-between items-start mb-2">
-                            <h3 className={`text-2xl font-bold ${HOGU_THEME.text} group-hover:text-[#68B49B] transition-colors`}>{service.name}</h3>
-                        </div>
-                        <p className={`text-sm mt-0 flex items-center gap-1 text-[${HOGU_COLORS.subtleText}]`}>
-                            <MapPin size={14} /> {service.location || service.address}
-                        </p>
-                        <p className="text-gray-500 text-sm leading-relaxed my-3 line-clamp-2">
-                           {service.description}
-                        </p>
-                        <div className="flex flex-wrap gap-x-4 gap-y-2 mb-4 text-xs text-gray-500 font-medium">
-                           <span className="flex items-center gap-1"><CheckCircle2 size={12} className="text-[#68B49B]"/> {t('luggage_listing.card.feature_insurance')}</span>
-                           <span className="flex items-center gap-1"><CheckCircle2 size={12} className="text-[#68B49B]"/> {t('luggage_listing.card.feature_cancellation')}</span>
-                        </div>
-                        <div className="flex-grow" />
-                        
-                        <div className="mt-auto pt-4 border-t border-gray-50 flex justify-between items-end">
-                           <div>
-                               <p className="text-[10px] text-gray-400 uppercase font-bold tracking-wider mb-0.5">
-                                   {t('luggage_listing.card.estimated_total')}
-                               </p>
-                               <div className="flex items-baseline gap-1">
-                                   <span className={`text-3xl font-extrabold text-[${HOGU_COLORS.dark}]`}>€{totalPrice}</span>
-                                   <span className="text-sm text-gray-400 font-medium ml-1">
-                                     (€{service.price} / bag / day)
-                                   </span>
-                               </div>
-                           </div>
-                           <button 
-                               className="w-12 h-12 rounded-full bg-gray-50 flex items-center justify-center text-[#68B49B] group-hover:bg-[#68B49B] group-hover:text-white transition-all duration-300 shadow-sm"
-                           >
-                              <ArrowRight size={24} />
-                           </button>
-                        </div>
-                      </div>
-                    </div>
-                  )})}
-                </div>
-                <Pagination />
-              </>
+            {error && (
+                <ErrorModal
+                    isOpen={!!error}
+                    title={error.title}
+                    message={error.message}
+                    onClose={handleCloseError}
+                />
             )}
         </div>
-      </div>
-    </div>
-  );
+    );
 }
 
 export default ServiceListingLuggage;

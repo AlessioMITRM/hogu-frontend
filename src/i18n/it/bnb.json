@@ -1,0 +1,46 @@
+{
+  "expandable": {
+    "showLess": "Mostra meno",
+    "showMore": "Mostra altro"
+  },
+  "map": {
+    "verifiedPosition": "Posizione verificata",
+    "whereWeAre": "Dove siamo",
+    "getDirections": "Ottieni indicazioni",
+    "whereYouWillSleep": "Dove dormirai"
+  },
+  "booking": {
+    "checkIn": "Check-in",
+    "checkOut": "Check-out",
+    "from": "Dal",
+    "to": "al",
+    "guests": "Ospiti",
+    "guestsCount": "{{count}} Ospiti (Max {{max}})",
+    "nights": "notti",
+    "total": "Totale",
+    "selectDatesToSeePrice": "Seleziona le date per vedere il preventivo",
+    "bookNow": "Prenota ora",
+    "noChargeNow": "Non ti verrà addebitato nulla in questa fase",
+    "pricePerNight": "Prezzo per notte",
+    "perNight": "/ notte",
+    "perNightShort": "/notte",
+    "checkAvailability": "Verifica disp.",
+    "yourBooking": "La tua prenotazione",
+    "selectDatesAndGuests": "Seleziona date e ospiti"
+  },
+  "error": {
+    "loading": "Impossibile caricare il B&B.",
+    "addressNotAvailable": "Indirizzo non disponibile",
+    "photoNotAvailable": "Foto Non Disponibile"
+  },
+  "accommodation": {
+    "title": "L'Alloggio",
+    "roomTitle": "La Camera",
+    "roomDescription": "Goditi un soggiorno rilassante. La struttura offre tutti i comfort necessari per una vacanza perfetta o un viaggio di lavoro."
+  },
+  "breadcrumb": {
+    "home": "Home",
+    "bnb": "B&B"
+  },
+  "live_viewers": "{{count}} persone stanno guardando"
+}

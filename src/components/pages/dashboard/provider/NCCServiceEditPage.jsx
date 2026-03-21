@@ -1,13 +1,18 @@
 import React, { useState, useMemo, useEffect, useRef } from 'react';
-import { useParams } from 'react-router-dom';
+import { useParams, useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { 
-    MapPin, Info, Car, Briefcase, Users,
-    Save, Upload, Trash2, Plus, Euro, Eye, EyeOff, Navigation,
-    CalendarCheck, CreditCard, FileText, ChevronDown
+    MapPin, Car, Briefcase, Users,
+    Save, Upload, Trash2, Plus, Euro, Eye, EyeOff, Navigation
 } from 'lucide-react';
 import CurrencyInput from 'react-currency-input-field';
 
+import { 
+    getDisplayLocation, 
+    createLocationPayload 
+} from '../../../../utils/locationUtils';
+import { MAX_IMAGE_SIZE_BYTES, splitFilesByMaxSize, buildOversizedFilesMessage } from '../../../../utils/imageValidation';
+import { CityAutocomplete } from '../../../ui/CityAutocomplete';
 import { HOGU_COLORS, HOGU_THEME } from '../../../../config/theme.js';
 import { withAuthProtection } from './../../auth/withAuthProtection.jsx'; 
 import { Breadcrumbs } from '../../../../components/ui/Breadcrumbs.jsx'; 
@@ -15,6 +20,8 @@ import { nccService } from '../../../../api/apiClient.js';
 import SuccessModal from '../../../ui/SuccessModal.jsx';
 import ErrorModal from '../../../ui/ErrorModal.jsx';
 import LoadingScreen from '../../../ui/LoadingScreen.jsx';
+import SafeImage from '../../../ui/SafeImage.jsx';
+
 
 import italianLocationsData from '../../../../assets/data/italian_locations.json'; 
 import englishLocationsData from '../../../../assets/data/english_locations.json'; 
@@ -46,136 +53,9 @@ const breadcrumbsItems = [
     { labelKey: 'ncc_edit.nav.edit_profile', href: '#' }
 ];
 
-// --- COMPONENTE INFO ACCORDION ITEM (SOTTO-SEZIONE ESPANDIBILE) ---
-const InfoAccordionItem = ({ icon: Icon, title, description, colorClass }) => {
-    const [isOpen, setIsOpen] = useState(false);
-
-    return (
-        <div className="border-b border-gray-50 last:border-0">
-            <button 
-                onClick={() => setIsOpen(!isOpen)} 
-                className="w-full flex items-center justify-between py-3 hover:bg-gray-50 transition-colors rounded-lg px-2 -mx-2 group"
-            >
-                <div className="flex items-center gap-3">
-                    <div className={`p-1.5 rounded-lg shrink-0 transition-colors ${colorClass}`}>
-                        <Icon size={16} />
-                    </div>
-                    <span className="font-bold text-sm text-gray-900 group-hover:text-gray-700">{title}</span>
-                </div>
-                <ChevronDown 
-                    size={16} 
-                    className={`text-gray-400 transition-transform duration-300 ${isOpen ? 'rotate-180' : ''}`} 
-                />
-            </button>
-            <div 
-                className={`
-                    overflow-hidden transition-all duration-300 ease-in-out
-                    ${isOpen ? 'max-h-24 opacity-100 mb-3' : 'max-h-0 opacity-0'}
-                `}
-            >
-                <p className="text-xs text-gray-500 leading-relaxed pl-[2.8rem] pr-2">
-                    {description}
-                </p>
-            </div>
-        </div>
-    );
-};
 
 // --- COMPONENTE AUTOCOMPLETE CITTA' ---
-const CityAutocomplete = ({ label, value, onChange, icon: Icon, required = false }) => {
-    const { i18n, t } = useTranslation();
-    const [suggestions, setSuggestions] = useState([]);
-    const [showSuggestions, setShowSuggestions] = useState(false);
-    const wrapperRef = useRef(null);
-
-    const locationData = useMemo(() => {
-        const isItalian = i18n.language && i18n.language.startsWith('it');
-        const rawData = isItalian ? italianLocationsData : (englishLocationsData || italianLocationsData);
-        return rawData ? processLocations(rawData) : [];
-    }, [i18n.language]);
-
-    useEffect(() => {
-        const handleClickOutside = (event) => {
-            if (wrapperRef.current && !wrapperRef.current.contains(event.target)) {
-                setShowSuggestions(false);
-            }
-        };
-        document.addEventListener("mousedown", handleClickOutside);
-        return () => document.removeEventListener("mousedown", handleClickOutside);
-    }, []);
-
-    const handleInputChange = (e) => {
-        const userInput = e.target.value;
-        const lowerInput = userInput.toLowerCase();
-        
-        onChange(userInput);
-
-        if (userInput.length > 2 && locationData.length > 0) {
-            const filtered = locationData
-                .filter(item => item.searchString.includes(lowerInput))
-                .sort((a, b) => {
-                    const aCity = a.city.toLowerCase();
-                    const bCity = b.city.toLowerCase();
-                    if (aCity === lowerInput && bCity !== lowerInput) return -1;
-                    if (bCity === lowerInput && aCity !== lowerInput) return 1;
-                    const aStarts = aCity.startsWith(lowerInput);
-                    const bStarts = bCity.startsWith(lowerInput);
-                    if (aStarts && !bStarts) return -1;
-                    if (!aStarts && bStarts) return 1;
-                    return aCity.localeCompare(bCity);
-                })
-                .slice(0, 8);
-
-            setSuggestions(filtered);
-            setShowSuggestions(true);
-        } else {
-            setSuggestions([]);
-            setShowSuggestions(false);
-        }
-    };
-
-    const handleSelect = (item) => {
-        onChange(item.fullLabel); 
-        setShowSuggestions(false);
-    };
-
-    return (
-        <div className="group relative" ref={wrapperRef}>
-            {label && <label className="block text-xs font-bold text-gray-400 uppercase tracking-wider mb-1.5 ml-1">{label} {required && <span className="text-red-500">*</span>}</label>}
-            <div className="relative">
-                {Icon && <Icon className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400" size={20} />}
-                <input 
-                    type="text"
-                    value={value}
-                    onChange={handleInputChange}
-                    onFocus={() => value.length > 2 && setShowSuggestions(true)}
-                    placeholder={t('ncc_edit.profile.city_placeholder', "Cerca città...")}
-                    className={`${HOGU_THEME.inputBase} ${Icon ? 'pl-11' : ''}`}
-                    autoComplete="off"
-                />
-                {showSuggestions && suggestions.length > 0 && (
-                    <div className="absolute z-50 w-full mt-2 bg-white rounded-xl shadow-xl border border-gray-100 max-h-60 overflow-y-auto">
-                        {suggestions.map((item, idx) => (
-                            <button
-                                key={idx}
-                                onClick={() => handleSelect(item)}
-                                className="w-full text-left px-4 py-3 hover:bg-[#F0FDF9] hover:text-[#33594C] transition-colors border-b border-gray-50 last:border-0"
-                            >
-                                <div className="font-bold text-sm text-gray-800">{item.city}</div>
-                                <div className="text-xs text-gray-400">{item.province}, {item.region}</div>
-                            </button>
-                        ))}
-                    </div>
-                )}
-                {showSuggestions && value.length > 2 && suggestions.length === 0 && (
-                     <div className="absolute z-50 w-full mt-2 bg-white rounded-xl shadow-xl border border-gray-100 p-4 text-center text-gray-400 text-sm">
-                        Nessuna città trovata
-                     </div>
-                )}
-            </div>
-        </div>
-    );
-};
+// (Component moved to src/components/ui/CityAutocomplete.jsx)
 
 // --- COMPONENTI UI DI SUPPORTO ---
 const EditableInput = ({ label, value, onChange, type = "text", className = "", large = false, placeholder = "", icon: Icon, required = false }) => (
@@ -210,7 +90,7 @@ const ImageUploadCard = ({ src, onDelete, isMain = false }) => {
     const { t } = useTranslation("home");
     return (
     <div className={`relative rounded-2xl overflow-hidden group ${isMain ? 'col-span-2 row-span-2 aspect-video' : 'aspect-[4/3]'}`}>
-        <img src={src} alt={t('ncc_edit.image_alt')} className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105" />
+        <SafeImage src={src} alt={t('ncc_edit.image_alt')} className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105" />
         <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center gap-2">
             <button onClick={onDelete} className="p-2 bg-white rounded-full text-red-500 hover:bg-red-50 transition-colors shadow-lg">
                 <Trash2 size={20} />
@@ -317,19 +197,20 @@ const VehicleEditorCard = ({ vehicle, onChange, onDelete, canDelete }) => {
                 </div>
 
                 {/* Price */}
-                 <div className="col-span-1">
+                <div className="col-span-1">
                     <label className={`${labelClasses} text-[#33594C]`}>{t('ncc_edit.vehicle.rate_label', "Prezzo per Km")} <span className="text-red-500">*</span></label>
                     <div className="relative">
-                         <CurrencyInput
+                        <CurrencyInput
                             id={`price-${vehicle.id}`}
                             name="pricePerKm"
                             placeholder="0,00"
                             value={vehicle.pricePerKm}
                             decimalsLimit={2}
                             decimalScale={2}
-                            onValueChange={(value) => onChange(vehicle.id, 'pricePerKm', value ? parseFloat(value) : 0)}
+                            decimalSeparator=","
+                            groupSeparator="."
+                            onValueChange={(value) => onChange(vehicle.id, 'pricePerKm', value || '')}
                             className={`${inputClasses} font-bold text-[#33594C] bg-[#F0FDF9] border-[#68B49B]/30 focus:border-[#68B49B]`}
-                            intlConfig={{ locale: 'it-IT', currency: 'EUR' }}
                         />
                     </div>
                 </div>
@@ -343,6 +224,7 @@ const VehicleEditorCard = ({ vehicle, onChange, onDelete, canDelete }) => {
 export const NCCServiceEditPageBase = () => {
     const { t, i18n } = useTranslation("home");
     const { id } = useParams();
+    const navigate = useNavigate();
     
     // --- STATO ---
     const [isLoading, setIsLoading] = useState(false);
@@ -371,62 +253,14 @@ export const NCCServiceEditPageBase = () => {
             try {
                 const data = await nccService.getNccProvider(id);
                 if (data) {
-                    // Helper per formattare la città con supporto cross-language
-                    const getFormattedCity = (locale) => {
-                        if (!locale || !locale.city) return '';
-                        
-                        const isItalian = !i18n.language || i18n.language.startsWith('it');
-                        const targetDataset = isItalian ? italianLocationsData : (englishLocationsData || italianLocationsData);
-                        const otherDataset = isItalian ? (englishLocationsData || italianLocationsData) : italianLocationsData;
-
-                        const normalizedCity = locale.city.toLowerCase().trim();
-                        
-                        // 1. Cerca nel dataset della lingua corrente
-                        for (const region of targetDataset) {
-                            for (const province of region.provinces) {
-                                const foundCity = province.cities.find(c => c.toLowerCase() === normalizedCity);
-                                if (foundCity) {
-                                    return `${foundCity}, ${region.region}`;
-                                }
-                            }
-                        }
-
-                        // 2. Se non trovato, cerca nell'altro dataset e mappa
-                        if (otherDataset) {
-                            for (const region of otherDataset) {
-                                for (const province of region.provinces) {
-                                    // Cerca l'indice della città
-                                    const cityIndex = province.cities.findIndex(c => c.toLowerCase() === normalizedCity);
-                                    if (cityIndex !== -1) {
-                                        // Trovata! Cerchiamo la provincia corrispondente nel dataset target
-                                        const pId = province.provinceId;
-                                        
-                                        // Trova la regione/provincia target
-                                        for (const tRegion of targetDataset) {
-                                            const tProvince = tRegion.provinces.find(p => p.provinceId === pId);
-                                            if (tProvince) {
-                                                // Proviamo a prendere la città allo stesso indice
-                                                // Assumiamo che gli array cities siano ordinati parallelamente
-                                                const tCity = tProvince.cities[cityIndex] || locale.city;
-                                                return `${tCity}, ${tRegion.region}`;
-                                            }
-                                        }
-                                    }
-                                }
-                            }
-                        }
-
-                        // 3. Fallback
-                        return locale.state ? `${locale.city}, ${locale.state}` : locale.city;
-                    };
- 
-                    const localeString = getFormattedCity(data.locale);
+                    const localeObj = data.locale || data.locales?.[0];
+                    const localeString = getDisplayLocation(localeObj, i18n.language);
   
                     setFormData({
                         providerName: data.name || "",
                         description: data.description || "",
                         baseLocation: localeString,
-                        address: data.locale?.address || "",
+                        address: localeObj?.address || "",
                         isActive: data.publicationStatus !== false,
                         features: [], 
                         fleet: data.vehicle ? [{
@@ -436,7 +270,7 @@ export const NCCServiceEditPageBase = () => {
                             plateNumber: data.vehicle.plateNumber || "",
                             pax: data.vehicle.numberOfSeats || 4,
                             luggage: 2, 
-                            pricePerKm: data.basePrice || 0
+                            pricePerKm: (data.basePrice !== undefined && data.basePrice !== null) ? data.basePrice.toString() : ''
                         }] : []
                     });
                     
@@ -471,22 +305,52 @@ export const NCCServiceEditPageBase = () => {
 
     const addVehicle = () => {
         const newId = formData.fleet.length > 0 ? Math.max(...formData.fleet.map(v => v.id)) + 1 : 1;
-        setFormData(prev => ({ ...prev, fleet: [...prev.fleet, { id: newId, name: t('ncc_edit.vehicle.default_category_name'), model: '', plateNumber: '', pax: 4, luggage: 2, pricePerKm: 2.00 }] }));
+        setFormData(prev => ({ 
+            ...prev, 
+            fleet: [
+                ...prev.fleet, 
+                { 
+                    id: newId, 
+                    name: t('ncc_edit.vehicle.default_category_name'), 
+                    model: '', 
+                    plateNumber: '', 
+                    pax: 4, 
+                    luggage: 2, 
+                    pricePerKm: '2.00' 
+                }
+            ] 
+        }));
     };
     
     const removeImage = (indexToRemove) => setImages(images.filter((_, index) => index !== indexToRemove));
 
     const handleImageUpload = (event) => {
-        const files = event.target.files;
-        if (files && files.length > 0) {
-            Array.from(files).forEach(file => {
-                const reader = new FileReader();
-                reader.onloadend = () => {
-                    setImages(prev => [...prev, { url: reader.result, file: file }]);
-                };
-                reader.readAsDataURL(file);
-            });
+        const files = event.target.files ? Array.from(event.target.files) : [];
+        if (!files.length) {
+            event.target.value = '';
+            return;
         }
+
+        const { validFiles, oversizedFiles } = splitFilesByMaxSize(files, MAX_IMAGE_SIZE_BYTES);
+
+        if (oversizedFiles.length) {
+            setErrorMessage(buildOversizedFilesMessage(oversizedFiles, MAX_IMAGE_SIZE_BYTES));
+            setShowError(true);
+        }
+
+        if (!validFiles.length) {
+            event.target.value = '';
+            return;
+        }
+
+        validFiles.forEach(file => {
+            const reader = new FileReader();
+            reader.onloadend = () => {
+                setImages(prev => [...prev, { url: reader.result, file }]);
+            };
+            reader.readAsDataURL(file);
+        });
+
         event.target.value = '';
     };
 
@@ -505,7 +369,8 @@ export const NCCServiceEditPageBase = () => {
                 if (!vehicle.model.trim()) errors.push(t('ncc_edit.validation.vehicle_model_required', "Veicolo {{number}}: Il modello è obbligatorio.", { number: index + 1 }));
                 if (!vehicle.plateNumber || !vehicle.plateNumber.trim()) errors.push(t('ncc_edit.validation.vehicle_plate_required', "Veicolo {{number}}: La targa è obbligatoria.", { number: index + 1 }));
                 if (!vehicle.pax || vehicle.pax < 1) errors.push(t('ncc_edit.validation.vehicle_pax_min', "Veicolo {{number}}: Passeggeri deve essere almeno 1.", { number: index + 1 }));
-                if (!vehicle.pricePerKm || vehicle.pricePerKm <= 0) errors.push(t('ncc_edit.validation.vehicle_price_min', "Veicolo {{number}}: Il prezzo per Km deve essere maggiore di 0.", { number: index + 1 }));
+                const priceNumber = vehicle.pricePerKm ? parseFloat(vehicle.pricePerKm.toString().replace(',', '.')) : NaN;
+                if (!priceNumber || priceNumber <= 0) errors.push(t('ncc_edit.validation.vehicle_price_min', "Veicolo {{number}}: Il prezzo per Km deve essere maggiore di 0.", { number: index + 1 }));
             });
         }
 
@@ -528,105 +393,12 @@ export const NCCServiceEditPageBase = () => {
             const dataToSend = new FormData();
             
             // Parsing location
-            const locationParts = formData.baseLocation.split(',').map(s => s.trim());
-            const city = locationParts[0] || "";
-            const state = locationParts[1] || "";
-
-            // --- LOGIC FIND LOCATION (Like LuggageServiceEditPage.jsx) ---
-            let locales = [];
-            let foundProvinceId = null;
-            let foundSourceLang = null;
-
-            const findLocation = (dataset, cityName, regionName) => {
-                if (!dataset) return null;
-                for (const r of dataset) {
-                    if (r.region && r.region.toLowerCase() === regionName.toLowerCase()) {
-                        for (const p of r.provinces) {
-                            if (p.cities && p.cities.some(c => c.toLowerCase() === cityName.toLowerCase())) {
-                                return { region: r, province: p, city: cityName };
-                            }
-                        }
-                    }
-                }
-                return null;
-            };
-
-            // 1. Prova a trovare nel DB Italiano
-            let match = findLocation(italianLocationsData, city, state);
-            if (match) {
-                foundProvinceId = match.province.provinceId;
-                foundSourceLang = 'it';
-            } else {
-                // 2. Prova Inglese
-                match = findLocation(englishLocationsData, city, state);
-                if (match) {
-                    foundProvinceId = match.province.provinceId;
-                    foundSourceLang = 'en';
-                }
-            }
-
-            if (foundProvinceId) {
-                // Lingua sorgente
-                locales.push({
-                    serviceType: "NCC",
-                    language: foundSourceLang,
-                    country: foundSourceLang === 'it' ? 'Italia' : 'Italy',
-                    state: state,
-                    city: city,
-                    address: formData.address
-                });
-
-                // Lingua opposta
-                const targetLang = foundSourceLang === 'it' ? 'en' : 'it';
-                const targetDataset = foundSourceLang === 'it' ? englishLocationsData : italianLocationsData;
-                
-                let targetMatch = null;
-                for (const r of targetDataset) {
-                    for (const p of r.provinces) {
-                        if (p.provinceId === foundProvinceId) {
-                            targetMatch = {
-                                region: r.region,
-                                province: p.name,
-                                city: city 
-                            };
-                            if (match.city.toLowerCase() === match.province.name.toLowerCase()) {
-                                 targetMatch.city = p.name;
-                            }
-                            break;
-                        }
-                    }
-                    if (targetMatch) break;
-                }
-
-                if (targetMatch) {
-                    locales.push({
-                        serviceType: "NCC",
-                        language: targetLang,
-                        country: targetLang === 'it' ? 'Italia' : 'Italy',
-                        state: targetMatch.region,
-                        city: targetMatch.city,
-                        address: formData.address
-                    });
-                }
-            } else {
-                // Fallback standard
-                const isEnglish = i18n.language && i18n.language.startsWith('en');
-                const country = isEnglish ? 'Italy' : 'Italia';
-                const lang = isEnglish ? 'en' : 'it';
-                locales.push({
-                    serviceType: "NCC",
-                    language: lang,
-                    country: country,
-                    state: state,
-                    city: city,
-                    address: formData.address
-                });
-            }
+            const locales = createLocationPayload(formData.baseLocation, formData.address, 'NCC');
 
             const payload = {
                 name: formData.providerName,
                 description: formData.description,
-                basePrice: formData.fleet.length > 0 ? formData.fleet[0].pricePerKm : 0,
+                basePrice: formData.fleet.length > 0 ? (parseFloat(formData.fleet[0].pricePerKm?.toString().replace(',', '.')) || 0) : 0,
                 publicationStatus: formData.isActive,
                 locales: locales,
                 vehicle: formData.fleet.length > 0 ? {
@@ -635,16 +407,42 @@ export const NCCServiceEditPageBase = () => {
                     plateNumber: formData.fleet[0].plateNumber,
                     model: formData.fleet[0].model,
                     type: formData.fleet[0].name
-                } : null,
-                images: images.filter(img => !img.file).map(img => img.url)
+                } : null
             };
             
             dataToSend.append('service', new Blob([JSON.stringify(payload)], { type: 'application/json' }));
 
-            images.forEach(img => {
-                if (img.file) {
-                    dataToSend.append('images', img.file);
+            const imagePromises = images.map(async (img) => {
+                if (img.file) return img.file;
+                if (!img.url) return null;
+
+                try {
+                    const controller = new AbortController();
+                    const timeoutId = setTimeout(() => controller.abort(), 10000);
+
+                    const token = localStorage.getItem('authToken');
+                    const headers = token ? { 'Authorization': `Bearer ${token}` } : {};
+
+                    const response = await fetch(img.url, { signal: controller.signal, headers });
+                    clearTimeout(timeoutId);
+
+                    if (!response.ok) {
+                        console.warn(`Failed to fetch image ${img.url}: ${response.status}`);
+                        return null;
+                    }
+
+                    const blob = await response.blob();
+                    const filename = img.url.split('/').pop() || 'image.jpg';
+                    return new File([blob], filename, { type: blob.type });
+                } catch (err) {
+                    console.error('Error processing image:', img.url, err);
+                    return null;
                 }
+            });
+
+            const processedImages = await Promise.all(imagePromises);
+            processedImages.forEach(file => {
+                if (file) dataToSend.append('images', file);
             });
             
             await nccService.updateNccProvider(id, dataToSend);
@@ -660,7 +458,14 @@ export const NCCServiceEditPageBase = () => {
     return (
         <div className={`min-h-screen bg-[#F8FAFC] pb-20 ${HOGU_THEME.fontFamily}`}>
             <LoadingScreen isLoading={isLoading} />
-            <SuccessModal isOpen={!!successMessage} onClose={() => setSuccessMessage(null)} message={successMessage} />
+            <SuccessModal 
+                isOpen={!!successMessage} 
+                onClose={() => {
+                    setSuccessMessage(null);
+                    navigate('/provider/dashboard');
+                }} 
+                message={successMessage} 
+            />
             {errorMessage && <ErrorModal onClose={() => setErrorMessage(null)} message={errorMessage} />}
             
             {/* --- HEADER --- */}
@@ -759,7 +564,10 @@ export const NCCServiceEditPageBase = () => {
                         {/* SEZIONE 4: FOTO */}
                         <section className="bg-white rounded-[2rem] p-8 shadow-[0_8px_30px_rgb(0,0,0,0.04)] border border-gray-100/50">
                             <div className="flex justify-between items-center mb-6">
-                                <h3 className="text-xl font-bold text-gray-900">{t('ncc_edit.photos.title')}</h3>
+                                <h3 className="text-xl font-bold text-gray-900 flex items-center justify-between">
+                                    {t('ncc_edit.photos.title')}
+                                    <span className="text-xs font-normal text-gray-400">{images.length} foto</span>
+                                </h3>
                                 <button 
                                     onClick={() => fileInputRef.current?.click()}
                                     className={`text-[${HOGU_COLORS.primary}] font-bold text-sm flex items-center gap-2 hover:underline`}
@@ -787,6 +595,36 @@ export const NCCServiceEditPageBase = () => {
                                     multiple
                                 />
                             </div>
+
+                            <div className="mt-6 pt-4 border-t border-gray-100">
+                                <h4 className="text-sm font-bold text-gray-900 mb-4">
+                                    {t('ncc_edit.status.title')}
+                                </h4>
+                                <div className="flex items-center justify-between p-4 bg-gray-50 rounded-xl border border-gray-100">
+                                    <div className="flex items-center gap-3">
+                                        <div className={`p-2 rounded-lg ${formData.isActive ? 'bg-green-100 text-green-600' : 'bg-gray-200 text-gray-500'}`}>
+                                            {formData.isActive ? <Eye size={20} /> : <EyeOff size={20} />}
+                                        </div>
+                                        <div>
+                                            <p className="font-bold text-sm text-gray-900">
+                                                {t('ncc_edit.status.availability_label')}
+                                            </p>
+                                            <p className="text-xs text-gray-500">
+                                                {formData.isActive ? t('ncc_edit.status.status_available') : t('ncc_edit.status.status_unavailable')}
+                                            </p>
+                                        </div>
+                                    </div>
+                                    <label className="relative inline-flex items-center cursor-pointer">
+                                        <input 
+                                            type="checkbox" 
+                                            className="sr-only peer"
+                                            checked={formData.isActive}
+                                            onChange={(e) => handleInputChange('isActive', e.target.checked)}
+                                        />
+                                        <div className="w-11 h-6 bg-gray-200 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-0.5 after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-[#68B49B]"></div>
+                                    </label>
+                                </div>
+                            </div>
                         </section>
                     </div>
 
@@ -794,78 +632,56 @@ export const NCCServiceEditPageBase = () => {
                     <div className="lg:col-span-1">
                         <div className="sticky top-24 space-y-6">
                             
-                            {/* --- NUOVA SEZIONE INFORMAZIONI SERVIZIO (ACCORDION) --- */}
-                            <div className={`${HOGU_THEME.cardBase} p-6 shadow-[0_8px_30px_rgb(0,0,0,0.08)]`}>
-                                <h3 className="text-lg font-bold text-gray-900 mb-4 flex items-center gap-2">
-                                    <Info size={18} className={`text-[${HOGU_COLORS.primary}]`} />
-                                    {t('ncc_edit.info_service.title', 'Info Servizio')}
-                                </h3>
-                                
-                                <div className="space-y-1">
-                                    <InfoAccordionItem 
-                                        icon={CalendarCheck}
-                                        colorClass="bg-blue-50 text-blue-600"
-                                        title={t('ncc_edit.info_service.bookings_label', 'Prenotazioni')}
-                                        description={t('ncc_edit.info_service.bookings_desc', 'Richieste dirette con preavviso minimo 24h. Le conferme sono soggette alla disponibilità attuale.')}
-                                    />
-                                    <InfoAccordionItem 
-                                        icon={CreditCard}
-                                        colorClass="bg-emerald-50 text-emerald-600"
-                                        title={t('ncc_edit.info_service.payments_label', 'Pagamenti')}
-                                        description={t('ncc_edit.info_service.payments_desc', 'Accredito automatico settimanale (ogni Lunedì) sul conto bancario collegato al tuo profilo partner.')}
-                                    />
-                                    <InfoAccordionItem 
-                                        icon={FileText}
-                                        colorClass="bg-purple-50 text-purple-600"
-                                        title={t('ncc_edit.info_service.policy_label', 'Commissioni')}
-                                        description={t('ncc_edit.info_service.policy_desc', 'Service fee standard del 15% applicata su ogni corsa completata. Nessun costo fisso mensile.')}
-                                    />
-                                </div>
-                            </div>
 
-                            {/* --- CARD STATUS E SALVATAGGIO --- */}
+                            {/* --- CARD STATUS --- */}
                             <div className={`${HOGU_THEME.cardBase} p-6 overflow-hidden relative shadow-[0_8px_30px_rgb(0,0,0,0.08)]`}>
                                 <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-slate-700 to-slate-900"></div>
                                 <h3 className="text-lg font-bold text-gray-900 mb-4">{t('ncc_edit.status.title')}</h3>
-                                <div className="bg-gray-50 rounded-xl p-4 mb-6 border border-gray-100">
+                                <div className="bg-gray-50 rounded-xl p-4 mb-4 border border-gray-100">
                                     <div className="flex justify-between mb-2">
                                         <span className="text-xs text-gray-500 font-bold uppercase">{t('ncc_edit.status.min_rate_label')}</span>
                                         <span className="font-bold text-gray-900">{t('ncc_edit.status.min_rate_value')}</span>
                                     </div>
                                 </div>
-                                <div className="p-4 bg-gray-50 rounded-xl border border-gray-100 flex items-center justify-between mb-6">
-                                    <div className="flex items-center gap-3">
-                                        <div className={`p-2 rounded-lg ${formData.isActive ? 'bg-green-100 text-green-600' : 'bg-gray-200 text-gray-500'}`}>
-                                            {formData.isActive ? <Eye size={20} /> : <EyeOff size={20} />}
-                                        </div>
-                                        <div>
-                                            <p className="font-bold text-sm text-gray-900">{t('ncc_edit.status.availability_label')}</p>
-                                            <p className="text-xs text-gray-500">{formData.isActive ? t('ncc_edit.status.status_available') : t('ncc_edit.status.status_unavailable')}</p>
-                                        </div>
-                                    </div>
-                                    <div className="relative inline-block w-12 mr-2 align-middle select-none">
-                                        <input 
-                                            type="checkbox" 
-                                            checked={formData.isActive}
-                                            onChange={(e) => handleInputChange('isActive', e.target.checked)}
-                                            className="absolute block w-6 h-6 rounded-full bg-white border-4 appearance-none cursor-pointer checked:right-0 right-6 transition-all duration-300"
-                                        />
-                                        <label className={`block overflow-hidden h-6 rounded-full cursor-pointer transition-colors duration-200 ${formData.isActive ? 'bg-green-500' : 'bg-gray-300'}`}></label>
-                                    </div>
-                                </div>
-                                <button 
-                                    onClick={handleSave}
-                                    disabled={isLoading}
-                                    className={`w-full py-4 rounded-xl font-bold text-lg text-white shadow-xl shadow-slate-500/20 flex items-center justify-center gap-2 transition-all ${isLoading ? 'bg-gray-400 cursor-not-allowed' : `bg-slate-800 hover:bg-slate-700 hover:scale-[1.02]`}`}
-                                >
-                                    {isLoading ? t('ncc_edit.status.saving_button') : <><Save size={20} /> {t('ncc_edit.status.save_button')}</>}
-                                </button>
+                                <p className="text-xs text-gray-500">
+                                    {t('ncc_edit.status.hint', 'Gestisci disponibilità e salvataggio dalla sezione foto e dalla barra in basso.')}
+                                </p>
                             </div>
                              <div className="bg-slate-50 rounded-[2rem] p-6 border border-slate-200">
                                 <h4 className="font-bold text-slate-800 mb-2 flex items-center gap-2"><Navigation size={18} /> {t('ncc_edit.help.title')}</h4>
                                 <p className="text-sm text-slate-600 leading-relaxed">{t('ncc_edit.help.description')}</p>
                             </div>
                         </div>
+                    </div>
+                </div>
+
+                <div className="max-w-7xl mx-auto px-4 lg:px-8 mt-8">
+                    <div className="bg-white rounded-[2rem] p-6 shadow-sm border border-gray-100 flex flex-col md:flex-row items-center justify-between gap-4 sticky bottom-4 z-40">
+                        <div className="flex-1 flex flex-col gap-2">
+                            <div className="flex items-center gap-2">
+                                <span className="text-sm font-medium text-gray-600">
+                                    {t('ncc_edit.status.publish_status_label', 'Stato pubblicazione:')}
+                                </span>
+                                <span className={`px-3 py-1 rounded-full text-xs font-bold ${formData.isActive ? 'bg-green-100 text-green-700' : 'bg-gray-200 text-gray-600'}`}>
+                                    {formData.isActive ? t('ncc_edit.status.status_available') : t('ncc_edit.status.status_unavailable')}
+                                </span>
+                            </div>
+                            <div className="text-xs text-gray-500 font-medium">
+                                {t('ncc_edit.status.required_note', 'I campi contrassegnati con * sono obbligatori.')}
+                            </div>
+                        </div>
+                        <button 
+                            onClick={handleSave}
+                            disabled={isLoading}
+                            className={`w-full md:w-auto px-10 py-4 rounded-xl font-bold text-white shadow-lg shadow-slate-500/20 hover:shadow-xl hover:-translate-y-1 transition-all flex items-center justify-center gap-2 ${isLoading ? 'bg-gray-400 cursor-not-allowed' : 'bg-slate-800 hover:bg-slate-700'}`}
+                        >
+                            {isLoading ? t('ncc_edit.status.saving_button') : (
+                                <>
+                                    <Save size={20} />
+                                    {t('ncc_edit.status.save_button')}
+                                </>
+                            )}
+                        </button>
                     </div>
                 </div>
             </div>

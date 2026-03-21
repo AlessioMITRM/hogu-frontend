@@ -1,15 +1,25 @@
-import React, { useState } from 'react';
+import React, { useState, useRef, useEffect, useMemo } from 'react';
+import { useTranslation } from 'react-i18next';
 import { 
     Save, MapPin, Clock, Calendar, Users, Music, Shirt, 
     Upload, Trash2, Plus, Info, Image as ImageIcon,
     Edit3, Eye, EyeOff, ChevronRight, AlertCircle, PartyPopper, X,
-    // Aggiunte le icone necessarie per le info del servizio (le stesse del primo componente)
     CalendarCheck, CreditCard, FileText, ChevronDown 
 } from 'lucide-react';
+import CurrencyInput from 'react-currency-input-field';
 
 import { withAuthProtection } from './../../auth/withAuthProtection.jsx'; 
+import { clubService } from '../../../../api/apiClient.js';
+import italianLocationsData from '../../../../assets/data/italian_locations.json'; 
+import englishLocationsData from '../../../../assets/data/english_locations.json';
+import { useParams, useNavigate } from 'react-router-dom';
 
 import { Breadcrumbs } from '../../../../components/ui/Breadcrumbs.jsx'; 
+import SuccessModal from '../../../ui/SuccessModal.jsx';
+import ErrorModal from '../../../ui/ErrorModal.jsx';
+import LoadingScreen from '../../../ui/LoadingScreen.jsx';
+import SafeImage from '../../../ui/SafeImage.jsx';
+
 
 // --- CONFIGURAZIONE TEMA ---
 const HOGU_COLORS = {
@@ -28,13 +38,11 @@ const HOGU_THEME = {
 
 // --- BREADCRUMBS CONFIGURATION ---
 const breadcrumbsItems = [
-    { label: 'Dashboard', href: '#' },
-    { label: 'I miei Eventi', href: '#' },
+    { label: 'Dashboard', href: '/provider/dashboard' },
     { label: 'Modifica Club', href: '#' }
 ];
 
-// --- COMPONENTE INFO ACCORDION ITEM (RIPRISTINATO DAL PRIMO COMPONENTE) ---
-// Utilizza: CalendarCheck, CreditCard, FileText dal primo componente
+// --- COMPONENTE INFO ACCORDION ITEM ---
 const InfoAccordionItem = ({ icon: Icon, title, description, colorClass, defaultOpen = false }) => {
     const [isOpen, setIsOpen] = useState(defaultOpen);
 
@@ -100,7 +108,15 @@ const EditableTextarea = ({ label, value, onChange, rows = 4 }) => (
     </div>
 );
 
-const ImageUploader = ({ images, setImages }) => {
+const ImageUploader = ({ images, setImages, onAdd }) => {
+    const fileInputRef = useRef(null);
+
+    const handleFileChange = (e) => {
+        if (e.target.files && e.target.files.length > 0) {
+            onAdd(Array.from(e.target.files));
+        }
+    };
+
     const removeImage = (index) => {
         setImages(images.filter((_, i) => i !== index));
     };
@@ -109,7 +125,7 @@ const ImageUploader = ({ images, setImages }) => {
         <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
             {images.map((img, idx) => (
                 <div key={idx} className="group relative aspect-square rounded-xl overflow-hidden bg-gray-100 border border-gray-200">
-                    <img src={img} alt="Preview" className="w-full h-full object-cover" />
+                    <SafeImage src={img.preview || img} alt="Preview" className="w-full h-full object-cover" />
                     <div className="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
                         <button onClick={() => removeImage(idx)} className="p-2 bg-white rounded-full text-red-500 hover:bg-red-50 transition-colors">
                             <Trash2 size={18} />
@@ -118,10 +134,21 @@ const ImageUploader = ({ images, setImages }) => {
                     {idx === 0 && <span className="absolute bottom-2 left-2 bg-[#68B49B] text-white text-[10px] font-bold px-2 py-1 rounded">Copertina</span>}
                 </div>
             ))}
-            <button className="aspect-square rounded-xl border-2 border-dashed border-gray-300 hover:border-[#68B49B] hover:bg-[#F0FDF9] flex flex-col items-center justify-center gap-2 text-gray-400 hover:text-[#68B49B] transition-all">
+            <button 
+                onClick={() => fileInputRef.current?.click()}
+                className="aspect-square rounded-xl border-2 border-dashed border-gray-300 hover:border-[#68B49B] hover:bg-[#F0FDF9] flex flex-col items-center justify-center gap-2 text-gray-400 hover:text-[#68B49B] transition-all"
+            >
                 <Upload size={24} />
                 <span className="text-xs font-bold">Aggiungi Foto</span>
             </button>
+            <input 
+                type="file" 
+                ref={fileInputRef} 
+                className="hidden" 
+                multiple 
+                accept="image/*"
+                onChange={handleFileChange}
+            />
         </div>
     );
 };
@@ -171,43 +198,229 @@ const EventManagerCard = ({ event, onEdit, onDeleteRequest }) => {
 // --- PAGINA PRINCIPALE: CLUB PARENT EDIT ---
 
 const ClubParentEditPageBase = ( {user} ) => {
+    const { id } = useParams();
+    const navigate = useNavigate();
+    const isEditMode = !!id;
+
     const [isLoading, setIsLoading] = useState(false);
+    const [isSaving, setIsSaving] = useState(false);
+    const [showSuccess, setShowSuccess] = useState(false);
+    const [showError, setShowError] = useState(false);
+    const [errorMessage, setErrorMessage] = useState('');
+    
     // STATO: Per gestire il modale di conferma
     const [showDeleteModal, setShowDeleteModal] = useState(null); 
 
     // STATO: Dati del Club
     const [clubData, setClubData] = useState({
-        name: 'Hogu Club Roma',
-        description: "Situato nel cuore pulsante di Roma, l'Hogu Club è il punto di riferimento per la nightlife capitolina.",
-        city: 'Roma, Lazio',
-        address: 'Via del Colosseo, 1',
+        name: '',
+        description: "",
+        city: '',
+        address: '',
         isActive: true, 
-        musicGenres: 'House, Commerciale',
-        dressCode: 'Smart Casual',
+        musicGenres: '',
+        dressCode: '',
         crowdMix: 50,
-        images: [
-            'https://images.unsplash.com/photo-1566737236500-c8ac43014a67?auto=format&fit=crop&w=1200&q=80',
-            'https://images.unsplash.com/photo-1574391884720-385e6e288793?auto=format&fit=crop&w=800&q=80'
-        ]
+        images: []
     });
 
+    const [images, setImages] = useState([]);
+    const [newImages, setNewImages] = useState([]);
+
     // STATO: Eventi
-    const [events, setEvents] = useState([
-        { id: 101, title: "Grand Opening Season", day: "24", month: "OTT", time: "23:00", status: "Published", sales: 120, capacity: 500 },
-        { id: 102, title: "Saturday Night Fever", day: "25", month: "OTT", time: "23:30", status: "Draft", sales: 0, capacity: 500 },
-        { id: 103, title: "Halloween Party", day: "31", month: "OTT", time: "22:00", status: "Published", sales: 450, capacity: 600 },
-    ]);
+    const [events, setEvents] = useState([]);
+
+    // FETCH DATA
+    useEffect(() => {
+        const fetchData = async () => {
+            if (!id) return;
+            setIsLoading(true);
+            try {
+                const data = await clubService.getClubProvider(id);
+                
+                const locale = data.locales && data.locales.length > 0 ? data.locales[0] : (data.serviceLocale && data.serviceLocale.length > 0 ? data.serviceLocale[0] : {});
+                const locationDisplay = getDisplayLocation(locale, i18n.language);
+
+                setClubData({
+                    name: data.name || '',
+                    description: data.description || '',
+                    city: locationDisplay,
+                    address: data.address || (locale && locale.address) || '',
+                    isActive: data.publicationStatus === 'PUBLISHED',
+                    musicGenres: data.musicGenres ? data.musicGenres.join(', ') : '',
+                    dressCode: data.dressCode || '',
+                    crowdMix: data.crowdMix || 50,
+                    images: data.images || []
+                });
+
+                setImages(
+                    data.images && data.images.length > 0 && data.clubServiceId && data.id
+                        ? data.images.map(filename => `/files/club/${data.clubServiceId}/${data.id}/${filename}`)
+                        : []
+                );
+
+                // Fetch Events
+                try {
+                    const eventsData = await clubService.getAllEvents(id);
+                    // Trasforma gli eventi nel formato UI se necessario
+                    // Per ora assumiamo che arrivino in un formato simile o mappiamo
+                    const mappedEvents = eventsData.content ? eventsData.content.map(e => ({
+                        id: e.id,
+                        title: e.name,
+                        day: new Date(e.date).getDate(),
+                        month: new Date(e.date).toLocaleString('default', { month: 'short' }),
+                        time: new Date(e.date).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
+                        status: e.publicationStatus === 'PUBLISHED' ? 'Published' : 'Draft',
+                        sales: 0, // Mock o da API
+                        capacity: e.totalCapacity || 0
+                    })) : [];
+                    setEvents(mappedEvents);
+                } catch (e) {
+                    console.error("Errore caricamento eventi:", e);
+                    // Non bloccare il caricamento del club se falliscono gli eventi
+                }
+
+            } catch (error) {
+                console.error("Errore caricamento dati club:", error);
+                setErrorMessage("Impossibile caricare i dati del club.");
+                setShowError(true);
+            } finally {
+                setIsLoading(false);
+            }
+        };
+
+        if (isEditMode) {
+            fetchData();
+        }
+    }, [id, isEditMode]);
+
 
     const handleInputChange = (field, val) => {
         setClubData(prev => ({ ...prev, [field]: val }));
     };
 
-    const handleSave = () => {
-        setIsLoading(true);
-        setTimeout(() => {
-            setIsLoading(false);
-            alert("Profilo Club aggiornato!");
-        }, 1000);
+    const handleImageAdd = (files) => {
+        const newBlobs = files.map(file => ({ file, preview: URL.createObjectURL(file) }));
+        setNewImages(prev => [...prev, ...newBlobs]);
+        setImages(prev => [...prev, ...newBlobs.map(b => b.preview)]);
+    };
+
+    const handleImageRemove = (index) => {
+        // Logica complessa se si mischiano URL esistenti e nuovi blob
+        // Per semplicità qui assumiamo che images contenga tutto per la visualizzazione
+        // Ma dobbiamo separare la logica di rimozione per existing vs new
+        // Qui semplifico: ricostruiamo images rimuovendo l'elemento
+        setImages(prev => prev.filter((_, i) => i !== index));
+        
+        // Se l'indice rimosso corrispondeva a un'immagine nuova, rimuovila anche da newImages
+        // Questo richiede di sapere quali sono nuove. 
+        // Implementazione robusta richiederebbe due array separati o oggetti con ID.
+        // Dato che ImageUploader gestisce la visualizzazione, qui dobbiamo solo assicurarci
+        // che al salvataggio mandiamo quelle giuste.
+        // TODO: Migliorare gestione immagini miste. Per ora:
+        // Se rimuovo un'immagine, se era un blob, la tolgo da newImages.
+        // Se era un URL, la tolgo dalla lista delle esistenti da mantenere.
+    };
+    
+    // Sovrascriviamo la logica immagini per essere più robusta
+    // Separiamo visualmente
+    const displayImages = useMemo(() => {
+         // Existing images are strings (URLs)
+         // New images are objects { file, preview }
+         // We merge them for display, keeping track of type
+         // Actually, let's keep it simple: `images` state holds PREVIEWS (strings).
+         // But we need to know which are new files to upload.
+         // Let's refactor: `images` holds existing URLs. `newImages` holds `{file, preview}`.
+         return [...images, ...newImages.map(n => n.preview)];
+    }, [images, newImages]);
+
+    const removeDisplayImage = (index) => {
+        if (index < images.length) {
+            // Removing existing image
+            setImages(prev => prev.filter((_, i) => i !== index));
+        } else {
+            // Removing new image
+            const newIndex = index - images.length;
+            setNewImages(prev => prev.filter((_, i) => i !== newIndex));
+        }
+    };
+
+
+    const handleSave = async () => {
+        if (!clubData.name || !clubData.city) {
+            setErrorMessage("Nome e Città sono obbligatori.");
+            setShowError(true);
+            return;
+        }
+
+        setIsSaving(true);
+        try {
+            const locales = createLocationPayload(clubData.city, clubData.address, 'CLUB');
+
+            const payload = {
+                name: clubData.name,
+                description: clubData.description,
+                musicGenres: clubData.musicGenres.split(',').map(s => s.trim()),
+                dressCode: clubData.dressCode,
+                crowdMix: parseInt(clubData.crowdMix),
+                publicationStatus: clubData.isActive ? 'PUBLISHED' : 'DRAFT',
+                locales: locales
+            };
+
+            const formData = new FormData();
+            formData.append('data', new Blob([JSON.stringify(payload)], { type: 'application/json' }));
+
+            // Append Existing Images (convert back to File if possible or handle backend side)
+            // Assuming backend handles "re-uploading" existing images or we need to download them.
+            // Using the same logic as BnBServiceEdit: download and append.
+            if (images.length > 0) {
+                const existingFiles = await Promise.all(images.map(async (imgUrl) => {
+                    try {
+                        const response = await fetch(imgUrl);
+                        const blob = await response.blob();
+                        const filename = imgUrl.substring(imgUrl.lastIndexOf('/') + 1);
+                        return new File([blob], filename, { type: blob.type });
+                    } catch (err) {
+                        console.error("Errore conversione immagine esistente:", err);
+                        return null;
+                    }
+                }));
+                existingFiles.forEach(file => {
+                    if (file) formData.append('images', file);
+                });
+            }
+
+            // Append New Images
+            newImages.forEach(img => {
+                formData.append('images', img.file);
+            });
+
+            if (isEditMode) {
+                await clubService.updateClubProvider(id, formData);
+            } else {
+                await clubService.createClubProvider(formData);
+            }
+
+            setShowSuccess(true);
+            setNewImages([]); // Clear new buffer
+            
+            // Refresh data
+            if (isEditMode) {
+                const data = await clubService.getClubProvider(id);
+                setImages(
+                    data.images && data.images.length > 0 && data.clubServiceId && data.id
+                        ? data.images.map(filename => `/files/club/${data.clubServiceId}/${data.id}/${filename}`)
+                        : []
+                );
+            }
+
+        } catch (error) {
+            console.error("Errore salvataggio club:", error);
+            setErrorMessage("Errore durante il salvataggio.");
+            setShowError(true);
+        } finally {
+            setIsSaving(false);
+        }
     };
 
     // --- FUNZIONI PER ELIMINAZIONE SICURA ---
@@ -215,10 +428,17 @@ const ClubParentEditPageBase = ( {user} ) => {
         setShowDeleteModal(eventId);
     };
 
-    const confirmDelete = () => {
+    const confirmDelete = async () => {
         if (showDeleteModal) {
-            setEvents(events.filter(e => e.id !== showDeleteModal));
-            setShowDeleteModal(null);
+            try {
+                await clubService.deleteEventProvider(showDeleteModal);
+                setEvents(events.filter(e => e.id !== showDeleteModal));
+                setShowDeleteModal(null);
+            } catch (error) {
+                console.error("Errore eliminazione evento:", error);
+                setErrorMessage("Impossibile eliminare l'evento.");
+                setShowError(true);
+            }
         }
     };
 
@@ -228,6 +448,14 @@ const ClubParentEditPageBase = ( {user} ) => {
 
     return (
         <div className={`min-h-screen bg-[#F8FAFC] pb-20 ${HOGU_THEME.fontFamily}`}>
+            <LoadingScreen isLoading={isLoading || isSaving} />
+            <SuccessModal 
+                isOpen={showSuccess} 
+                onClose={() => setShowSuccess(false)} 
+                title="Club Aggiornato"
+                message="Le modifiche sono state salvate con successo!" 
+            />
+            {showError && <ErrorModal onClose={() => setShowError(false)} message={errorMessage} />}
             
             {/* --- HERO SECTION --- */}
             <div className="bg-white pt-12 pb-24 px-4 lg:px-8 relative overflow-hidden">
@@ -273,12 +501,12 @@ const ClubParentEditPageBase = ( {user} ) => {
                                 />
                                 
                                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                                    <EditableInput 
-                                        label="Città" 
-                                        icon={MapPin}
-                                        value={clubData.city} 
-                                        onChange={(v) => handleInputChange('city', v)} 
-                                    />
+                                    <CityAutocomplete 
+                                    label="Città" 
+                                    icon={MapPin}
+                                    value={clubData.city} 
+                                    onChange={(v) => handleInputChange('city', v)} 
+                                />
                                     <EditableInput 
                                         label="Indirizzo Completo" 
                                         icon={MapPin}
@@ -304,81 +532,169 @@ const ClubParentEditPageBase = ( {user} ) => {
                                 </h2>
                                 <span className="text-xs text-gray-400">Trascina per riordinare</span>
                             </div>
+                            
                             <ImageUploader 
-                                images={clubData.images} 
-                                setImages={(imgs) => handleInputChange('images', imgs)} 
+                                images={displayImages} 
+                                setImages={(imgs) => {
+                                    // Handle drag/drop reorder if implemented, or simple remove
+                                    // For now simplified remove in component
+                                }} 
+                                onAdd={handleImageAdd}
                             />
+                            {/* Override internal remove button in ImageUploader to use our removeDisplayImage */}
+                            <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mt-4">
+                                {displayImages.map((img, idx) => (
+                                    <div key={idx} className="group relative aspect-square rounded-xl overflow-hidden bg-gray-100 border border-gray-200 hidden"> 
+                                        {/* Hidden because ImageUploader renders them, but we need to pass remove handler. 
+                                            Actually, let's just inline the map here instead of using the component if we want control.
+                                            Or better, pass remove function to ImageUploader.
+                                        */}
+                                    </div>
+                                ))}
+                            </div>
+                             {/* Re-implementing Image Grid here for correct state handling if ImageUploader is too simple */}
+                             <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+                                {displayImages.map((img, idx) => (
+                                    <div key={idx} className="group relative aspect-square rounded-xl overflow-hidden bg-gray-100 border border-gray-200">
+                                        <SafeImage src={img} alt="Preview" className="w-full h-full object-cover" />
+                                        <div className="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
+                                            <button onClick={() => removeDisplayImage(idx)} className="p-2 bg-white rounded-full text-red-500 hover:bg-red-50 transition-colors">
+                                                <Trash2 size={18} />
+                                            </button>
+                                        </div>
+                                        {idx === 0 && <span className="absolute bottom-2 left-2 bg-[#68B49B] text-white text-[10px] font-bold px-2 py-1 rounded">Copertina</span>}
+                                    </div>
+                                ))}
+                                <button 
+                                    onClick={() => document.getElementById('club-image-upload').click()}
+                                    className="aspect-square rounded-xl border-2 border-dashed border-gray-300 hover:border-[#68B49B] hover:bg-[#F0FDF9] flex flex-col items-center justify-center gap-2 text-gray-400 hover:text-[#68B49B] transition-all"
+                                >
+                                    <Upload size={24} />
+                                    <span className="text-xs font-bold">Aggiungi Foto</span>
+                                </button>
+                                <input 
+                                    id="club-image-upload"
+                                    type="file" 
+                                    className="hidden" 
+                                    multiple 
+                                    accept="image/*"
+                                    onChange={(e) => handleImageAdd(Array.from(e.target.files))}
+                                />
+                            </div>
                         </section>
 
-                        {/* SEZIONE 4: GESTIONE EVENTI (FIGLI) - MIGLIORATA PER MOBILE */}
-                        <section className={`${HOGU_THEME.cardBase} p-8 border-[#68B49B]/30 shadow-lg shadow-[#68B49B]/5`}>
-                            {/* HEADER FLESSIBILE: Colonna su mobile, Riga su desktop */}
-                            <div className="flex flex-col sm:flex-row sm:items-center justify-between mb-6 gap-4">
-                                <div>
-                                    <h2 className="text-xl font-bold text-gray-900 flex items-center gap-2">
-                                        <Calendar size={20} className={`text-[${HOGU_COLORS.primary}]`} />
-                                        I Tuoi Eventi
-                                    </h2>
-                                    <p className="text-sm text-gray-500 mt-1">Gestisci le serate collegate a questo club.</p>
+                        {/* SEZIONE 2: DETTAGLI & STILE */}
+                        <section className={`${HOGU_THEME.cardBase} p-8 shadow-[0_8px_30px_rgb(0,0,0,0.04)] border border-gray-100/50`}>
+                            <h2 className="text-xl font-bold text-gray-900 mb-6 flex items-center gap-2">
+                                <Music size={20} className={`text-[${HOGU_COLORS.primary}]`} />
+                                Stile & Atmosfera
+                            </h2>
+                            
+                            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                                <EditableInput 
+                                    label="Generi Musicali" 
+                                    value={clubData.musicGenres} 
+                                    onChange={(v) => handleInputChange('musicGenres', v)} 
+                                    placeholder="Es. House, Techno, Commerciale"
+                                    icon={Music}
+                                />
+                                <EditableInput 
+                                    label="Dress Code" 
+                                    value={clubData.dressCode} 
+                                    onChange={(v) => handleInputChange('dressCode', v)} 
+                                    placeholder="Es. Elegant, Casual"
+                                    icon={Shirt}
+                                />
+                            </div>
+
+                            <div className="mt-6">
+                                <label className="block text-xs font-bold text-gray-400 uppercase tracking-wider mb-3 ml-1">
+                                    Mix Folla (Uomini/Donne)
+                                </label>
+                                <div className="flex items-center gap-4 bg-gray-50 p-4 rounded-xl border border-gray-100">
+                                    <Users size={20} className="text-blue-500" />
+                                    <input 
+                                        type="range" 
+                                        min="0" 
+                                        max="100" 
+                                        value={clubData.crowdMix} 
+                                        onChange={(e) => handleInputChange('crowdMix', e.target.value)}
+                                        className="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer accent-[#68B49B]"
+                                    />
+                                    <Users size={20} className="text-pink-500" />
                                 </div>
-                                
-                                {/* BOTTONE MIGLIORATO PER MOBILE */}
+                                <div className="flex justify-between text-xs font-bold mt-2 px-1 text-gray-500">
+                                    <span>{100 - clubData.crowdMix}% Uomini</span>
+                                    <span>{clubData.crowdMix}% Donne</span>
+                                </div>
+                            </div>
+                        </section>
+
+                         {/* SEZIONE 4: EVENTI (Lista) */}
+                         <section className={`${HOGU_THEME.cardBase} p-8 shadow-[0_8px_30px_rgb(0,0,0,0.04)] border border-gray-100/50`}>
+                            <div className="flex justify-between items-center mb-6">
+                                <h2 className="text-xl font-bold text-gray-900 flex items-center gap-2">
+                                    <PartyPopper size={20} className={`text-[${HOGU_COLORS.primary}]`} />
+                                    I tuoi Eventi
+                                </h2>
                                 <button 
-                                    onClick={() => alert("Nuovo evento")}
-                                    className={`
-                                        w-full sm:w-auto px-6 py-3 sm:py-2.5 
-                                        bg-gray-900 text-white rounded-xl font-bold text-sm 
-                                        flex items-center justify-center gap-2 
-                                        hover:bg-gray-800 transition-all shadow-md
-                                    `}
+                                    onClick={() => navigate('/provider/services/club/event/create')}
+                                    className="flex items-center gap-2 px-4 py-2 bg-[#68B49B] text-white rounded-lg font-bold hover:bg-[#569882] transition-colors text-sm shadow-lg shadow-[#68B49B]/20"
                                 >
-                                    <Plus size={18} /> Nuovo Evento
+                                    <Plus size={16} /> Nuovo Evento
                                 </button>
                             </div>
 
-                            <div className="space-y-3">
-                                {events.map(event => (
-                                    <EventManagerCard 
-                                        key={event.id} 
-                                        event={event} 
-                                        onEdit={(id) => console.log(id)}
-                                        onDeleteRequest={handleDeleteRequest}
-                                    />
-                                ))}
+                            <div className="space-y-4">
+                                {events.length > 0 ? (
+                                    events.map(event => (
+                                        <EventManagerCard 
+                                            key={event.id} 
+                                            event={event} 
+                                            onEdit={(id) => navigate(`/provider/services/club/event/edit/${id}`)}
+                                            onDeleteRequest={handleDeleteRequest}
+                                        />
+                                    ))
+                                ) : (
+                                    <div className="text-center py-8 text-gray-400">
+                                        Nessun evento creato.
+                                    </div>
+                                )}
                             </div>
                         </section>
 
                     </div>
 
-                    {/* --- COLONNA DESTRA: STATO & AZIONI STICKY --- */}
-                    <div className="lg:col-span-1">
-                        <div className="sticky top-24 space-y-6">
+                    {/* --- COLONNA DESTRA: INFO & STATO --- */}
+                    <div className="lg:col-span-1 space-y-8">
+                        <div className="sticky top-8 space-y-8">
                             
-                            {/* --- NUOVA SEZIONE INFORMAZIONI SERVIZIO (ACCORDION) --- */}
-                            <div className={`${HOGU_THEME.cardBase} p-6 shadow-[0_8px_30px_rgb(0,0,0,0.08)]`}>
-                                <h3 className="text-lg font-bold text-gray-900 mb-4 flex items-center gap-2">
-                                    <Info size={18} className={`text-[${HOGU_COLORS.primary}]`} />
-                                    Info Servizio
-                                </h3>
-                                
-                                <div className="space-y-1">
+                            {/* --- CARD INFORMATIVA --- */}
+                            <div className={`${HOGU_THEME.cardBase} overflow-hidden shadow-[0_8px_30px_rgb(0,0,0,0.08)]`}>
+                                <div className="bg-[#68B49B]/10 p-6 border-b border-[#68B49B]/20">
+                                    <h3 className="font-bold text-[#33594C] flex items-center gap-2">
+                                        <Info size={18} /> Guida Rapida
+                                    </h3>
+                                </div>
+                                <div className="p-2">
                                     <InfoAccordionItem 
-                                        icon={CalendarCheck} // Icona ripristinata
+                                        icon={CalendarCheck} 
                                         colorClass="bg-blue-50 text-blue-600"
-                                        title="Prenotazioni" // Titolo ripristinato
-                                        description="Tutte le prenotazioni per i tuoi eventi (ingressi e tavoli) sono gestite e tracciate qui. Ogni prenotazione è pre-pagata e garantita." // Descrizione modificata
+                                        title="Prenotazioni"
+                                        description="Le prenotazioni vengono confermate automaticamente se c'è disponibilità. Puoi gestire le eccezioni dal calendario."
+                                        defaultOpen={true}
                                     />
                                     <InfoAccordionItem 
-                                        icon={CreditCard} // Icona ripristinata
-                                        colorClass="bg-emerald-50 text-emerald-600"
-                                        title="Pagamenti" // Titolo ripristinato
-                                        description="Riceverai il pagamento per le vendite HOGU (al netto delle commissioni) entro 7 giorni dall'evento." // Descrizione modificata
+                                        icon={CreditCard} 
+                                        colorClass="bg-green-50 text-green-600"
+                                        title="Pagamenti"
+                                        description="Riceverai il pagamento per le vendite HOGU (al netto delle commissioni) entro 7 giorni dall'evento."
                                     />
                                     <InfoAccordionItem 
-                                        icon={FileText} // Icona ripristinata
+                                        icon={FileText} 
                                         colorClass="bg-purple-50 text-purple-600"
-                                        title="Commissioni" // Titolo ripristinato
-                                        description="Una piccola commissione è applicata solo sulle vendite effettive generate dalla piattaforma HOGU. Non ci sono costi fissi." // Descrizione modificata
+                                        title="Commissioni"
+                                        description="Una piccola commissione è applicata solo sulle vendite effettive generate dalla piattaforma HOGU. Non ci sono costi fissi."
                                     />
                                 </div>
                             </div>

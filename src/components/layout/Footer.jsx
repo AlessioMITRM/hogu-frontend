@@ -13,7 +13,7 @@ export const Footer = () => {
   const legalLinks = t('footer.legalLinks', { returnObjects: true });
 
   return (
-    <footer className={`py-12 mt-12 border-t border-gray-100 ${HOGU_THEME.bg}`}>
+    <footer className={`py-12 mt-16 md:mt-24 border-t border-gray-100 ${HOGU_THEME.bg}`}>
       <div className="max-w-7xl mx-auto px-4">
 
         {/* --- PARTE SUPERIORE: LINK E CONTATTI --- */}

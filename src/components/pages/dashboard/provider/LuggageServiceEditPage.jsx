@@ -4,17 +4,23 @@ import { useTranslation } from 'react-i18next';
 import CurrencyInput from 'react-currency-input-field'; // ← Libreria aggiunta
 import { withAuthProtection } from '../../auth/withAuthProtection.jsx';
 import { luggageService } from '../../../../api/apiClient.js';
-import italianLocationsData from '../../../../assets/data/italian_locations.json';
-import englishLocationsData from '../../../../assets/data/english_locations.json';
 import { Breadcrumbs } from '../../../../components/ui/Breadcrumbs.jsx';
+import { CityAutocomplete } from '../../../ui/CityAutocomplete';
+import {
+  getDisplayLocation,
+  createLocationPayload
+} from '../../../../utils/locationUtils';
+import { MAX_IMAGE_SIZE_BYTES, splitFilesByMaxSize, buildOversizedFilesMessage } from '../../../../utils/imageValidation';
 import SuccessModal from '../../../ui/SuccessModal.jsx';
 import ErrorModal from '../../../ui/ErrorModal.jsx';
 import LoadingScreen from '../../../ui/LoadingScreen.jsx';
+import SafeImage from '../../../ui/SafeImage.jsx';
+
 
 import {
-  Clock, MapPin, Info, Check, Backpack, Briefcase, Package,
+  Clock, MapPin, Check, Backpack, Briefcase, Package,
   ChevronRight, Save, Upload, Trash2, Plus, Eye, EyeOff, Warehouse, Navigation, DollarSign,
-  CalendarCheck, CreditCard, FileText, AlertCircle
+  AlertCircle
 } from 'lucide-react';
 
 const HOGU_COLORS = {
@@ -34,143 +40,11 @@ const HOGU_THEME = {
 };
 
 /* --------------  LOCATION UTILS  -------------- */
-const processLocations = (data) => {
-  if (!data) return [];
-  const flat = [];
-  data.forEach(region =>
-    region.provinces.forEach(province =>
-      province.cities.forEach(city =>
-        flat.push({
-          city,
-          province: province.name,
-          provinceId: province.provinceId,
-          region: region.region,
-          fullLabel: `${city}, ${region.region}`,
-          searchString: `${city}, ${province.name}, ${region.region}`
-            .toLowerCase()
-            .normalize('NFD')
-            .replace(/[\u0300-\u036f]/g, '')
-        })
-      )
-    )
-  );
-  return flat;
-};
+// Logic moved to src/utils/locationUtils.js
 
-/* --------------  InfoAccordionItem  -------------- */
-const InfoAccordionItem = ({ icon: Icon, title, description, colorClass, defaultOpen = false }) => {
-  const [isOpen, setIsOpen] = useState(defaultOpen);
-  return (
-    <div className="border-b border-gray-100 last:border-0">
-      <button
-        onClick={() => setIsOpen(!isOpen)}
-        className="w-full flex items-center justify-between py-3 hover:bg-gray-50 transition-colors rounded-lg px-2 -mx-2 group"
-      >
-        <div className="flex items-center gap-3">
-          <div className={`p-1.5 rounded-lg shrink-0 transition-colors ${colorClass}`}><Icon size={16} /></div>
-          <span className="font-bold text-sm text-gray-900">{title}</span>
-        </div>
-        <ChevronRight size={16} className={`text-gray-400 transition-transform duration-300 ${isOpen ? 'rotate-90' : ''}`} />
-      </button>
-      <div className={`overflow-hidden transition-all duration-300 ease-in-out ${isOpen ? 'max-h-32 opacity-100 mb-3' : 'max-h-0 opacity-0'}`}>
-        <p className="text-xs text-gray-500 leading-relaxed pl-[2.8rem] pr-2">{description}</p>
-      </div>
-    </div>
-  );
-};
 
 /* --------------  CityAutocomplete  -------------- */
-const CityAutocomplete = ({ label, value, onChange, icon: Icon }) => {
-  const { i18n, t } = useTranslation();
-  const [suggestions, setSuggestions] = useState([]);
-  const [show, setShow] = useState(false);
-  const wrapperRef = useRef(null);
-  const [inputValue, setInputValue] = useState(value || '');
-
-  useEffect(() => setInputValue(value || ''), [value]);
-
-  const locationData = useMemo(() => {
-    const it = i18n.language?.startsWith('it');
-    const raw = it ? italianLocationsData : (englishLocationsData || italianLocationsData);
-    return processLocations(raw);
-  }, [i18n.language]);
-
-  useEffect(() => {
-    const outside = e => wrapperRef.current && !wrapperRef.current.contains(e.target) && setShow(false);
-    document.addEventListener('mousedown', outside);
-    return () => document.removeEventListener('mousedown', outside);
-  }, []);
-
-  const handleInputChange = e => {
-    const userInput = e.target.value;
-    setInputValue(userInput);
-    onChange(userInput);
-    const lowerInput = userInput.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '');
-    
-    if (userInput.length > 2) {
-      const filtered = locationData
-        .filter(item => item.searchString.includes(lowerInput))
-        .sort((a, b) => {
-          const aCity = a.city.toLowerCase();
-          const bCity = b.city.toLowerCase();
-          if (aCity === lowerInput && bCity !== lowerInput) return -1;
-          if (bCity === lowerInput && aCity !== lowerInput) return 1;
-          const aStarts = aCity.startsWith(lowerInput);
-          const bStarts = bCity.startsWith(lowerInput);
-          if (aStarts && !bStarts) return -1;
-          if (!aStarts && bStarts) return 1;
-          return aCity.localeCompare(bCity);
-        })
-        .slice(0, 8);
-      setSuggestions(filtered);
-      setShow(true);
-    } else {
-      setSuggestions([]);
-      setShow(false);
-    }
-  };
-
-  const handleSelect = item => {
-    const formatted = `${item.city}, ${item.region}`;
-    setInputValue(formatted);
-    onChange(formatted);
-    setShow(false);
-  };
-
-  return (
-    <div className="flex flex-col gap-3 flex-[2] min-w-[200px] relative" ref={wrapperRef}>
-      <label className={`flex items-center gap-2 text-xs font-bold uppercase tracking-wide text-[${HOGU_COLORS.subtleText}] ml-1`}>
-        <Icon size={14} className={`text-[${HOGU_COLORS.primary}]`} /> {label}
-      </label>
-      <div className="flex gap-2 bg-white p-1.5 rounded-2xl border border-gray-100 shadow-sm focus-within:ring-2 focus-within:ring-[#68B49B]/20 focus-within:border-[#68B49B] transition-all h-[60px] items-center">
-        <input
-          type="text"
-          value={inputValue}
-          onChange={handleInputChange}
-          onFocus={() => inputValue.length > 1 && setShow(true)}
-          placeholder={t('luggage.location_placeholder', 'Dove si trova il deposito?')}
-          className="w-full h-full px-4 bg-transparent border-none focus:ring-0 text-lg font-medium text-gray-800 placeholder:text-gray-400 outline-none"
-          autoComplete="off"
-        />
-        {show && suggestions.length > 0 && (
-          <div className="absolute top-full left-0 mt-2 w-full bg-white rounded-xl shadow-xl border border-gray-100 max-h-60 overflow-y-auto z-50">
-            {suggestions.map((it, idx) => (
-              <button key={idx} type="button" onClick={() => handleSelect(it)} className="w-full text-left px-4 py-3 hover:bg-[#F0FDF9] hover:text-[#33594C] transition-colors border-b border-gray-50 last:border-0 group">
-                <div className="font-bold text-sm text-gray-800 group-hover:text-[#33594C]">{it.city}</div>
-                <div className="text-xs text-gray-400 group-hover:text-[#68B49B]/70">{it.province}, {it.region}</div>
-              </button>
-            ))}
-          </div>
-        )}
-        {show && inputValue.length > 1 && suggestions.length === 0 && (
-          <div className="absolute top-full left-0 mt-2 w-full bg-white rounded-xl shadow-xl border border-gray-100 p-4 text-center text-gray-400 text-sm z-50">
-            Nessuna città trovata
-          </div>
-        )}
-      </div>
-    </div>
-  );
-};
+// Moved to src/components/ui/CityAutocomplete.jsx
 
 /* --------------  EditableInput & Textarea  -------------- */
 const EditableInput = ({ label, value, onChange, type = 'text', large = false, placeholder = '', icon: Icon, className = '', required = false }) => (
@@ -214,7 +88,7 @@ const ImageUploadCard = ({ src, onDelete, isMain = false, isNew = false }) => {
   const { t } = useTranslation();
   return (
     <div className={`relative rounded-2xl overflow-hidden group ${isMain ? 'col-span-2 row-span-2 aspect-video' : 'aspect-[4/3]'}`}>
-      <img src={src} alt="Gallery" className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105" />
+      <SafeImage src={src} alt="Gallery" className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105" />
       <div className="absolute inset-0 bg-black/60 opacity-0 group-hover:opacity-100 transition-all flex items-center justify-center gap-2">
         <button
           onClick={onDelete}
@@ -359,14 +233,14 @@ export const LuggageServiceEditPageBase = () => {
     if (!formData.openingTime || !formData.closingTime) errors.push('Orari di apertura e chiusura obbligatori');
     if (formData.openingTime >= formData.closingTime) errors.push('L\'orario di chiusura deve essere successivo all\'apertura');
     if (!formData.capacity || formData.capacity < 1) errors.push('La capacità deve essere almeno 1');
-    
+
     const totalImages = images.length + newImages.length;
     if (totalImages < 6) errors.push(`Devi caricare almeno 6 immagini (attuali: ${totalImages})`);
-    
+
     if (basePrice <= 0) errors.push('Almeno una categoria deve avere un prezzo maggiore di 0€');
-    
+
     if (errors.length > 0) {
-        console.log("Validation errors:", errors);
+      console.log("Validation errors:", errors);
     }
     return errors;
   };
@@ -384,26 +258,7 @@ export const LuggageServiceEditPageBase = () => {
         const res = await luggageService.getLuggageProvider(id);
         const data = res;
 
-        // Helper per formattare la città
-        const getFormattedCity = (locale) => {
-          if (!locale || !locale.city) return '';
-          
-          // 1. Prova a cercare la città nel database locale per ottenere "Città, Regione"
-          const normalizedCity = locale.city.toLowerCase().trim();
-          for (const region of italianLocationsData) {
-            for (const province of region.provinces) {
-              const foundCity = province.cities.find(c => c.toLowerCase() === normalizedCity);
-              if (foundCity) {
-                return `${foundCity}, ${region.region}`;
-              }
-            }
-          }
-
-          // 2. Fallback: Se non trovata o se c'è lo stato nell'API, usa quello
-          return locale.state ? `${locale.city}, ${locale.state}` : locale.city;
-        };
-
-        const cityStr = getFormattedCity(data.locales?.[0]) || getFormattedCity(data.serviceLocale?.[0]) || '';
+        const cityStr = getDisplayLocation(data.locales?.[0] || data.serviceLocale?.[0], i18n.language);
 
         let openingTime = '08:00';
         let closingTime = '20:00';
@@ -471,8 +326,22 @@ export const LuggageServiceEditPageBase = () => {
   const handleImageUpload = (e) => {
     const files = Array.from(e.target.files);
     if (!files.length) return;
-    const newBlobs = files.map(file => ({ file, preview: URL.createObjectURL(file) }));
+
+    const { validFiles, oversizedFiles } = splitFilesByMaxSize(files, MAX_IMAGE_SIZE_BYTES);
+
+    if (oversizedFiles.length) {
+      setErrorMessage(buildOversizedFilesMessage(oversizedFiles, MAX_IMAGE_SIZE_BYTES));
+      setShowError(true);
+    }
+
+    if (!validFiles.length) {
+      if (fileInputRef.current) fileInputRef.current.value = '';
+      return;
+    }
+
+    const newBlobs = validFiles.map(file => ({ file, preview: URL.createObjectURL(file) }));
     setNewImages(prev => [...prev, ...newBlobs]);
+    if (fileInputRef.current) fileInputRef.current.value = '';
   };
 
   const handleDeleteExisting = (idx) => setImages(prev => prev.filter((_, i) => i !== idx));
@@ -493,184 +362,8 @@ export const LuggageServiceEditPageBase = () => {
     setIsSaving(true);
 
     try {
-      const cityParts = formData.city.split(',').map(p => p.trim());
-      const city = cityParts[0] || '';
-      const state = cityParts[1] || '';
-
-      let locales = [];
-      let foundProvinceId = null;
-      let foundSourceLang = null;
-
-      const findLocation = (dataset, cityName, regionName) => {
-        if (!dataset) return null;
-        for (const r of dataset) {
-          if (r.region && r.region.toLowerCase() === regionName.toLowerCase()) {
-            for (const p of r.provinces) {
-              if (p.cities && p.cities.some(c => c.toLowerCase() === cityName.toLowerCase())) {
-                return { region: r, province: p, city: cityName };
-              }
-            }
-          }
-        }
-        return null;
-      };
-
-      // 1. Prova a trovare nel DB Italiano
-      let match = findLocation(italianLocationsData, city, state);
-      if (match) {
-        foundProvinceId = match.province.provinceId;
-        foundSourceLang = 'it';
-      } else {
-        // 2. Prova Inglese
-        match = findLocation(englishLocationsData, city, state);
-        if (match) {
-          foundProvinceId = match.province.provinceId;
-          foundSourceLang = 'en';
-        }
-      }
-
-      if (foundProvinceId) {
-        // Lingua sorgente
-        locales.push({
-          serviceType: 'LUGGAGE',
-          language: foundSourceLang,
-          country: foundSourceLang === 'it' ? 'Italia' : 'Italy',
-          state: state,
-          city: city,
-          address: formData.address
-        });
-
-        // Lingua opposta
-        const targetLang = foundSourceLang === 'it' ? 'en' : 'it';
-        const targetDataset = foundSourceLang === 'it' ? englishLocationsData : italianLocationsData;
-        
-        let targetMatch = null;
-        for (const r of targetDataset) {
-          for (const p of r.provinces) {
-            if (p.provinceId === foundProvinceId) {
-              targetMatch = {
-                region: r.region,
-                province: p.name,
-                city: city // Assumiamo nome città invariato di base
-              };
-
-              // Se la città sorgente è nell'array della provincia sorgente, proviamo a mapparla per indice
-              // per trovare il nome corrispondente nell'altra lingua (es. Firenze -> Florence)
-              // Ma attenzione: gli array devono essere perfettamente allineati.
-              // Controlliamo se nel dataset target esiste una città nella stessa posizione?
-              // Rischiose se gli array non sono ordinati uguali.
-              // Dato che i file sembrano avere "Firenze" anche in inglese (vedi grep), forse il problema è la provincia?
-              // L'utente dice: "continuando a vedere la citta e la provicnia in italiano"
-              
-              // Se la città nel file inglese è "Firenze", allora è giusto che sia Firenze.
-              // Ma se la provincia nel file inglese è "Florence", dobbiamo usare quella.
-              
-              // Nel codice precedente usavo: province: p.name.
-              // Ma nel payload finale inviavo `state: targetMatch.region`.
-              // Non inviavo la provincia nel payload 'locales'.
-              // Il payload ha campi: language, country, state, city, address.
-              // 'state' corrisponde alla regione nel nostro mapping.
-              // Dove finisce la provincia? 
-              // Se l'utente intende che nel campo 'state' vede la regione italiana (es. Toscana) invece di Tuscany,
-              // allora il mio codice dovrebbe aver risolto (targetMatch.region).
-              
-              // Se l'utente intende che nel campo 'city' vede "Firenze" invece di "Florence", 
-              // allora dobbiamo vedere se nel file inglese c'è "Florence".
-              // Ho visto che in english_locations.json c'è "Florence" come nome provincia, ma "Firenze" come città.
-              // Quindi se l'utente vuole "Florence" come città, il JSON inglese non lo supporta per la città, solo per la provincia.
-              
-              // TUTTAVIA, se l'utente intende che vede "Toscana" invece di "Tuscany", allora il fix è corretto.
-              // Ma forse l'utente vuole che se nel file inglese la provincia si chiama "Florence", 
-              // e la città è il capoluogo, allora la città dovrebbe chiamarsi "Florence"?
-              // Questo è un caso specifico.
-              
-              // In ogni caso, il codice precedente usava `city: city` (quindi user input).
-              // Se l'utente ha scritto "Firenze", rimane "Firenze".
-              
-              // Se vogliamo provare a mappare la città:
-              // Cerchiamo se la città esiste nell'elenco della provincia target.
-              // Se c'è "Florence" nella lista città della provincia "Florence" (id 89), usiamo quella.
-              // Ma nel file ho visto "Firenze" nella lista città della provincia Florence.
-              
-              // Se l'utente si lamenta che vede "citta e provincia in italiano",
-              // forse intende che il `state` (Regione) è rimasto in italiano?
-              // O forse che non stiamo salvando correttamente la provincia da nessuna parte?
-              // Nel payload standard non c'è un campo esplicito 'province'. C'è 'state' (che usiamo per regione).
-              // Forse il backend si aspetta 'province'? O forse 'state' dovrebbe essere la provincia?
-              // Nei formati indirizzo spesso State = Provincia/Regione.
-              
-              // Rileggendo la richiesta: "mettendo sotto al nome della provincia un altro parametro keyProvince..."
-              // E ora: "non ho il corrispettivo esatto anche nell'altra località... continuando a vedere la città e la provincia in italiano".
-              
-              // Se il backend o il frontend visualizza "Città, Provincia", e la provincia viene dal campo 'state' o è dedotta?
-              // Se 'state' nel payload è la Regione (es. Tuscany), e la città è Firenze.
-              // L'utente vede "Firenze, Tuscany".
-              // Se vede "Firenze, Toscana" nel locale EN, allora il mapping non ha funzionato.
-              
-              // Possibile causa: `match` non trovato nel primo step.
-              // `findLocation` cerca per `region.toLowerCase() === regionName.toLowerCase()`.
-              // `state` (input) è "Lazio" (trim). `region.region` è "Lazio". Match!
-              // Ma se l'utente ha input "Firenze, Toscana".
-              // `state` = "Toscana".
-              // Cerchiamo in Italian DB. Troviamo ProvinceId 89.
-              // Cerchiamo in English DB ProvinceId 89.
-              // Troviamo Region "Tuscany".
-              // targetMatch.region = "Tuscany".
-              // Payload EN: state = "Tuscany".
-              
-              // Se l'utente dice che non va, forse `state` non viene passato correttamente o salvato?
-              // O forse `cityParts[1]` non è la regione ma la provincia?
-              // Nell'autocomplete: `fullLabel: ${city}, ${region.region}`.
-              // Quindi "Firenze, Toscana". Toscana è la REGIONE.
-              // La provincia (Florence/Firenze) non è nella stringa "Firenze, Toscana".
-              
-              // Quindi `state` nel payload è la Regione.
-              // Se l'utente vuole vedere la provincia corretta, dove la vede?
-              // Forse l'utente chiama "Provincia" la Regione (Toscana)?
-              
-              // Proviamo a garantire che `targetMatch` venga costruito correttamente.
-              // E aggiungiamo un controllo: se la città è uguale al nome della provincia (es. Firenze == Firenze),
-              // e nel target la provincia ha nome diverso (es. Florence),
-              // forse dovremmo usare il nome della provincia target come città?
-              // Es. Provincia target name = "Florence".
-              // Se la città source era il capoluogo (uguale a nome provincia source), usiamo capoluogo target.
-              
-              if (match.city.toLowerCase() === match.province.name.toLowerCase()) {
-                 // È un capoluogo (es. Firenze == Firenze)
-                 // Usiamo il nome della provincia target come città (es. Florence)
-                 targetMatch.city = p.name;
-              }
-              
-              break;
-            }
-          }
-          if (targetMatch) break;
-        }
-
-        if (targetMatch) {
-          locales.push({
-            serviceType: 'LUGGAGE',
-            language: targetLang,
-            country: targetLang === 'it' ? 'Italia' : 'Italy',
-            state: targetMatch.region,
-            city: targetMatch.city,
-            address: formData.address
-          });
-        }
-      } else {
-        // Fallback standard se non trovato nel DB
-        const isEnglish = i18n.language?.startsWith('en');
-        const country = isEnglish ? 'Italy' : 'Italia';
-        const lang = isEnglish ? 'en' : 'it';
-        locales.push({
-          serviceType: 'LUGGAGE',
-          language: lang,
-          country: country,
-          state: state,
-          city: city,
-          address: formData.address
-        });
-      }
+      // Use centralized location payload creation
+      const locales = createLocationPayload(formData.city, formData.address, 'LUGGAGE');
 
       const openingHours = [];
       for (let day = 1; day <= 7; day++) {
@@ -716,13 +409,13 @@ export const LuggageServiceEditPageBase = () => {
           // Adding a timeout is crucial.
           const controller = new AbortController();
           const timeoutId = setTimeout(() => controller.abort(), 10000); // 10s timeout
-          
+
           const response = await fetch(url, { signal: controller.signal });
           clearTimeout(timeoutId);
 
           if (!response.ok) {
-             console.warn(`Failed to fetch image ${url}: ${response.status}`);
-             return null;
+            console.warn(`Failed to fetch image ${url}: ${response.status}`);
+            return null;
           }
 
           const blob = await response.blob();
@@ -738,7 +431,7 @@ export const LuggageServiceEditPageBase = () => {
       processedImages.forEach(file => {
         if (file) formDataToSend.append('images', file);
       });
-      
+
       newImages.forEach(item => formDataToSend.append('images', item.file));
 
       console.log("Sending request...", payload); // Debug log
@@ -927,7 +620,10 @@ export const LuggageServiceEditPageBase = () => {
             {/* GALLERY */}
             <section className={`${HOGU_THEME.cardBase} p-8`}>
               <div className="flex justify-between items-center mb-6">
-                <h3 className="text-xl font-bold text-gray-900">Foto del Deposito</h3>
+                <h3 className="text-xl font-bold text-gray-900 flex items-center justify-between">
+                  Foto del Deposito
+                  <span className="text-xs font-normal text-gray-400">{images.length + newImages.length} foto</span>
+                </h3>
                 <label className={`text-[${HOGU_COLORS.primary}] font-bold text-sm flex items-center gap-2 hover:underline cursor-pointer`}>
                   <Upload size={18} /> Carica immagini
                   <input ref={fileInputRef} type="file" multiple accept="image/*" onChange={handleImageUpload} className="hidden" />
@@ -948,23 +644,36 @@ export const LuggageServiceEditPageBase = () => {
                   <span className="text-xs mt-2">Aggiungi foto</span>
                 </div>
               </div>
+
+              <div className="mt-6 pt-4 border-t border-gray-100">
+                <h4 className="text-sm font-bold text-gray-900 mb-4">Pubblicazione</h4>
+                <div className="flex items-center justify-between p-4 bg-gray-50 rounded-xl border border-gray-100">
+                  <div className="flex items-center gap-3">
+                    <div className={`p-2 rounded-lg ${formData.publicationStatus ? 'bg-green-100 text-green-600' : 'bg-gray-200 text-gray-500'}`}>
+                      {formData.publicationStatus ? <Eye size={20} /> : <EyeOff size={20} />}
+                    </div>
+                    <div>
+                      <p className="font-bold text-sm text-gray-900">Visibilità</p>
+                      <p className="text-xs text-gray-500">{formData.publicationStatus ? 'Online' : 'Nascosto'}</p>
+                    </div>
+                  </div>
+                  <label className="relative inline-flex items-center cursor-pointer">
+                    <input
+                      type="checkbox"
+                      className="sr-only peer"
+                      checked={formData.publicationStatus}
+                      onChange={e => handle('publicationStatus', e.target.checked)}
+                    />
+                    <div className="w-11 h-6 bg-gray-200 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-0.5 after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-[#68B49B]"></div>
+                  </label>
+                </div>
+              </div>
             </section>
           </div>
 
           {/* RIGHT SIDEBAR */}
           <div className="lg:col-span-1">
             <div className="sticky top-24 space-y-6">
-              <div className={`${HOGU_THEME.cardBase} p-6 shadow-[0_8px_30px_rgb(0,0,0,0.08)]`}>
-                <h3 className="text-lg font-bold text-gray-900 mb-4 flex items-center gap-2">
-                  <Info size={18} className={`text-[${HOGU_COLORS.primary}]`} />
-                  Info Servizio
-                </h3>
-                <div className="space-y-1">
-                  <InfoAccordionItem icon={CalendarCheck} colorClass="bg-blue-50 text-blue-600" title="Prenotazioni" description="Capienza gestita automaticamente per evitare overbooking." />
-                  <InfoAccordionItem icon={CreditCard} colorClass="bg-emerald-50 text-emerald-600" title="Pagamenti" description="Ricevi i compensi settimanalmente al netto delle commissioni." />
-                  <InfoAccordionItem icon={FileText} colorClass="bg-purple-50 text-purple-600" title="Commissioni" description="Applicate solo sulle prenotazioni completate." />
-                </div>
-              </div>
 
               <div className={`${HOGU_THEME.cardBase} p-6 shadow-[0_8px_30px_rgb(0,0,0,0.08)]`}>
                 <h3 className="text-lg font-bold text-gray-900 mb-6">Stato Operativo</h3>
@@ -985,7 +694,7 @@ export const LuggageServiceEditPageBase = () => {
                   </div>
                 </div>
 
-                <div className="flex items-center justify-between p-4 bg-gray-50 rounded-xl border border-gray-100 mb-6">
+                <div className="flex items-center justify-between p-4 bg-gray-50 rounded-xl border border-gray-100 mb-2">
                   <div className="flex items-center gap-3">
                     <div className={`p-2 rounded-lg ${formData.publicationStatus ? 'bg-green-100 text-green-600' : 'bg-gray-200 text-gray-500'}`}>
                       {formData.publicationStatus ? <Eye size={20} /> : <EyeOff size={20} />}
@@ -995,28 +704,42 @@ export const LuggageServiceEditPageBase = () => {
                       <p className="text-xs text-gray-500">{formData.publicationStatus ? 'Online' : 'Nascosto'}</p>
                     </div>
                   </div>
-                  <label className="relative inline-flex items-center cursor-pointer">
-                    <input type="checkbox" className="sr-only peer" checked={formData.publicationStatus} onChange={e => handle('publicationStatus', e.target.checked)} />
-                    <div className="w-11 h-6 bg-gray-200 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-0.5 after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-[#68B49B]"></div>
-                  </label>
+                  <span className="text-xs text-gray-500 font-medium">
+                    Gestisci lo stato anche dalla sezione foto.
+                  </span>
                 </div>
-
-                <button
-                  onClick={handleSave}
-                  disabled={isSaving}
-                  className={`w-full py-4 rounded-xl font-bold text-lg text-white shadow-xl flex items-center justify-center gap-2 transition-all
-                    ${isSaving ? 'bg-gray-400 cursor-not-allowed' : 'bg-slate-800 hover:bg-slate-700 hover:scale-[1.02]'}`}
-                >
-                  {isSaving ? 'Salvataggio in corso...' : (
-                    <>
-                      <Save size={20} />
-                      {isEditMode ? 'Salva Modifiche' : 'Crea Deposito'}
-                    </>
-                  )}
-                </button>
               </div>
             </div>
           </div>
+        </div>
+      </div>
+
+      <div className="max-w-7xl mx-auto px-4 lg:px-8 mt-8">
+        <div className="bg-white rounded-[2rem] p-6 shadow-sm border border-gray-100 flex flex-col md:flex-row items-center justify-between gap-4 sticky bottom-4 z-40">
+          <div className="flex-1 flex flex-col gap-2">
+            <div className="flex items-center gap-2">
+              <span className="text-sm font-medium text-gray-600">Stato pubblicazione:</span>
+              <span className={`px-3 py-1 rounded-full text-xs font-bold ${formData.publicationStatus ? 'bg-green-100 text-green-700' : 'bg-gray-200 text-gray-600'}`}>
+                {formData.publicationStatus ? 'Online' : 'Nascosto'}
+              </span>
+            </div>
+            <div className="text-xs text-gray-500 font-medium">
+              I campi contrassegnati con * sono obbligatori.
+            </div>
+          </div>
+          <button
+            onClick={handleSave}
+            disabled={isSaving}
+            className={`w-full md:w-auto px-10 py-4 rounded-xl font-bold text-white shadow-lg shadow-slate-500/20 hover:shadow-xl hover:-translate-y-1 transition-all flex items-center justify-center gap-2 ${isSaving ? 'bg-gray-400 cursor-not-allowed' : 'bg-slate-800 hover:bg-slate-700'
+              }`}
+          >
+            {isSaving ? 'Salvataggio in corso...' : (
+              <>
+                <Save size={20} />
+                {isEditMode ? 'Salva Modifiche' : 'Crea Deposito'}
+              </>
+            )}
+          </button>
         </div>
       </div>
 

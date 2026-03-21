@@ -1,0 +1,457 @@
+{
+  "title": "Dashboard",
+  "language_tag": "en-US",
+  "welcome_back": "Welcome back,",
+  "subtitle_welcome": "Your booking center.",
+  "btn_security": "Account Security",
+  "tabs": {
+    "active": "Schedule",
+    "history": "History"
+  },
+  "stats": {
+    "agenda": "Schedule",
+    "bookings": "Bookings",
+    "events_unit": "Events",
+    "total_unit": "Totals",
+    "explore": "Explore",
+    "new_events": "New Events",
+    "revenue": "{{label}} Revenue",
+    "monthly_total": "This month total"
+  },
+  "no_bookings": {
+    "title": "No bookings",
+    "desc_active": "You have no more plans for the near future.",
+    "desc_history": "There are no past bookings in the archive.",
+    "cta": "Book Now"
+  },
+  "price_change": {
+    "title": "Price Change Request",
+    "desc": "The manager has proposed a change for your booking.",
+    "old_price": "Old Price",
+    "new_price": "New Price",
+    "accept": "Accept Change",
+    "reject": "Reject and Cancel"
+  },
+  "booking_card": {
+    "date": "Date",
+    "time": "Time",
+    "ticket": "Ticket",
+    "detail": "Detail",
+    "review": "Leave Review",
+    "report": "Report Problem",
+    "today_arrival": "Arriving Today",
+    "today_arrival_desc": "Your appointments for today, {{date}}.",
+    "today": "TODAY",
+    "show_ticket": "Show Ticket",
+    "detail_tooltip": "Booking Details"
+  },
+  "main_section": {
+    "agenda_title": "Schedule & Bookings",
+    "history_title": "Booking History",
+    "all_title": "All Bookings",
+    "desc": "Manage your upcoming appointments and check the details."
+  },
+  "ticket_modal": {
+    "title": "Digital Ticket",
+    "guests": "Guests",
+    "close": "Close",
+    "entrance_instruction": "Show at entrance",
+    "download": "Download Ticket"
+  },
+  "detail_modal": {
+    "title": "Booking Detail",
+    "description_placeholder": "Full details of your booking at the facility.",
+    "address": "Address",
+    "at_time": "at",
+    "guests": "People",
+    "summary": "Cost Summary",
+    "base_price": "Base price",
+    "service_fees": "Service fees",
+    "total": "Total",
+    "view_ticket": "View Ticket",
+    "close": "Close",
+    "address_not_available": "Address not available"
+  },
+  "complaint_modal": {
+    "title": "Report Problem",
+    "subtitle_step1": "Problems with <strong>{{service}}</strong>?",
+    "subtitle_step2": "Choose how to send the report.",
+    "placeholder": "Briefly describe the problem...",
+    "cancel": "Cancel",
+    "continue": "Continue",
+    "email_app": {
+      "title": "1. Email App (Recommended)",
+      "desc": "We will open the default email client on your device with the message filled in.",
+      "button": "Open Email App"
+    },
+    "manual": {
+      "title": "2. Copy and Send",
+      "desc": "Copy the fields below to send the email from your web provider (e.g. Gmail).",
+      "to": "To:",
+      "subject": "Subject",
+      "message": "Message",
+      "copy_text": "Copy Text",
+      "copied": "Copied"
+    },
+    "back": "Back",
+    "email_body": {
+      "intro": "Hi, I would like to report a problem concerning the following booking:",
+      "details_header": "Booking Details:",
+      "service": "- Service: {{service}}",
+      "type": "- Type: {{type}}",
+      "date": "- Date: {{date}} at {{time}}",
+      "code": "- Booking Code: {{code}}",
+      "user_desc": "User Description:",
+      "footer": "--- Sent via HOGU Customer Dashboard"
+    }
+  },
+  "messages": {
+    "loading": "Loading...",
+    "error_fetch": "Unable to load bookings. Please try again later.",
+    "success_cancel": "Booking successfully cancelled.",
+    "error_cancel": "Error during cancellation. Please try again soon."
+  },
+  "pagination": {
+    "page": "Page",
+    "of": "of"
+  },
+  "restaurant_edit": {
+    "validation": {
+      "name": "Restaurant name is required",
+      "city": "City is required",
+      "address": "Address is required",
+      "description": "Description is required",
+      "min_images": "You must upload at least 6 images (current: {{count}})."
+    }
+  },
+  "provider": {
+    "categories": {
+      "restaurant": "Restaurant",
+      "beb": "B&B / Hotel",
+      "club": "Club / Events",
+      "ncc": "NCC / Transport",
+      "storage": "Storage",
+      "units": {
+        "coperti": "Covers",
+        "notti": "Nights",
+        "ingressi": "Entries",
+        "pax": "Passengers",
+        "bags": "Bags"
+      }
+    },
+    "core": {
+      "title": "Provider Dashboard",
+      "info_btn": "Info",
+      "security_btn": "Account Security",
+      "modal_info_title": "Service Info",
+      "modal_info_subtitle": "Useful information for your facility",
+      "modal_close": "I understand",
+      "info_items": {
+        "club": {
+          "event_management": {
+            "title": "Event Management",
+            "desc": "Create and manage your nights in a few clicks. Keep event details and table availability up to date, and monitor bookings in real time for a successful night."
+          },
+          "entry_scanner": {
+            "title": "Entry Scanner",
+            "desc": "Speed up access to your club. Use the integrated QR scanner to validate customers' digital tickets at the entrance for smooth and secure crowd control."
+          },
+          "lists_tables": {
+            "title": "Lists & Tables",
+            "desc": "Organize your space. Manage waiting list requests and table bookings (VIP and main floor) by approving requests to enable secure payments on the platform."
+          },
+          "payments": {
+            "title": "Payments",
+            "desc": "Full transparency on your earnings. Confirmed payments are paid out in a monthly batch. The commission covers transaction handling and platform technical support."
+          }
+        },
+        "restaurant": {
+          "room_management": {
+            "title": "Room Management",
+            "desc": "Accept or reject bookings in real time from the 'Room Management' section. Track customer arrivals for excellent service."
+          },
+          "qr_scanner": {
+            "title": "QR Scanner",
+            "desc": "Quickly validate customer arrivals. Use the built-in scanner to verify digital bookings when seating guests."
+          },
+          "booking_schedule": {
+            "title": "Booking Schedule",
+            "desc": "Stay in control. In 'Incoming' you'll find confirmed bookings ready for service. Use 'Archive' to view the full history of completed, cancelled, or rejected bookings."
+          },
+          "commissions_payments": {
+            "title": "Commissions & Payments",
+            "desc": "Automatic and transparent calculation. Commissions (€2.50 per cover) are deducted only for completed bookings, with monthly payout to your account."
+          }
+        },
+        "bnb": {
+          "booking_schedule": {
+            "title": "Booking Schedule",
+            "desc": "Monitor your property's activity. In 'Incoming' you’ll find all check-ins from today onward, including bookings cancelled during the day. 'Archive' includes only stays with a check-in before today. Each booking has a unique code (COD) for quick identification."
+          },
+          "reception_scanner": {
+            "title": "Reception Scanner",
+            "desc": "Streamline check-in with the built-in scanner. Scan guests’ identity documents to automatically capture required data, reducing wait times and manual errors."
+          },
+          "your_rooms": {
+            "title": "Your Rooms",
+            "desc": "Keep availability up to date. You can adjust prices for special periods, update room descriptions, and manage calendars to avoid overlaps."
+          },
+          "payments_compensation": {
+            "title": "Payments & Payouts",
+            "desc": "Transparency matters. Net payout is settled monthly for all completed stays. The service fee covers transaction handling and platform insurance."
+          }
+        },
+        "luggage": {
+          "request_management": {
+            "title": "Request Management",
+            "desc": "Check the 'Pending' section to accept new storage requests. Always verify the number and size of items at drop-off."
+          },
+          "storage_scanner": {
+            "title": "Storage Scanner",
+            "desc": "Use the scanner to validate both drop-off and pickup."
+          },
+          "security_custody": {
+            "title": "Security & Custody",
+            "desc": "Keep items in secure areas not accessible to the public. We recommend using security seals to ensure service integrity."
+          },
+          "rates_hours": {
+            "title": "Rates & Hours",
+            "desc": "Manage prices by size (Small, Medium, Large) and opening hours directly from the 'Edit Storage' section."
+          },
+          "payments": {
+            "title": "Payments",
+            "desc": "Full transparency on your reimbursements. Accumulated earnings are paid out monthly to your bank account, minus the platform service fee."
+          }
+        },
+        "ncc": {
+          "request_management": {
+            "title": "Request Management",
+            "desc": "New bookings appear in 'Ride Requests'. You can accept, adjust the price (extras or changes), or reject if you can’t cover the service."
+          },
+          "current_ride": {
+            "title": "Ride in Progress",
+            "desc": "Confirmed rides appear in 'Current ride'. Here you see the route map and can mark the ride as completed at the end of the transfer."
+          },
+          "ride_scanner": {
+            "title": "Ride Scanner",
+            "desc": "Use the Scanner to validate the customer's voucher via QR code when welcoming them on board."
+          },
+          "rates_fleet": {
+            "title": "Rates & Fleet",
+            "desc": "In 'Your Service' you can update available vehicles, per-km or zone rates, and night/holiday surcharges."
+          }
+        },
+        "default": {
+          "bookings": {
+            "title": "Bookings",
+            "desc": "Manage your bookings and calendar."
+          },
+          "payments": {
+            "title": "Payments",
+            "desc": "Receive payments directly to your account."
+          },
+          "rules": {
+            "title": "Rules",
+            "desc": "Set house rules and cancellation terms."
+          }
+        }
+      }
+    },
+    "mobile": {
+      "have_requests": "You have {{count}} requests",
+      "click_manage": "Click to manage now",
+      "requests_title": "Ride Requests",
+      "pending_count_one": "1 pending booking",
+      "pending_count_other": "{{count}} pending bookings",
+      "all_done": "All done!",
+      "no_pending": "No pending requests.",
+      "close": "Close"
+    },
+    "stats": {
+      "revenue": "{{label}} Revenue",
+      "bookings": "Bookings",
+      "monthly_total": "This month total"
+    },
+    "actions": {
+      "accept": "Accept",
+      "rectify": "Rectify",
+      "reject": "Reject",
+      "details": "Details",
+      "cancel": "Cancel",
+      "complete": "Complete",
+      "send": "Send",
+      "back": "Back",
+      "confirm": "Confirm",
+      "other_options": "Other options",
+      "cancel_booking": "Cancel Booking",
+      "report_problem": "Report Problem",
+      "mark_completed": "Mark as completed",
+      "cancel_ride": "Cancel ride",
+      "close": "Close",
+      "retry": "Retry"
+    },
+    "status": {
+      "payment_completed": "Payment Completed",
+      "completed": "Completed",
+      "in_progress": "In progress",
+      "pending": "Pending",
+      "waiting_customer": "Waiting for Customer",
+      "cancelled": "Cancelled",
+      "refunded": "Refunded by Admin",
+      "confirmed": "Confirmed"
+    },
+    "filters": {
+      "active": "Incoming",
+      "past": "Archive"
+    },
+    "storage": {
+      "scanner_title": "Storage Scanner",
+      "my_storage_title": "My Storage",
+      "my_storage_subtitle": "Configuration and prices",
+      "requests_title": "Requests ({{count}})",
+      "requests_subtitle": "Manage incoming storage bookings",
+      "back_to_dashboard": "Back to Dashboard",
+      "no_pending": "No pending storage requests.",
+      "pending_section_title": "Pending Storage Requests",
+      "pending_empty": "No new storage requests.",
+      "schedule_title": "Active Storage & History",
+      "schedule_empty": "No storage bookings in this list.",
+      "detail_title": "Storage Details",
+      "dropoff": "Drop-off",
+      "pickup": "Expected Pickup",
+      "size_small": "Small",
+      "size_medium": "Medium",
+      "size_large": "Large",
+      "total_items": "Total items",
+      "pieces_count_one": "1 item",
+      "pieces_count_other": "{{count}} items",
+      "bag_count_one": "1 bag",
+      "bag_count_other": "{{count}} bags",
+      "booking_number": "Booking #{{id}}"
+    },
+    "booking_details": {
+      "title": "Booking Details",
+      "itinerary": "Itinerary",
+      "departure": "Departure",
+      "arrival": "Arrival",
+      "not_specified": "Not specified",
+      "checkin_out": "Check-in / Out",
+      "nights": "Nights",
+      "luggage_details": "Luggage Details",
+      "luggage_desc": "{{count}} Items stored for {{duration}}",
+      "full_day": "Full day",
+      "date": "Date",
+      "time": "Time",
+      "total": "Total",
+      "guests": "Guests",
+      "guest_one": "Guest",
+      "guest_other": "Guests",
+      "night_one": "Night",
+      "night_other": "Nights",
+      "passengers": "Passengers",
+      "quantity": "Quantity",
+      "pax_count": "{{count}} pax",
+      "booking_one": "booking",
+      "booking_other": "bookings",
+      "customer": "Customer",
+      "customer_notes": "Customer Notes",
+      "commission_label": "Commissions",
+      "cancellation_reason": "Cancellation Reason",
+      "entrance_only": "Entrance Only",
+      "table": "Table",
+      "female_entrance": "Female Entrance",
+      "male_entrance": "Male Entrance",
+      "standard_entrance": "Guest List Entrance"
+    },
+    "modals": {
+      "complaint": {
+        "title": "Report Problem",
+        "placeholder": "Report details...",
+        "submit": "Send Report"
+      },
+      "cancellation": {
+        "title": "Cancel Booking",
+        "placeholder": "Reason..."
+      },
+      "correction": {
+        "title": "Price Correction",
+        "label": "New Price (€)",
+        "placeholder": "Enter new price",
+        "notes": "Notes"
+      }
+    },
+    "restaurant_service_edit": {
+      "publishing": {
+        "status_heading": "Publishing status",
+        "sidebar_hint": "Manage visibility from the photo section and save from the bottom bar.",
+        "status_label": "Status",
+        "footer_label": "Publishing status:",
+        "visible": "Visible online",
+        "hidden": "Hidden"
+      }
+    },
+    "dashboard": {
+      "scanner_title": "Ride Scanner",
+      "restaurant_scanner_title": "Room Scanner",
+      "scanner_subtitle": "Click to scan entries.",
+      "restaurant_scanner_subtitle": "Click to scan entries.",
+      "scanner_desc": "Validate voucher on board.",
+      "scanner_short": "Scanner",
+      "history_title": "Booking Schedule",
+      "pending_section_title": "Room Management",
+      "pending_message": "Table requests to confirm.",
+      "no_pending": "No pending requests.",
+      "all_clear_title": "Room Updated",
+      "all_clear_subtitle": "All requests have been managed.",
+      "manage_restaurant": "Manage Restaurant",
+      "restaurant_short": "Restaurant",
+      "your_restaurant": "Your Restaurant",
+      "waiting_customer": "Waiting for customer...",
+      "stats": {
+        "commissions_to_pay": "Commissions to pay",
+        "view_commissions_detail": "View commissions detail"
+      },
+      "banner": {
+        "incomplete_profile": "Incomplete profile",
+        "incomplete_profile_desc": "To better manage your restaurant, update the basic information (Name, Description and Menu).",
+        "update_now": "Update Now"
+      },
+      "manage_tables": "Manage tables and lists",
+      "general_details": "General Restaurant Details",
+      "edit_details_desc": "Edit name, description, photo and menu",
+      "agenda_desc_active": "Includes all check-ins scheduled from today onwards, including any bookings cancelled during the day.",
+      "agenda_desc_past": "Reserved exclusively for the history of bookings with check-in prior to today.",
+      "waiting": "waiting",
+      "new_tag": "NEW",
+      "service_title": "Your Service",
+      "service_desc": "Rates and fleet",
+      "current_ride_title": "Ride in progress",
+      "current_ride_desc_active": "Manage the ride currently scheduled.",
+      "current_ride_desc_none": "No ride currently in progress.",
+      "pending_requests_title": "Ride Requests",
+      "pending_requests_none": "No pending rides.",
+      "pending_requests_desc_one": "1 new transfer request.",
+      "pending_requests_desc_other": "{{count}} new transfer requests.",
+      "fleet_idle": "Fleet Idle",
+      "agenda_title": "Ride Schedule",
+      "no_rides": "No rides in this list.",
+      "tabs": {
+        "upcoming": "Incoming",
+        "archive": "Archive"
+      }
+    },
+    "success": {
+      "title": "Operation Completed",
+      "booking_accepted": "Booking accepted!",
+      "booking_cancelled": "Booking cancelled/rejected.",
+      "complaint_sent": "Report sent.",
+      "correction_sent": "Correction proposal sent."
+    },
+    "errors": {
+      "title": "Oops, something went wrong",
+      "no_rides": "No rides in this list.",
+      "customer": "Customer",
+      "generic_action": "Error during operation."
+    }
+  }
+}

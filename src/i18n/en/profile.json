@@ -1,0 +1,107 @@
+{
+  "title": "Account Security",
+  "subtitle": "Manage your credentials and monitor account access to ensure maximum protection of your data.",
+  "privacy_card": {
+    "title": "Privacy First",
+    "description": "HOGU will never share your password. If you notice suspicious activity, change your credentials immediately.",
+    "support": "Contact Security Support"
+  },
+  "personal_data": {
+    "title": "Personal Data",
+    "subtitle": "Update your name and billing address.",
+    "business_name": "Task Name / Business Name",
+    "first_name": "First Name",
+    "last_name": "Last Name",
+    "business_name_placeholder": "Business Name",
+    "first_name_placeholder": "Your Name",
+    "last_name_placeholder": "Your Last Name",
+    "city": "City / Location",
+    "vat_number": "VAT Number",
+    "fiscal_code": "Fiscal Code",
+    "vat_placeholder": "Your VAT Number",
+    "fiscal_code_placeholder": "Fiscal Code",
+    "address": "Address",
+    "address_placeholder": "Street / Square, number",
+    "zip_code": "ZIP Code",
+    "save_changes": "Save Changes",
+    "saving": "Saving..."
+  },
+  "email": {
+    "title": "Email Address",
+    "subtitle": "Manage the email for notifications and login.",
+    "verified": "Verified",
+    "new_email": "New Email",
+    "placeholder": "name@example.com",
+    "verification_notice": "We will send a verification link to the new address.",
+    "cancel": "Cancel",
+    "send_verification": "Send Verification"
+  },
+  "password": {
+    "title": "Reset Password",
+    "subtitle": "We recommend using a strong password.",
+    "current": "Current Password",
+    "new": "New Password",
+    "confirm": "Confirm New Password",
+    "new_placeholder": "At least 8 characters",
+    "confirm_placeholder": "Repeat password",
+    "update": "Update Password",
+    "updating": "Updating...",
+    "strength": {
+      "title": "Security",
+      "placeholder": "Enter Password",
+      "weak": "Weak",
+      "good": "Good",
+      "strong": "Strong"
+    },
+    "requirements": {
+      "length": "8+ Characters",
+      "uppercase": "Uppercase Letter",
+      "lowercase": "Lowercase Letter",
+      "number": "Number",
+      "symbol": "Special Character (@$!%*?&)"
+    }
+  },
+  "delete_account": {
+    "title": "Delete Account",
+    "subtitle": "Irreversible actions on your account.",
+    "warning_title": "Delete Account",
+    "warning_description": "Once the account is deleted, your personal data will be anonymized. This action cannot be undone.",
+    "provider_warning": "Also, offered services and uploaded documents will be disabled.",
+    "confirm_button": "Delete Account",
+    "modal_title": "Are you absolutely sure?",
+    "modal_description": "This action is final. Your profile will be deleted and you will no longer be able to log in with these credentials.",
+    "modal_data_notice": "Past activities and bookings will be kept anonymously.",
+    "modal_provider_alert": "WARNING: All offered services will be marked as deleted and documents invalidated.",
+    "confirm_delete": "Yes, delete my account",
+    "deleting": "Deleting...",
+    "cancel": "Cancel"
+  },
+  "modals": {
+    "profile_updated": {
+      "title": "Profile Updated",
+      "message": "Your personal data has been successfully updated.",
+      "close": "Close"
+    },
+    "password_updated": {
+      "title": "Password Updated!",
+      "message": "Your password has been successfully modified. Use the new password at your next login.",
+      "close": "Close"
+    }
+  },
+  "errors": {
+    "name_required": "Name is mandatory.",
+    "vat_invalid": "Invalid VAT number.",
+    "update_failed": "Error during profile update.",
+    "password_required": "All fields are mandatory.",
+    "passwords_mismatch": "Passwords do not match.",
+    "password_requirements": "The password must meet all security requirements.",
+    "password_update_failed": "Error during password update.",
+    "delete_pending_commissions": "Cannot delete account: there are pending commissions to be paid for your restaurant.",
+    "delete_pending_bookings": "Cannot delete account: there are bookings awaiting confirmation.",
+    "delete_failed": "Error during account deletion."
+  },
+  "breadcrumbs": {
+    "dashboard": "Dashboard",
+    "security": "Security & Login"
+  }
+}

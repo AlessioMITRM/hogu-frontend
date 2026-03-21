@@ -1,158 +1,298 @@
 import React, { useState, useEffect, useRef, useMemo } from 'react';
 import L from "leaflet";
 import "leaflet/dist/leaflet.css";
-import { 
-    Clock, 
-    Calendar, 
-    Briefcase, 
-    MapPin, 
-    Star,
-    Check,
+import {
+    Clock,
+    Calendar,
+    Briefcase,
+    MapPin,
     ShieldCheck,
     Package,
     Info,
     AlertCircle
 } from 'lucide-react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useParams, useSearchParams } from 'react-router-dom';
+import { HOGU_COLORS, HOGU_THEME } from '../../../config/theme.js';
+import { X } from 'lucide-react';
 
 // --- COMPONENTI UI ---
 import { Breadcrumbs } from '../../../components/ui/Breadcrumbs.jsx';
 import { Tag } from '../../../components/ui/Tag.jsx';
 import { ServiceHeaderDetail } from '../../../components/ui/ServiceHeaderDetail.jsx';
-import { PrimaryButton } from '../../../components/ui/Button.jsx';
+import { PrimaryButton, PrimaryEmphasis } from '../../../components/ui/Button.jsx';
 import { ServiceImageGallery } from '../../../components/ui/ServiceImageGallery.jsx';
 import { LocationAddress } from '../../../components/ui/LocationAddress.jsx';
 import LoadingScreen from '../../ui/LoadingScreen.jsx';
 import ErrorModal from '../../ui/ErrorModal.jsx';
+import MapLoadingSkeleton from '../../ui/MapLoadingSkeleton.jsx';
+import ServiceUnavailablePage from '../ServiceUnavailablePage.jsx';
 
 // --- API ---
 import { luggageService, mapService, infoService } from '../../../api/apiClient.js';
+import { getServiceLocalization } from '../../../utils/dateUtils.js';
+import { calculateLuggageTotal } from '../../../utils/pricingUtils.js';
+
+import { LiveViewersFloatingBadge } from '../../../components/ui/LiveViewersBadge.jsx';
 
 // --- COSTANTI ---
-const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:8080';
+const ENV_URL = import.meta.env.VITE_API_BASE_URL;
+const DYNAMIC_URL = `${window.location.protocol}//${window.location.hostname}:8080`;
+const API_BASE_URL =
+    ENV_URL && ENV_URL.includes('localhost') && window.location.hostname !== 'localhost'
+        ? DYNAMIC_URL
+        : (ENV_URL || DYNAMIC_URL);
 const IMG_BASE_URL = `${API_BASE_URL}/uploads/`;
 
-// --- COMPONENTE MAPPA ---
+// --- COMPONENTE MAPPA (LEAFLET) - STILE UNIFORME ---
 const LeafletMapLuggage = ({ lat, lon, name }) => {
-    const mapContainerRef = useRef(null);
-    const mapInstanceRef = useRef(null);
+    const mapId = "service-map-luggage";
+
+    // Ref per tracciare se la mappa è già stata inizializzata
+    const mapInitializedRef = useRef(false);
 
     useEffect(() => {
-        if (!lat || !lon || !mapContainerRef.current) return;
+        if (!lat || !lon) return;
 
-        if (mapInstanceRef.current) {
-            mapInstanceRef.current.remove();
-            mapInstanceRef.current = null;
+        let mapInstance = null;
+        if (typeof L !== 'undefined' && document.getElementById(mapId)) {
+            // Pulizia preventiva rigorosa
+            const container = L.DomUtil.get(mapId);
+            if (container._leaflet_id) {
+                container._leaflet_id = null;
+            }
+
+            // Rimuovi eventuali mappe precedenti
+            if (L.Map.allMaps && L.Map.allMaps.length > 0) {
+                L.Map.allMaps.forEach(m => {
+                    if (m._container && m._container.id === mapId) {
+                        m.remove();
+                    }
+                });
+            }
+
+            const position = [lat, lon];
+
+            mapInstance = L.map(mapId, {
+                scrollWheelZoom: false,
+                zoomControl: false
+            }).setView(position, 16);
+
+            L.tileLayer('https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}.png', {
+                attribution: '&copy; CARTO',
+                subdomains: 'abcd',
+                maxZoom: 20
+            }).addTo(mapInstance);
+
+            L.control.zoom({ position: 'topleft' }).addTo(mapInstance);
+
+            const customIcon = L.divIcon({
+                className: 'bg-transparent',
+                html: `<div style="background-color: ${HOGU_COLORS.primary}; width: 28px; height: 28px; border-radius: 50%; border: 3px solid white; box-shadow: 0 4px 8px rgba(0,0,0,0.4);"></div>`
+            });
+
+            L.marker(position, { icon: customIcon }).addTo(mapInstance)
+                .bindPopup(`<div style="font-family: sans-serif; text-align: center; padding: 5px;"><strong>${name}</strong></div>`)
+                .openPopup();
         }
 
-        const position = [lat, lon];
-        const map = L.map(mapContainerRef.current, {
-            scrollWheelZoom: false,
-            zoomControl: false
-        }).setView(position, 16);
-
-        L.tileLayer('https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}.png', {
-            attribution: '&copy; CARTO',
-            subdomains: 'abcd',
-            maxZoom: 20
-        }).addTo(map);
-
-        L.control.zoom({ position: 'topleft' }).addTo(map);
-
-        const customIcon = L.divIcon({
-            className: 'bg-transparent',
-            html: `<div style="background-color: #68B49B; width: 28px; height: 28px; border-radius: 50%; border: 3px solid white; box-shadow: 0 4px 8px rgba(0,0,0,0.4);"></div>`
-        });
-
-        L.marker(position, { icon: customIcon }).addTo(map)
-            .bindPopup(`<strong>${name}</strong>`)
-            .openPopup();
-
-        mapInstanceRef.current = map;
-
         return () => {
-            if (mapInstanceRef.current) {
-                mapInstanceRef.current.remove();
-                mapInstanceRef.current = null;
+            if (mapInstance) {
+                mapInstance.remove();
             }
         };
     }, [lat, lon, name]);
 
-    // Placeholder se non ci sono coordinate
-    if (!lat || !lon) {
-        return (
-            <div className="h-72 md:h-[480px] w-full rounded-3xl bg-gray-50 border border-dashed border-gray-200 flex flex-col items-center justify-center mb-6">
-                <AlertCircle className="w-12 h-12 text-gray-300 mb-4" />
-                <p className="text-gray-500 text-sm font-medium text-center px-8">
-                    Mappa non disponibile per questo punto deposito
-                </p>
-                <p className="text-xs text-gray-400 mt-2">L'indirizzo è stato verificato manualmente</p>
-            </div>
-        );
-    }
+    if (!lat || !lon) return <MapLoadingSkeleton />;
 
     return (
-        <div className="relative group rounded-3xl overflow-hidden shadow-lg border border-gray-100 mb-6 mt-4 transition-all duration-300 hover:shadow-xl">
-            <div ref={mapContainerRef} className="h-72 md:h-[480px] w-full z-0" />
+        <div className="relative group rounded-3xl overflow-hidden shadow-lg border border-gray-100 mb-6 transition-all duration-300 hover:shadow-xl">
+            <div id={mapId} className="h-72 md:h-[480px] w-full z-0" />
             <div className="absolute bottom-0 left-0 right-0 bg-white/95 backdrop-blur-md px-5 py-3 text-xs text-gray-500 border-t border-gray-100 flex items-center justify-between z-[400]">
                 <div className="flex items-center gap-2">
-                    <div className="w-2 h-2 rounded-full bg-[#68B49B] animate-pulse"></div>
+                    <div className={`w-2 h-2 rounded-full bg-[${HOGU_COLORS.primary}] animate-pulse`}></div>
                     <span className="font-medium">Posizione verificata</span>
                 </div>
-                <span className="opacity-60 text-[10px] uppercase tracking-wider">CARTO ©</span>
+                <span className="opacity-60 text-[10px] uppercase tracking-wider">Stadia Maps ©</span>
             </div>
         </div>
     );
 };
 
 // --- CARD SELETTORE BAGAGLIO ---
-const LuggageSelectorCard = ({ label, count, onChange, icon: Icon, price, iconSize = 32, description }) => (
-    <div 
+const LuggageSelectorCard = ({ label, count, onChange, icon: Icon, price, description }) => (
+    <div
         className={`
-            relative flex flex-col items-center justify-center p-5 rounded-2xl border-2 transition-all duration-300 cursor-pointer hover:shadow-md
-            ${count > 0 ? 'border-[#68B49B] bg-[#F0FDF9] shadow-sm' : 'border-gray-200 bg-white'}
-        `} 
-        onClick={() => onChange(count + 1)}
+            w-full flex items-center justify-between p-3 rounded-xl border transition-all duration-200
+            ${count > 0 ? `border-[${HOGU_COLORS.primary}] bg-[#F0FDF9]` : 'border-gray-100 bg-white hover:border-gray-200'}
+        `}
     >
-        <div className={`mb-3 ${count > 0 ? 'text-[#68B49B]' : 'text-gray-400'}`}>
-            <Icon size={iconSize} strokeWidth={1.8} />
-        </div>
-        <span className="font-bold text-base">{label}</span>
-        {description && <p className="text-xs text-gray-500 text-center mt-1">{description}</p>}
-        <span className="text-sm font-bold text-gray-700 mt-2">€{price}/giorno</span>
-
-        <div className="flex items-center gap-4 bg-gray-50 rounded-xl px-3 py-2 mt-4 shadow-inner" onClick={(e) => e.stopPropagation()}>
-            <button 
-                onClick={(e) => { e.stopPropagation(); onChange(Math.max(0, count - 1)); }}
-                className="w-9 h-9 rounded-lg bg-white shadow text-gray-600 hover:text-[#68B49B] flex items-center justify-center font-bold text-lg disabled:opacity-50"
-                disabled={count === 0}
-            >−</button>
-            <span className="w-8 text-center font-extrabold text-lg">{count}</span>
-            <button 
-                onClick={(e) => { e.stopPropagation(); onChange(count + 1); }}
-                className="w-9 h-9 rounded-lg bg-white shadow text-[#68B49B] flex items-center justify-center font-bold text-lg"
-            >+</button>
-        </div>
-    </div>
-);
-
-// --- MODAL SUCCESSO (opzionale, puoi sostituirlo con navigazione reale) ---
-const SuccessModal = ({ onClose }) => (
-    <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50 p-4">
-        <div className="bg-white rounded-3xl shadow-2xl max-w-md w-full p-8 text-center">
-            <div className="w-20 h-20 bg-[#68B49B] rounded-full flex items-center justify-center mx-auto mb-6">
-                <Check size={40} className="text-white" strokeWidth={3} />
+        <div className="flex items-center gap-3 overflow-hidden cursor-pointer flex-1" onClick={() => onChange(count + 1)}>
+            <div className={`p-2 rounded-lg shrink-0 ${count > 0 ? 'bg-white text-[#68B49B]' : 'bg-gray-50 text-gray-400'}`}>
+                <Icon size={20} />
             </div>
-            <h2 className="text-2xl font-extrabold text-[#1A202C] mb-3">Prenotazione Confermata!</h2>
-            <p className="text-gray-600 mb-8">Riceverai una mail con tutti i dettagli e il QR code.</p>
-            <PrimaryButton onClick={onClose} className="w-full">Torna alla Home</PrimaryButton>
+            <div className="flex flex-col min-w-0">
+                <span className="font-bold text-sm text-gray-900 truncate">{label}</span>
+                <span className="text-xs text-gray-500 font-medium">€{typeof price === 'number' ? price.toFixed(2) : price}/gg</span>
+            </div>
+        </div>
+
+        <div className="flex items-center gap-2 bg-gray-50 rounded-lg p-1 ml-2 shrink-0">
+            <button
+                onClick={(e) => { e.stopPropagation(); onChange(Math.max(0, count - 1)); }}
+                disabled={count === 0}
+                className="w-7 h-7 flex items-center justify-center rounded-md bg-white shadow-sm text-gray-600 hover:text-red-500 disabled:opacity-50 disabled:hover:text-gray-600 transition-colors"
+            >
+                -
+            </button>
+            <span className="w-4 text-center text-sm font-bold text-gray-900">{count}</span>
+            <button
+                onClick={(e) => { e.stopPropagation(); onChange(count + 1); }}
+                className={`w-7 h-7 flex items-center justify-center rounded-md bg-white shadow-sm text-[${HOGU_COLORS.primary}] hover:bg-[${HOGU_COLORS.primary}] hover:text-white transition-all`}
+            >
+                +
+            </button>
         </div>
     </div>
 );
+
+// --- FORM PRENOTAZIONE LUGGAGE (CONTENUTO CONDIVISO) ---
+const BookingFormContentLuggage = ({ bagsSmall, setBagsSmall, bagsMedium, setBagsMedium, bagsLarge, setBagsLarge, prices, onProceed, totalBags, totalPrice }) => {
+    return (
+        <div className="flex flex-col h-full">
+            <label className="text-xs font-bold uppercase text-gray-500 mb-4 block tracking-wider">Seleziona bagagli</label>
+
+            <div className="flex flex-col gap-3 mb-6">
+                <LuggageSelectorCard
+                    label="A Mano"
+                    icon={Briefcase}
+                    price={prices.small}
+                    description="fino a 40cm"
+                    count={bagsSmall}
+                    onChange={setBagsSmall}
+                />
+                <LuggageSelectorCard
+                    label="Media"
+                    icon={Briefcase}
+                    price={prices.medium}
+                    description="fino a 65cm"
+                    count={bagsMedium}
+                    onChange={setBagsMedium}
+                />
+                <LuggageSelectorCard
+                    label="XXL"
+                    icon={Briefcase}
+                    price={prices.large}
+                    description="oltre 65cm"
+                    count={bagsLarge}
+                    onChange={setBagsLarge}
+                />
+            </div>
+
+            <div className="mt-auto pt-4 border-t border-dashed border-gray-300">
+                <div className="flex justify-between items-end mb-5">
+                    <div>
+                        <span className="block text-xs text-gray-400 font-bold uppercase tracking-wider mb-1">Totale stimato</span>
+                        <div className="flex items-baseline gap-1">
+                            <span className="text-3xl font-black text-gray-900">€{totalPrice.toFixed(2)}</span>
+                            <span className="text-sm text-gray-500 font-medium">Totale</span>
+                        </div>
+                        <p className="text-[10px] text-gray-400 mt-1 leading-tight">
+                            Tariffa calcolata su base mista (Giornaliera + Oraria)
+                        </p>
+                    </div>
+                    <div className="text-right">
+                        <span className={`text-sm font-bold text-[${HOGU_COLORS.primary}] bg-[#F0FDF9] px-3 py-1 rounded-full`}>
+                            {totalBags} Bagagli
+                        </span>
+                    </div>
+                </div>
+
+                <PrimaryButton
+                    onClick={onProceed}
+                    disabled={totalBags === 0}
+                    className={`w-full py-4 text-lg font-bold shadow-xl shadow-[${HOGU_COLORS.primary}]/20 transition-all hover:translate-y-[-2px] active:translate-y-[1px]`}
+                >
+                    Prenota Ora
+                </PrimaryButton>
+                <p className="text-center text-[10px] text-gray-400 font-medium mt-3 flex items-center justify-center gap-1">
+                    <ShieldCheck size={12} /> Pagamento sicuro al 100%
+                </p>
+            </div>
+        </div>
+    );
+};
+
+// --- WIDGET MOBILE (SHEET) ---
+const MobileBookingSheetLuggage = ({ bagsSmall, setBagsSmall, bagsMedium, setBagsMedium, bagsLarge, setBagsLarge, prices, onProceed, totalBags, totalPrice }) => {
+    const [isOpen, setIsOpen] = useState(false);
+
+    const handleProceed = () => {
+        setIsOpen(false);
+        onProceed();
+    };
+
+    return (
+        <>
+            <div className="fixed bottom-0 left-0 right-0 z-[900] bg-white border-t border-gray-100 p-4 shadow-[0_-5px_20px_rgba(0,0,0,0.1)] md:hidden safe-area-bottom">
+                <div className="flex items-center justify-between gap-4 max-w-md mx-auto">
+                    <div className="flex flex-col">
+                        <span className="text-[10px] text-gray-500 uppercase tracking-wide font-semibold">Totale</span>
+                        <div className="flex items-baseline gap-1">
+                            <span className={`text-xl font-bold text-[${HOGU_COLORS.primary}]`}>€ {totalPrice.toFixed(2)}</span>
+                            <span className="text-xs text-gray-400">Totale</span>
+                        </div>
+                    </div>
+                    <PrimaryEmphasis
+                        onClick={() => setIsOpen(true)}
+                        className={`flex-1 py-3 text-base shadow-lg shadow-[${HOGU_COLORS.primary}]/25 active:scale-95 transition-transform`}
+                    >
+                        {totalBags > 0 ? `Prenota (${totalBags})` : 'Seleziona'}
+                    </PrimaryEmphasis>
+                </div>
+            </div>
+
+            {isOpen && (
+                <div
+                    className="fixed inset-0 bg-black/60 backdrop-blur-sm z-[950] transition-opacity duration-300 md:hidden"
+                    onClick={() => setIsOpen(false)}
+                />
+            )}
+
+            <div className={`fixed bottom-0 left-0 right-0 z-[1000] bg-white rounded-t-[2rem] shadow-[0_-10px_40px_rgba(0,0,0,0.2)] transition-transform duration-500 cubic-bezier(0.32, 0.72, 0, 1) md:hidden flex flex-col max-h-[85vh] ${isOpen ? 'translate-y-0' : 'translate-y-[110%]'}`}>
+                <div className="w-full flex justify-center pt-3 pb-1" onClick={() => setIsOpen(false)}>
+                    <div className="w-12 h-1.5 bg-gray-300 rounded-full cursor-pointer hover:bg-gray-400 transition-colors opacity-50"></div>
+                </div>
+                <div className="px-6 pt-2 pb-4 border-b border-gray-50 flex justify-between items-center bg-white rounded-t-[2rem]">
+                    <div>
+                        <h3 className="text-xl font-bold text-gray-900 tracking-tight">I tuoi bagagli</h3>
+                        <p className="text-xs text-gray-400 font-medium">Seleziona quantità e tipo</p>
+                    </div>
+                    <button onClick={() => setIsOpen(false)} className="p-2 bg-gray-50 rounded-full text-gray-400 hover:bg-gray-100">
+                        <X size={20} />
+                    </button>
+                </div>
+                <div className="p-6 overflow-y-auto safe-area-bottom bg-white">
+                    <BookingFormContentLuggage
+                        bagsSmall={bagsSmall} setBagsSmall={setBagsSmall}
+                        bagsMedium={bagsMedium} setBagsMedium={setBagsMedium}
+                        bagsLarge={bagsLarge} setBagsLarge={setBagsLarge}
+                        prices={prices}
+                        onProceed={handleProceed}
+                        totalBags={totalBags}
+                        totalPrice={totalPrice}
+                    />
+                </div>
+            </div>
+        </>
+    );
+};
 
 // --- COMPONENTE PRINCIPALE ---
-export const ServiceDetailPageLuggage = ({ id }) => {
+export const ServiceDetailPageLuggage = ({ id: propId }) => {
     const navigate = useNavigate();
+    const { id: paramId } = useParams();
+    const [searchParams] = useSearchParams();
+    const id = propId || paramId;
 
     // Stati
     const [service, setService] = useState(null);
@@ -161,11 +301,10 @@ export const ServiceDetailPageLuggage = ({ id }) => {
 
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
-    const [showSuccess, setShowSuccess] = useState(false);
 
-    const [bagsSmall, setBagsSmall] = useState(0);
-    const [bagsMedium, setBagsMedium] = useState(0);
-    const [bagsLarge, setBagsLarge] = useState(0);
+    const [bagsSmall, setBagsSmall] = useState(parseInt(searchParams.get('bagsS') || '0', 10));
+    const [bagsMedium, setBagsMedium] = useState(parseInt(searchParams.get('bagsM') || '0', 10));
+    const [bagsLarge, setBagsLarge] = useState(parseInt(searchParams.get('bagsL') || '0', 10));
 
     const loadedId = useRef(null);
 
@@ -202,34 +341,7 @@ export const ServiceDetailPageLuggage = ({ id }) => {
                 // Imposta dati principali subito
                 setService(luggageData);
                 setUrgencyCount(urgency);
-
-                // 2. Geocoding (OPZIONALE e ISOLATO)
-                const locale = luggageData.serviceLocale?.find(l => l.language === 'it') || 
-                               luggageData.serviceLocale?.[0] || {};
-
-                const addressParts = [
-                    locale.address?.trim(),
-                    locale.city?.trim(),
-                    locale.country?.trim()
-                ].filter(Boolean);
-
-                const fullAddress = addressParts.join(', ');
-
-                if (fullAddress && fullAddress !== ',') {
-                    try {
-                        const mapData = await mapService.getCoordinatesFromAddress(fullAddress);
-                        if (mapData?.latitude && mapData?.longitude) {
-                            setMapCoordinates({ lat: mapData.latitude, lon: mapData.longitude });
-                        }
-                    } catch (mapError) {
-                        console.warn("Geocoding fallito (indirizzo:", fullAddress, "):", mapError);
-                        // Non impostare errore globale → mappa mostrerà placeholder
-                        setMapCoordinates({ lat: null, lon: null });
-                    }
-                } else {
-                    console.info("Indirizzo non sufficiente per geocoding → mappa non caricata");
-                    setMapCoordinates({ lat: null, lon: null });
-                }
+                setMapCoordinates({ lat: null, lon: null });
 
             } catch (err) {
                 // Solo errori critici arrivano qui
@@ -243,25 +355,98 @@ export const ServiceDetailPageLuggage = ({ id }) => {
         fetchData();
     }, [id]);
 
+    // --- GEOCODING ISOLATO ---
+    useEffect(() => {
+        if (!service) return;
+
+        const fetchCoordinates = async () => {
+            const locale = service.serviceLocale?.find(l => l.language === 'it') ||
+                service.serviceLocale?.[0] || {};
+
+            const addressParts = [
+                locale.address?.trim(),
+                locale.city?.trim(),
+                locale.country?.trim()
+            ].filter(Boolean);
+
+            const fullAddress = addressParts.join(', ');
+
+            if (fullAddress && fullAddress !== ',') {
+                try {
+                    const mapData = await mapService.getCoordinatesFromAddress(fullAddress);
+                    if (mapData?.latitude && mapData?.longitude) {
+                        setMapCoordinates({ lat: mapData.latitude, lon: mapData.longitude });
+                    }
+                } catch (mapError) {
+                    console.warn("Geocoding fallito (indirizzo:", fullAddress, "):", mapError);
+                }
+            } else {
+                console.info("Indirizzo non sufficiente per geocoding → mappa non caricata");
+            }
+        };
+
+        fetchCoordinates();
+    }, [service]);
+
     // --- PARSING DATI ---
     const parsedData = useMemo(() => {
         if (!service) return null;
 
-        const locale = service.serviceLocale?.find(l => l.language === 'it') || service.serviceLocale?.[0] || {};
+        const { displayLocale } = getServiceLocalization(service.serviceLocale);
 
         const images = (service.images || []).length > 0
-            ? service.images.map(img => img.startsWith('http') ? img : `${IMG_BASE_URL}${img}`)
+            ? service.images.map(img => img.startsWith('http') ? img : `/files/luggage/${id}/${img}`)
             : ['https://placehold.co/1200x800/2D3748/A0AEC0?text=Deposito+Bagagli'];
 
         const displayAddress = [
-            locale.address?.trim(),
-            locale.city?.trim(),
-            locale.country?.trim()
+            displayLocale.address?.trim(),
+            displayLocale.city?.trim(),
+            displayLocale.country?.trim()
         ].filter(Boolean).join(', ') || "Indirizzo non disponibile";
 
+        // Costruzione robusta di sizePrices
+        let sizePrices = service.sizePrices ? [...service.sizePrices] : [];
+
+        // Normalizzazione dei dati (mapping sizeLabel -> size e fix prezzi 0)
+        if (sizePrices.length > 0) {
+            sizePrices = sizePrices.map(sp => {
+                const pPerHour = sp.pricePerHour || 0;
+                let pPerDay = sp.pricePerDay || 0;
+
+                // FIX: Se il prezzo giornaliero è 0 ma c'è un prezzo orario,
+                // impostiamo il giornaliero a (orario * 24) per evitare che il calcolo (Math.min) dia 0.
+                if (pPerDay === 0 && pPerHour > 0) {
+                    pPerDay = pPerHour * 24;
+                }
+
+                // Fallback inverso: se manca orario, usa giornaliero
+                const finalHourly = pPerHour > 0 ? pPerHour : pPerDay;
+
+                return {
+                    ...sp,
+                    size: sp.size || sp.sizeLabel, // Supporto per sizeLabel (da API)
+                    pricePerDay: pPerDay,
+                    pricePerHour: finalHourly
+                };
+            });
+        } else {
+            // Se sizePrices è vuoto, costruiscilo dai prezzi flat
+            const base = service.basePrice || 0;
+            const pSmall = service.priceSmall || base;
+            const pMedium = service.priceMedium || base;
+            const pLarge = service.priceLarge || base;
+
+            sizePrices = [
+                { size: 'SMALL', pricePerDay: pSmall, pricePerHour: pSmall },
+                { size: 'MEDIUM', pricePerDay: pMedium, pricePerHour: pMedium },
+                { size: 'LARGE', pricePerDay: pLarge, pricePerHour: pLarge }
+            ];
+        }
+
         return {
+            id: service.id || id,
             title: service.name || "Deposito Bagagli",
-            description: locale.description || service.description || "Deposito sicuro e assicurato.",
+            description: displayLocale.description || service.description || "Deposito sicuro e assicurato.",
             displayAddress,
             images,
             available: service.available !== false,
@@ -270,21 +455,56 @@ export const ServiceDetailPageLuggage = ({ id }) => {
                 medium: service.priceMedium || service.basePrice,
                 large: service.priceLarge || service.basePrice
             },
+            sizePrices: sizePrices,
             insurance: "N.D."
         };
-    }, [service]);
+    }, [service, id]);
 
     // Calcoli totale
     const totalBags = bagsSmall + bagsMedium + bagsLarge;
-    const totalPrice = parsedData
-        ? (bagsSmall * parsedData.prices.small) +
-          (bagsMedium * parsedData.prices.medium) +
-          (bagsLarge * parsedData.prices.large)
-        : 0;
+
+    // Recupera date/orari dai parametri URL
+    const dateFrom = searchParams.get('dateFrom');
+    const timeFrom = searchParams.get('timeFrom');
+    const dateTo = searchParams.get('dateTo');
+    const timeTo = searchParams.get('timeTo');
+
+    const { total, duration } = useMemo(() => {
+        if (!parsedData) return { total: 0, duration: null };
+        return calculateLuggageTotal(
+            dateFrom, timeFrom, dateTo, timeTo,
+            { small: bagsSmall, medium: bagsMedium, large: bagsLarge },
+            parsedData.sizePrices
+        );
+    }, [dateFrom, timeFrom, dateTo, timeTo, bagsSmall, bagsMedium, bagsLarge, parsedData]);
+
+    const totalPrice = total;
 
     const handleProceed = () => {
         if (totalBags === 0) return;
-        setShowSuccess(true); // Da sostituire con navigazione reale o chiamata API
+
+        navigate('/payment/summary', {
+            state: {
+                booking: {
+                    total: totalPrice,
+                    bagsSmall,
+                    bagsMedium,
+                    bagsLarge,
+                    totalBags,
+                    serviceId: service.id || id,
+                    serviceType: 'LUGGAGE',
+                    date: dateFrom,
+                    time: timeFrom,
+                    dateFrom,
+                    timeFrom,
+                    dateTo,
+                    timeTo,
+                    duration // Pass duration info
+                },
+                service: parsedData,
+                type: 'LUGGAGE'
+            }
+        });
     };
 
     // --- RENDER ---
@@ -298,6 +518,10 @@ export const ServiceDetailPageLuggage = ({ id }) => {
 
     if (!parsedData) return null;
 
+    if (!parsedData.available) {
+        return <ServiceUnavailablePage />;
+    }
+
     const breadcrumbsItems = [
         { label: 'Home', href: '/' },
         { label: 'Deposito Bagagli', href: '/service/luggage' },
@@ -305,37 +529,53 @@ export const ServiceDetailPageLuggage = ({ id }) => {
     ];
 
     return (
-        <>
-            <div className="max-w-7xl mx-auto px-4 py-6 md:py-12 font-sans">
-                <div className="mb-4 hidden md:block">
-                    <Breadcrumbs items={breadcrumbsItems} />
-                </div>
+        <div className={`min-h-screen bg-white ${HOGU_THEME.fontFamily} pb-24 md:pb-0`}>
+            {/* Sfondo sfumato header */}
+            <div className="absolute top-0 left-0 w-full h-96 bg-gradient-to-b from-gray-50 to-white -z-10"></div>
 
-                <ServiceHeaderDetail 
+            <div className="max-w-7xl mx-auto px-4 py-6 lg:px-8 lg:py-10">
+
+                <Breadcrumbs items={breadcrumbsItems} className="mb-6 opacity-80" />
+
+                <ServiceHeaderDetail
                     title={parsedData.title}
-                    urgencyCount={urgencyCount}
                     tags={<Tag>Sicuro & Assicurato</Tag>}
                 />
 
-                <div className="rounded-3xl overflow-hidden shadow-sm border border-gray-100 mb-8">
-                    <ServiceImageGallery images={parsedData.images} />
-                </div>
+                <div className="grid grid-cols-1 lg:grid-cols-12 gap-10">
 
-                <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 lg:gap-12 mt-8">
-                    {/* COLONNA SINISTRA - INFO */}
-                    <div className="lg:col-span-2 space-y-12">
+                    {/* --- COLONNA SINISTRA (CONTENUTI) --- */}
+                    <div className="lg:col-span-8 space-y-12">
+
+                        <div className="rounded-3xl overflow-hidden shadow-sm border border-gray-100">
+                            <ServiceImageGallery images={parsedData.images} />
+                        </div>
+
                         <section>
-                            <h2 className="text-2xl font-bold text-[#1A202C] mb-4">Descrizione</h2>
+                            {/* --- HEADER UNIFORME --- */}
+                            <div className="flex items-center gap-3 mb-6">
+                                <div className={`p-3 rounded-xl bg-[${HOGU_COLORS.primary}]/10`}>
+                                    <Info className={`w-6 h-6 text-[${HOGU_COLORS.primary}]`} />
+                                </div>
+                                <h2 className="text-2xl font-bold tracking-tight text-gray-900">Descrizione</h2>
+                            </div>
+
                             <p className="text-gray-600 leading-relaxed text-lg whitespace-pre-line">
                                 {parsedData.description}
                             </p>
                         </section>
 
-                        <section className="bg-white rounded-[2rem] border border-gray-100 shadow-lg p-8 border-l-4 border-l-[#68B49B]">
-                            <h3 className="text-xl font-bold text-[#1A202C] mb-6 flex items-center gap-2">
-                                <Package size={22} className="text-[#68B49B]" /> Tipologie Bagagli
-                            </h3>
-                            <div className="space-y-6">
+                        <section className={`bg-white rounded-3xl border border-gray-100 p-8 shadow-[0_8px_30px_rgb(0,0,0,0.04)] relative overflow-hidden`}>
+                            <div className={`absolute top-0 left-0 w-1 h-full bg-[${HOGU_COLORS.primary}]`}></div>
+
+                            <div className="flex items-center gap-3 mb-6 relative z-10">
+                                <div className={`p-3 rounded-xl bg-[${HOGU_COLORS.primary}]/10`}>
+                                    <Package className={`w-6 h-6 text-[${HOGU_COLORS.primary}]`} />
+                                </div>
+                                <h2 className="text-2xl font-bold tracking-tight text-gray-900">Tipologie Bagagli</h2>
+                            </div>
+
+                            <div className="space-y-6 relative z-10">
                                 {[
                                     { label: "A Mano (Small)", price: parsedData.prices.small, desc: "Zaini, borse PC, shopping" },
                                     { label: "Media (Standard)", price: parsedData.prices.medium, desc: "Trolley cabina, valigie medie" },
@@ -348,7 +588,7 @@ export const ServiceDetailPageLuggage = ({ id }) => {
                                         <div className="flex-1">
                                             <div className="flex justify-between items-start mb-1">
                                                 <h4 className="font-bold text-gray-900">{item.label}</h4>
-                                                <span className="font-bold text-lg">€{item.price}/gg</span>
+                                                <span className="font-bold text-lg">€{typeof item.price === 'number' ? item.price.toFixed(2) : item.price}/gg</span>
                                             </div>
                                             <p className="text-sm text-gray-600">{item.desc}</p>
                                         </div>
@@ -357,18 +597,19 @@ export const ServiceDetailPageLuggage = ({ id }) => {
                             </div>
                         </section>
 
-                        <section>
+                        <section className="pt-8 border-t border-gray-100">
+                            {/* --- HEADER UNIFORME --- */}
                             <div className="flex items-center gap-3 mb-6">
-                                <div className="p-3 rounded-xl bg-[#68B49B]/10">
-                                    <MapPin className="w-6 h-6 text-[#68B49B]" />
+                                <div className={`p-3 rounded-xl bg-[${HOGU_COLORS.primary}]/10`}>
+                                    <MapPin className={`w-6 h-6 text-[${HOGU_COLORS.primary}]`} />
                                 </div>
-                                <h2 className="text-2xl font-bold">Dove trovarci</h2>
+                                <h2 className="text-2xl font-bold tracking-tight text-gray-900">Dove trovarci</h2>
                             </div>
 
-                            <LeafletMapLuggage 
-                                lat={mapCoordinates.lat} 
-                                lon={mapCoordinates.lon} 
-                                name={parsedData.title} 
+                            <LeafletMapLuggage
+                                lat={mapCoordinates.lat}
+                                lon={mapCoordinates.lon}
+                                name={parsedData.title}
                             />
 
                             <div className="pl-2 border-l-4 border-gray-200">
@@ -377,81 +618,43 @@ export const ServiceDetailPageLuggage = ({ id }) => {
                         </section>
                     </div>
 
-                    {/* COLONNA DESTRA - PRENOTAZIONE */}
-                    <div className="lg:col-span-1">
-                        <div className="sticky top-24">
-                            <div className="bg-white rounded-[2rem] shadow-xl border border-gray-100 p-6 ring-1 ring-black/5">
-                                <div className="flex justify-between items-center mb-6">
-                                    <h3 className="text-xl font-extrabold">Prenota il tuo spazio</h3>
-                                    <div className="flex items-center gap-1 text-sm font-bold">
-                                        <Star size={16} className="text-yellow-400 fill-yellow-400" /> 4.9
-                                    </div>
+                    {/* --- COLONNA DESTRA (STICKY DESKTOP) --- */}
+                    <div className="hidden md:block lg:col-span-4">
+                        <div className="relative h-full">
+                            <div className="bg-white rounded-[2rem] shadow-[0_20px_40px_-10px_rgba(0,0,0,0.1)] border border-gray-100 overflow-hidden sticky top-28 ring-1 ring-black/5 p-6">
+                                <div className="flex justify-between items-center mb-6 border-b border-gray-50 pb-4">
+                                    <h3 className="text-xl font-extrabold text-gray-900">Prenota Spazio</h3>
                                 </div>
 
-                                <div className="space-y-6">
-                                    <div>
-                                        <label className="text-xs font-bold uppercase text-gray-500 ml-1">Seleziona bagagli</label>
-                                        <div className="grid grid-cols-2 gap-4 mt-3">
-                                            <LuggageSelectorCard 
-                                                label="A Mano" 
-                                                icon={Briefcase} 
-                                                iconSize={26}
-                                                price={parsedData.prices.small}
-                                                description="fino a 40cm"
-                                                count={bagsSmall}
-                                                onChange={setBagsSmall}
-                                            />
-                                            <LuggageSelectorCard 
-                                                label="Media" 
-                                                icon={Briefcase} 
-                                                iconSize={34}
-                                                price={parsedData.prices.medium}
-                                                description="fino a 65cm"
-                                                count={bagsMedium}
-                                                onChange={setBagsMedium}
-                                            />
-                                            <div className="col-span-2">
-                                                <LuggageSelectorCard 
-                                                    label="XXL" 
-                                                    icon={Briefcase} 
-                                                    iconSize={44}
-                                                    price={parsedData.prices.large}
-                                                    description="oltre 65cm"
-                                                    count={bagsLarge}
-                                                    onChange={setBagsLarge}
-                                                />
-                                            </div>
-                                        </div>
-                                    </div>
-
-                                    <div className="pt-4 border-t border-dashed border-gray-300">
-                                        <div className="flex justify-between items-end mb-5">
-                                            <div>
-                                                <p className="text-xs uppercase font-bold text-gray-500">Totale stimato</p>
-                                                <p className="text-[10px] text-gray-500">{totalBags} bagagli × 1 giorno</p>
-                                            </div>
-                                            <div className="text-3xl font-extrabold text-[#1A202C]">€ {totalPrice}</div>
-                                        </div>
-
-                                        <PrimaryButton 
-                                            onClick={handleProceed}
-                                            disabled={totalBags === 0}
-                                            className="w-full py-4 text-lg"
-                                        >
-                                            {totalBags > 0 ? 'Prenota Ora' : 'Seleziona almeno un bagaglio'}
-                                        </PrimaryButton>
-
-                                    </div>
-                                </div>
+                                <BookingFormContentLuggage
+                                    bagsSmall={bagsSmall} setBagsSmall={setBagsSmall}
+                                    bagsMedium={bagsMedium} setBagsMedium={setBagsMedium}
+                                    bagsLarge={bagsLarge} setBagsLarge={setBagsLarge}
+                                    prices={parsedData.prices}
+                                    onProceed={handleProceed}
+                                    totalBags={totalBags}
+                                    totalPrice={totalPrice}
+                                />
                             </div>
                         </div>
                     </div>
+
                 </div>
             </div>
 
-            {/* Modal successo (sostituibile con redirect o API reale) */}
-            {showSuccess && <SuccessModal onClose={() => navigate('/')} />}
-        </>
+            {/* --- MOBILE BOOKING SHEET --- */}
+            <MobileBookingSheetLuggage
+                bagsSmall={bagsSmall} setBagsSmall={setBagsSmall}
+                bagsMedium={bagsMedium} setBagsMedium={setBagsMedium}
+                bagsLarge={bagsLarge} setBagsLarge={setBagsLarge}
+                prices={parsedData.prices}
+                onProceed={handleProceed}
+                totalBags={totalBags}
+                totalPrice={totalPrice}
+            />
+
+            {urgencyCount > 0 && <LiveViewersFloatingBadge count={urgencyCount} className="!bottom-24 md:!bottom-6" />}
+        </div>
     );
 };
 

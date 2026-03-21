@@ -1,6 +1,9 @@
 import React from "react";
+import { useTranslation } from "react-i18next";
 import { HOGU_COLORS, HOGU_THEME } from "../../../config/theme.js"; // Assicurati il percorso sia corretto
 import { ShieldCheck, Star, MapPin, ChevronRight, Image as ImageIcon } from "lucide-react";
+import SafeImage from "../../ui/SafeImage.jsx";
+
 
 export const ProviderInfoCard = ({
     providerName = "Prestige Mobility NCC",
@@ -16,18 +19,19 @@ export const ProviderInfoCard = ({
     logoUrl = "https://ui-avatars.com/api/?name=Prestige+Mobility&background=1A202C&color=fff&size=128", // Fallback logo
     className = ""
 }) => {
+    const { t } = useTranslation();
 
     return (
         <div className={`w-full bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden ${className}`}>
-            
+
             {/* ---- HEADER PROVIDER ---- */}
             <div className="p-6 border-b border-gray-50 flex items-start justify-between gap-4">
                 <div className="flex gap-4">
                     {/* Logo / Avatar */}
                     <div className="relative">
-                        <img 
-                            src={logoUrl} 
-                            alt={providerName} 
+                        <SafeImage
+                            src={logoUrl}
+                            alt={providerName}
                             className="w-16 h-16 rounded-xl object-cover border border-gray-100 shadow-sm"
                         />
                         {/* Badge Verificato Assoluto */}
@@ -47,12 +51,12 @@ export const ProviderInfoCard = ({
                                 Pro
                             </span>
                         </div>
-                        
+
                         <div className="flex items-center gap-3 mt-1 text-sm text-gray-500">
                             <div className="flex items-center gap-1">
                                 <Star size={14} className="text-yellow-400 fill-yellow-400" />
                                 <span className="font-semibold text-gray-800">{rating}</span>
-                                <span className="text-gray-400">({reviews})</span>
+                                <span className="text-gray-400">({reviews} {t('ncc_detail.provider.reviews')})</span>
                             </div>
                             <span className="text-gray-300">•</span>
                             <div className="flex items-center gap-1">
@@ -66,45 +70,12 @@ export const ProviderInfoCard = ({
 
             {/* ---- DESCRIZIONE ---- */}
             <div className="px-6 py-5">
-                <h4 className="text-xs font-bold text-gray-400 uppercase tracking-wider mb-2">Informazioni sul servizio</h4>
+                <h4 className="text-xs font-bold text-gray-400 uppercase tracking-wider mb-2">{t('ncc_detail.provider.info_title')}</h4>
                 <p className={`text-sm leading-relaxed ${HOGU_THEME.subtleText}`}>
                     {description}
                 </p>
             </div>
 
-            {/* ---- GALLERIA IMMAGINI (Scroll orizzontale) ---- */}
-            <div className="pl-6 pb-6">
-                <h4 className="text-xs font-bold text-gray-400 uppercase tracking-wider mb-3 flex items-center gap-2">
-                    <ImageIcon size={14} />
-                    Flotta & Dettagli
-                </h4>
-                
-                {/* Contenitore Scroll */}
-                <div className="flex gap-3 overflow-x-auto pb-4 pr-6 hide-scrollbar snap-x">
-                    {images.map((img, index) => (
-                        <div 
-                            key={index} 
-                            className="relative min-w-[200px] h-32 rounded-lg overflow-hidden border border-gray-100 shadow-sm snap-start group cursor-pointer"
-                        >
-                            <img 
-                                src={img} 
-                                alt={`Dettaglio servizio ${index + 1}`} 
-                                className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
-                            />
-                            {/* Overlay on hover */}
-                            <div className="absolute inset-0 bg-black/0 group-hover:bg-black/10 transition-colors duration-300" />
-                        </div>
-                    ))}
-                    
-                    {/* Card "Vedi tutte" finale */}
-                    <div className="min-w-[100px] h-32 rounded-lg border-2 border-dashed border-gray-200 flex flex-col items-center justify-center gap-2 text-gray-400 hover:text-gray-600 hover:border-gray-300 cursor-pointer transition-all snap-start">
-                        <div className={`p-2 rounded-full bg-[${HOGU_COLORS.lightAccent}]`}>
-                            <ChevronRight size={16} className={`text-[${HOGU_COLORS.primary}]`} />
-                        </div>
-                        <span className="text-xs font-medium">Vedi tutte</span>
-                    </div>
-                </div>
-            </div>
 
             {/* Stile inline per nascondere scrollbar ma mantenere funzionalità */}
             <style>{`

@@ -1,0 +1,457 @@
+{
+  "title": "Dashboard",
+  "language_tag": "it-IT",
+  "welcome_back": "Bentornato,",
+  "subtitle_welcome": "Il tuo centro prenotazioni.",
+  "btn_security": "Sicurezza Account",
+  "tabs": {
+    "active": "Agenda",
+    "history": "Storico"
+  },
+  "stats": {
+    "agenda": "Agenda",
+    "bookings": "Prenotazioni",
+    "events_unit": "Eventi",
+    "total_unit": "Totali",
+    "explore": "Esplora",
+    "new_events": "Nuovi Eventi",
+    "revenue": "Fatturato {{label}}",
+    "monthly_total": "Totali questo mese"
+  },
+  "no_bookings": {
+    "title": "Nessuna prenotazione",
+    "desc_active": "Non hai altri programmi per il futuro prossimo.",
+    "desc_history": "Non ci sono prenotazioni passate in archivio.",
+    "cta": "Prenota Ora"
+  },
+  "price_change": {
+    "title": "Richiesta Modifica Prezzo",
+    "desc": "Il gestore ha proposto una variazione per la tua prenotazione.",
+    "old_price": "Vecchio Prezzo",
+    "new_price": "Nuovo Prezzo",
+    "accept": "Accetta Modifica",
+    "reject": "Rifiuta e Annulla"
+  },
+  "booking_card": {
+    "date": "Data",
+    "time": "Ora",
+    "ticket": "Ticket",
+    "detail": "Dettaglio",
+    "review": "Lascia Recensione",
+    "report": "Segnala Problema",
+    "today_arrival": "Oggi in Arrivo",
+    "today_arrival_desc": "I tuoi appuntamenti per oggi, {{date}}.",
+    "today": "OGGI",
+    "show_ticket": "Mostra Ticket",
+    "detail_tooltip": "Dettaglio Prenotazione"
+  },
+  "main_section": {
+    "agenda_title": "Agenda & Prenotazioni",
+    "history_title": "Storico Prenotazioni",
+    "all_title": "Tutte le Prenotazioni",
+    "desc": "Gestisci i tuoi prossimi impegni e controlla i dettagli."
+  },
+  "ticket_modal": {
+    "title": "Digital Ticket",
+    "guests": "Ospiti",
+    "close": "Chiudi",
+    "entrance_instruction": "Mostra all'ingresso",
+    "download": "Scarica Biglietto"
+  },
+  "detail_modal": {
+    "title": "Dettaglio Prenotazione",
+    "description_placeholder": "Dettagli completi della tua prenotazione presso la struttura.",
+    "address": "Indirizzo",
+    "at_time": "alle",
+    "guests": "Persone",
+    "summary": "Riepilogo Costi",
+    "base_price": "Prezzo base",
+    "service_fees": "Commissioni di servizio",
+    "total": "Totale",
+    "view_ticket": "Vedi Ticket",
+    "close": "Chiudi",
+    "address_not_available": "Indirizzo non gestito"
+  },
+  "complaint_modal": {
+    "title": "Segnala Problema",
+    "subtitle_step1": "Problemi con <strong>{{service}}</strong>?",
+    "subtitle_step2": "Scegli come inviare la segnalazione.",
+    "placeholder": "Descrivi brevemente il problema...",
+    "cancel": "Annulla",
+    "continue": "Continua",
+    "email_app": {
+      "title": "1. App di Posta (Consigliato)",
+      "desc": "Apriremo il client di posta predefinito del tuo dispositivo con il messaggio compilato.",
+      "button": "Apri App Email"
+    },
+    "manual": {
+      "title": "2. Copia e Invia",
+      "desc": "Copia i campi qui sotto per inviare l'email dal tuo provider web (es. Gmail).",
+      "to": "A:",
+      "subject": "Oggetto",
+      "message": "Messaggio",
+      "copy_text": "Copia Testo",
+      "copied": "Copiato"
+    },
+    "back": "Indietro",
+    "email_body": {
+      "intro": "Salve, vorrei segnalare un problema riguardante la seguente prenotazione:",
+      "details_header": "Dettagli Prenotazione:",
+      "service": "- Servizio: {{service}}",
+      "type": "- Tipo: {{type}}",
+      "date": "- Data: {{date}} alle {{time}}",
+      "code": "- Codice Prenotazione: {{code}}",
+      "user_desc": "Descrizione Utente:",
+      "footer": "--- Inviato tramite HOGU Customer Dashboard"
+    }
+  },
+  "messages": {
+    "loading": "Caricamento...",
+    "error_fetch": "Impossibile caricare le prenotazioni. Riprova più tardi.",
+    "success_cancel": "Prenotazione annullata con successo.",
+    "error_cancel": "Errore durante l'annullamento. Riprova tra poco."
+  },
+  "pagination": {
+    "page": "Pagina",
+    "of": "di"
+  },
+  "restaurant_edit": {
+    "validation": {
+      "name": "Il nome del ristorante è obbligatorio",
+      "city": "La città è obbligatoria",
+      "address": "L'indirizzo è obbligatorio",
+      "description": "La descrizione è obbligatoria",
+      "min_images": "Devi caricare almeno 6 immagini (attuali: {{count}})."
+    }
+  },
+  "provider": {
+    "categories": {
+      "restaurant": "Ristorante",
+      "beb": "B&B / Hotel",
+      "club": "Club / Eventi",
+      "ncc": "NCC / Trasporti",
+      "storage": "Depositi",
+      "units": {
+        "coperti": "Coperti",
+        "notti": "Notti",
+        "ingressi": "Ingressi",
+        "pax": "Passeggeri",
+        "bags": "Bagagli"
+      }
+    },
+    "core": {
+      "title": "Dashboard Provider",
+      "info_btn": "Info",
+      "security_btn": "Sicurezza Account",
+      "modal_info_title": "Info Servizio",
+      "modal_info_subtitle": "Informazioni utili per la tua struttura",
+      "modal_close": "Ho capito",
+      "info_items": {
+        "club": {
+          "event_management": {
+            "title": "Gestione Eventi",
+            "desc": "Crea e gestisci le tue serate in pochi click. Mantieni aggiornati i dettagli dell'evento, le disponibilità dei tavoli e monitora le prenotazioni in tempo reale per una serata di successo."
+          },
+          "entry_scanner": {
+            "title": "Scanner Ingressi",
+            "desc": "Velocizza l'accesso al tuo club. Utilizza il QR scanner integrato per convalidare i ticket digitali dei tuoi clienti all'ingresso, garantendo un controllo flussi fluido e sicuro."
+          },
+          "lists_tables": {
+            "title": "Liste e Tavoli",
+            "desc": "Organizza al meglio i tuoi spazi. Gestisci le richieste per le liste d'attesa e le prenotazioni dei tavoli (Privé e Pista) approvando le richieste per permettere il pagamento sicuro sulla piattaforma."
+          },
+          "payments": {
+            "title": "Pagamenti",
+            "desc": "Massima trasparenza sui tuoi incassi. I pagamenti confermati vengono liquidati cumulativamente a fine mese. La commissione copre la gestione transazioni e il supporto tecnico della piattaforma."
+          }
+        },
+        "restaurant": {
+          "room_management": {
+            "title": "Gestione Sala",
+            "desc": "Accetta o rifiuta le prenotazioni in tempo reale dalla sezione 'Gestione Sala'. Monitora l'arrivo dei clienti per un servizio sempre eccellente."
+          },
+          "qr_scanner": {
+            "title": "Scanner QR",
+            "desc": "Valida rapidamente l'arrivo dei clienti. Usa lo scanner integrato per validare e verificare le prenotazioni digitali al momento dell'accoglienza al tavolo."
+          },
+          "booking_schedule": {
+            "title": "Agenda Prenotazioni",
+            "desc": "Mantieni il controllo del tuo locale. Consulta in 'In Arrivo' le prenotazioni già confermate e pronte per il servizio. Usa l' 'Archivio' per consultare lo storico completo delle prestazioni completate, annullate o rifiutate."
+          },
+          "commissions_payments": {
+            "title": "Commissioni e Pagamenti",
+            "desc": "Calcolo automatico e trasparente. Le commissioni (2.50€ per coperto) vengono detratte solo sulle prenotazioni completate, con liquidazione mensile sul tuo conto."
+          }
+        },
+        "bnb": {
+          "booking_schedule": {
+            "title": "Agenda Prenotazioni",
+            "desc": "Monitora l'attività della tua struttura. In 'In Arrivo' trovi tutti i check-in da oggi in avanti, incluse le prenotazioni annullate in giornata. L' 'Archivio' raccoglie esclusivamente i soggiorni con check-in antecedente alla data odierna. Ogni prenotazione ha un codice unico (COD) per una rapida identificazione."
+          },
+          "reception_scanner": {
+            "title": "Reception Scanner",
+            "desc": "Semplifica l'accoglienza con lo scanner integrato. Inquadra i documenti d'identità dei tuoi ospiti per registrare automaticamente i dati necessari, riducendo i tempi d'attesa e gli errori manuali."
+          },
+          "your_rooms": {
+            "title": "Le tue Stanze",
+            "desc": "Mantieni sempre aggiornata la tua disponibilità. Puoi modificare i prezzi per periodi speciali, aggiornare le descrizioni delle camere e gestire i calendari per evitare sovrapposizioni."
+          },
+          "payments_compensation": {
+            "title": "Pagamenti e Compensi",
+            "desc": "La trasparenza è fondamentale. Il compenso netto viene liquidato cumulativamente a fine mese per tutti i soggiorni completati. La commissione di servizio copre la gestione transazioni e l'assicurazione sulla piattaforma."
+          }
+        },
+        "luggage": {
+          "request_management": {
+            "title": "Gestione Richieste",
+            "desc": "Monitora la sezione 'In Attesa' per accettare i nuovi depositi. Ricorda di verificare sempre il numero e la dimensione dei bagagli alla consegna."
+          },
+          "storage_scanner": {
+            "title": "Scanner Deposito",
+            "desc": "Usa lo scanner per validare sia la consegna che il ritiro."
+          },
+          "security_custody": {
+            "title": "Sicurezza e Custodia",
+            "desc": "Mantieni i bagagli in aree sicure e non accessibili al pubblico. Consigliamo l'uso di sigilli di sicurezza per garantire l'integrità del servizio."
+          },
+          "rates_hours": {
+            "title": "Tariffe e Orari",
+            "desc": "Puoi gestire i prezzi per dimensione (Small, Medium, Large) e gli orari di apertura direttamente dalla sezione 'Modifica Deposito'."
+          },
+          "payments": {
+            "title": "Pagamenti",
+            "desc": "Trasparenza totale sui tuoi rimborsi. Gli incassi accumulati vengono liquidati a fine mese sul tuo conto corrente, detratta la commissione di servizio per la gestione della piattaforma."
+          }
+        },
+        "ncc": {
+          "request_management": {
+            "title": "Gestione Richieste",
+            "desc": "Le nuove prenotazioni appaiono in 'Richieste Corsa'. Puoi accettare, rettificare il prezzo (per extra o variazioni) o rifiutare la richiesta se non puoi coprire il servizio."
+          },
+          "current_ride": {
+            "title": "Corsa in Corso",
+            "desc": "Le corse confermate compaiono in 'Richiesta in corso'. Qui visualizzi la mappa del percorso e puoi segnare la corsa come completata al termine del transfer."
+          },
+          "ride_scanner": {
+            "title": "Scanner Corsa",
+            "desc": "Utilizza la funzione Scanner per convalidare il voucher del cliente tramite QR Code direttamente al momento dell'accoglienza a bordo."
+          },
+          "rates_fleet": {
+            "title": "Tariffe e Flotta",
+            "desc": "In 'Il tuo Servizio' puoi aggiornare i mezzi a disposizione, le tariffe per km."
+          }
+        },
+        "default": {
+          "bookings": {
+            "title": "Prenotazioni",
+            "desc": "Gestisci le tue prenotazioni e il calendario."
+          },
+          "payments": {
+            "title": "Pagamenti",
+            "desc": "Ricevi i pagamenti direttamente sul tuo conto."
+          },
+          "rules": {
+            "title": "Regole",
+            "desc": "Imposta le regole della casa e i termini di cancellazione."
+          }
+        }
+      }
+    },
+    "mobile": {
+      "have_requests": "Hai {{count}} richieste",
+      "click_manage": "Clicca per gestire subito",
+      "requests_title": "Richieste Corsa",
+      "pending_count_one": "1 prenotazione in attesa",
+      "pending_count_other": "{{count}} prenotazioni in attesa",
+      "all_done": "Tutto fatto!",
+      "no_pending": "Nessuna richiesta in attesa.",
+      "close": "Chiudi"
+    },
+    "stats": {
+      "revenue": "Fatturato {{label}}",
+      "bookings": "Prenotazioni",
+      "monthly_total": "Totali questo mese"
+    },
+    "actions": {
+      "accept": "Accetta",
+      "rectify": "Rettifica",
+      "reject": "Rifiuta",
+      "details": "Dettagli",
+      "cancel": "Annulla",
+      "complete": "Completa",
+      "send": "Invia",
+      "back": "Indietro",
+      "confirm": "Conferma",
+      "other_options": "Altre opzioni",
+      "cancel_booking": "Annulla Prenotazione",
+      "report_problem": "Segnala Problema",
+      "mark_completed": "Segna completata",
+      "cancel_ride": "Annulla corsa",
+      "close": "Chiudi",
+      "retry": "Riprova"
+    },
+    "status": {
+      "payment_completed": "Pagamento Completato",
+      "completed": "Completato",
+      "in_progress": "In corso",
+      "pending": "In Attesa",
+      "waiting_customer": "Attesa Cliente",
+      "cancelled": "Annullata",
+      "refunded": "Rimborsato Admin",
+      "confirmed": "Confermata"
+    },
+    "filters": {
+      "active": "In Arrivo",
+      "past": "Archivio"
+    },
+    "storage": {
+      "scanner_title": "Scanner Deposito",
+      "my_storage_title": "Il mio Deposito",
+      "my_storage_subtitle": "Configurazione e prezzi",
+      "requests_title": "Richieste ({{count}})",
+      "requests_subtitle": "Gestisci i depositi in entrata",
+      "back_to_dashboard": "Torna alla Dashboard",
+      "no_pending": "Nessuna richiesta di deposito in attesa.",
+      "pending_section_title": "Depositi in Attesa",
+      "pending_empty": "Nessuna nuova richiesta di deposito.",
+      "schedule_title": "Depositi Attivi & Storico",
+      "schedule_empty": "Nessun deposito in questa lista.",
+      "detail_title": "Dettagli Deposito",
+      "dropoff": "Deposito",
+      "pickup": "Ritiro Previsto",
+      "size_small": "Piccolo",
+      "size_medium": "Medio",
+      "size_large": "Grande",
+      "total_items": "Totale Colli",
+      "pieces_count_one": "1 pezzo",
+      "pieces_count_other": "{{count}} pezzi",
+      "bag_count_one": "1 bagaglio",
+      "bag_count_other": "{{count}} bagagli",
+      "booking_number": "Prenotazione #{{id}}"
+    },
+    "booking_details": {
+      "title": "Dettagli Prenotazione",
+      "itinerary": "Itinerario",
+      "departure": "Partenza",
+      "arrival": "Arrivo",
+      "not_specified": "Non specificato",
+      "checkin_out": "Check-in / Out",
+      "nights": "Notti",
+      "luggage_details": "Dettagli Bagagli",
+      "luggage_desc": "{{count}} Colli custoditi per {{duration}}",
+      "full_day": "Giornata intera",
+      "date": "Data",
+      "time": "Orario",
+      "total": "Totale",
+      "guests": "Ospiti",
+      "guest_one": "Ospite",
+      "guest_other": "Ospiti",
+      "night_one": "Notte",
+      "night_other": "Notti",
+      "passengers": "Passeggeri",
+      "quantity": "Quantità",
+      "pax_count": "{{count}} pax",
+      "booking_one": "prenotazione",
+      "booking_other": "prenotazioni",
+      "customer": "Cliente",
+      "customer_notes": "Note Cliente",
+      "commission_label": "Commissioni",
+      "cancellation_reason": "Motivo Cancellazione",
+      "entrance_only": "Solo Ingresso",
+      "table": "Tavolo",
+      "female_entrance": "Ingresso Donna",
+      "male_entrance": "Ingresso Uomo",
+      "standard_entrance": "Ingresso Lista"
+    },
+    "modals": {
+      "complaint": {
+        "title": "Segnala Problema",
+        "placeholder": "Dettagli segnalazione...",
+        "submit": "Invia Segnalazione"
+      },
+      "cancellation": {
+        "title": "Annulla Prenotazione",
+        "placeholder": "Motivo..."
+      },
+      "correction": {
+        "title": "Rettifica Prezzo",
+        "label": "Nuovo Prezzo (€)",
+        "placeholder": "Inserisci nuovo prezzo",
+        "notes": "Note"
+      }
+    },
+    "restaurant_service_edit": {
+      "publishing": {
+        "status_heading": "Stato pubblicazione",
+        "sidebar_hint": "Gestisci la visibilità dalla sezione foto e salva dalla barra in basso.",
+        "status_label": "Stato",
+        "footer_label": "Stato pubblicazione:",
+        "visible": "Visibile online",
+        "hidden": "Nascosto"
+      }
+    },
+    "dashboard": {
+      "scanner_title": "Scanner Corsa",
+      "restaurant_scanner_title": "Scanner Sala",
+      "scanner_subtitle": "Clicca per scansionare ingressi.",
+      "restaurant_scanner_subtitle": "Clicca per scansionare ingressi.",
+      "scanner_desc": "Convalida il voucher a bordo.",
+      "scanner_short": "Scanner",
+      "history_title": "Agenda Prenotazioni",
+      "pending_section_title": "Gestione Sala",
+      "pending_message": "Richieste tavoli da confermare.",
+      "no_pending": "Nessuna richiesta in sospeso.",
+      "all_clear_title": "Sala Aggiornata",
+      "all_clear_subtitle": "Tutte le richieste sono state gestite.",
+      "manage_restaurant": "Gestisci Ristorante",
+      "restaurant_short": "Ristorante",
+      "your_restaurant": "Il tuo Ristorante",
+      "waiting_customer": "In attesa del cliente...",
+      "stats": {
+        "commissions_to_pay": "Commissioni da pagare",
+        "view_commissions_detail": "Vedi dettaglio commissioni"
+      },
+      "banner": {
+        "incomplete_profile": "Profilo incompleto",
+        "incomplete_profile_desc": "Per poter gestire al meglio il tuo ristorante, aggiorna le informazioni base (Nome, Descrizione e Menu).",
+        "update_now": "Aggiorna Ora"
+      },
+      "manage_tables": "Gestisci tavoli e liste",
+      "general_details": "Dettagli Generali Ristorante",
+      "edit_details_desc": "Modifica nome, descrizione, foto e menu",
+      "agenda_desc_active": "Include tutti i check-in programmati da oggi in avanti, comprese le prenotazioni eventualmente annullate durante la giornata.",
+      "agenda_desc_past": "Riservato esclusivamente allo storico delle prenotazioni con check-in precedente ad oggi.",
+      "waiting": "in attesa",
+      "new_tag": "NEW",
+      "service_title": "Il tuo Servizio",
+      "service_desc": "Tariffe e flotta",
+      "current_ride_title": "Richiesta in corso",
+      "current_ride_desc_active": "Gestisci la corsa attualmente in programma.",
+      "current_ride_desc_none": "Nessuna corsa in corso al momento.",
+      "pending_requests_title": "Richieste Corsa",
+      "pending_requests_none": "Nessuna corsa in attesa.",
+      "pending_requests_desc_one": "1 nuova richiesta di transfer.",
+      "pending_requests_desc_other": "{{count}} nuove richieste di transfer.",
+      "fleet_idle": "Parco Auto Fermo",
+      "agenda_title": "Agenda Corse",
+      "no_rides": "Nessuna corsa in questa lista.",
+      "tabs": {
+        "upcoming": "In Arrivo",
+        "archive": "Archivio"
+      }
+    },
+    "success": {
+      "title": "Operazione Completata",
+      "booking_accepted": "Prenotazione accettata!",
+      "booking_cancelled": "Prenotazione cancellata/rifiutata.",
+      "complaint_sent": "Segnalazione inviata.",
+      "correction_sent": "Proposta di correzione inviata."
+    },
+    "errors": {
+      "title": "Ops, qualcosa è andato storto",
+      "no_rides": "Nessuna corsa in questa lista.",
+      "customer": "Cliente",
+      "generic_action": "Errore durante l'operazione."
+    }
+  }
+}

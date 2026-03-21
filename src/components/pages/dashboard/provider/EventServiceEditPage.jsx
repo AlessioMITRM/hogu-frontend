@@ -3,17 +3,23 @@ import { useParams, useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { withAuthProtection } from '../../auth/withAuthProtection.jsx';
 import { clubService } from '../../../../api/apiClient.js';
-import italianLocationsData from '../../../../assets/data/italian_locations.json';
-import englishLocationsData from '../../../../assets/data/english_locations.json';
+import { CityAutocomplete } from '../../../ui/CityAutocomplete';
+import { 
+    getDisplayLocation, 
+    createLocationPayload 
+} from '../../../../utils/locationUtils';
 import { Breadcrumbs } from '../../../../components/ui/Breadcrumbs.jsx';
 import SuccessModal from '../../../ui/SuccessModal.jsx';
 import ErrorModal from '../../../ui/ErrorModal.jsx';
 import LoadingScreen from '../../../ui/LoadingScreen.jsx';
+import ConfirmModal from '../../../ui/ConfirmModal.jsx';
+import SafeImage from '../../../ui/SafeImage.jsx';
+
 
 import {
-  Clock, MapPin, Info, Check, Music, GlassWater, Armchair, Ticket, Shirt, Users,
-  ChevronRight, Save, Upload, Trash2, Plus, Eye, EyeOff, CreditCard, Navigation, Euro,
-  Mic2, Disc, Speaker, CalendarCheck, FileText, VenetianMask, Calendar
+  Clock, MapPin, Check, Music, GlassWater, Armchair, Ticket, Shirt, Users,
+  ChevronRight, Save, Upload, Trash2, Plus, Eye, EyeOff, Navigation, Euro,
+  Mic2, Disc, Speaker, VenetianMask, Calendar
 } from 'lucide-react';
 
 /* --------------  TEMA  -------------- */
@@ -32,135 +38,6 @@ const HOGU_THEME = {
   fontFamily: 'font-sans'
 };
 
-/* --------------  LOCATION UTILS  -------------- */
-const processLocations = (data) => {
-  if (!data) return [];
-  const flat = [];
-  data.forEach(region =>
-    region.provinces.forEach(province =>
-      province.cities.forEach(city =>
-        flat.push({
-          city,
-          province: province.name,
-          region: region.region,
-          fullLabel: `${city}, ${region.region}`,
-          searchString: `${city}, ${province.name}, ${region.region}`
-            .toLowerCase()
-            .normalize('NFD')
-            .replace(/[\u0300-\u036f]/g, '')
-        })
-      )
-    )
-  );
-  return flat;
-};
-
-/* --------------  InfoAccordionItem  -------------- */
-const InfoAccordionItem = ({ icon: Icon, title, description, colorClass, defaultOpen = false }) => {
-  const [isOpen, setIsOpen] = useState(defaultOpen);
-  return (
-    <div className="border-b border-gray-100 last:border-0">
-      <button
-        onClick={() => setIsOpen(!isOpen)}
-        className="w-full flex items-center justify-between py-3 hover:bg-gray-50 transition-colors rounded-lg px-2 -mx-2 group"
-      >
-        <div className="flex items-center gap-3">
-          <div className={`p-1.5 rounded-lg shrink-0 transition-colors ${colorClass}`}><Icon size={16} /></div>
-          <span className="font-bold text-sm text-gray-900">{title}</span>
-        </div>
-        <ChevronRight size={16} className={`text-gray-400 transition-transform duration-300 ${isOpen ? 'rotate-90' : ''}`} />
-      </button>
-      <div className={`overflow-hidden transition-all duration-300 ease-in-out ${isOpen ? 'max-h-24 opacity-100 mb-3' : 'max-h-0 opacity-0'}`}>
-        <p className="text-xs text-gray-500 leading-relaxed pl-[2.8rem] pr-2">{description}</p>
-      </div>
-    </div>
-  );
-};
-
-/* --------------  CityAutocomplete  -------------- */
-const CityAutocomplete = ({ label, value, onChange, icon: Icon }) => {
-  const { i18n, t } = useTranslation();
-  const [suggestions, setSuggestions] = useState([]);
-  const [show, setShow] = useState(false);
-  const wrapperRef = useRef(null);
-  const [inputValue, setInputValue] = useState(value || '');
-
-  useEffect(() => setInputValue(value || ''), [value]);
-
-  const locationData = useMemo(() => {
-    const it = i18n.language?.startsWith('it');
-    const raw = it ? italianLocationsData : (englishLocationsData || italianLocationsData);
-    return processLocations(raw);
-  }, [i18n.language]);
-
-  useEffect(() => {
-    const outside = e => wrapperRef.current && !wrapperRef.current.contains(e.target) && setShow(false);
-    document.addEventListener('mousedown', outside);
-    return () => document.removeEventListener('mousedown', outside);
-  }, []);
-
-  const handleInputChange = e => {
-    const v = e.target.value;
-    setInputValue(v);
-    onChange(v);
-    if (v.length < 2) { setSuggestions([]); setShow(false); return; }
-    const norm = v.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '');
-    const filtered = locationData
-      .filter(item => item.searchString.includes(norm))
-      .sort((a, b) => {
-        const aCity = a.city.toLowerCase();
-        const bCity = b.city.toLowerCase();
-        const aStarts = aCity.startsWith(norm);
-        const bStarts = bCity.startsWith(norm);
-        if (aStarts && !bStarts) return -1;
-        if (!aStarts && bStarts) return 1;
-        return aCity.localeCompare(bCity);
-      })
-      .slice(0, 8);
-    setSuggestions(filtered);
-    setShow(true);
-  };
-  const handleSelect = item => {
-    const formatted = `${item.city}, ${item.region}`;
-    setInputValue(formatted);
-    onChange(formatted);
-    setShow(false);
-  };
-
-  return (
-    <div className="flex flex-col gap-3 flex-[2] min-w-[200px] relative" ref={wrapperRef}>
-      <label className={`flex items-center gap-2 text-xs font-bold uppercase tracking-wide text-[${HOGU_COLORS.subtleText}] ml-1`}>
-        <Icon size={14} className={`text-[${HOGU_COLORS.primary}]`} /> {label}
-      </label>
-      <div className="flex gap-2 bg-white p-1.5 rounded-2xl border border-gray-100 shadow-sm focus-within:ring-2 focus-within:ring-[#68B49B]/20 focus-within:border-[#68B49B] transition-all h-[60px] items-center">
-        <input
-          type="text"
-          value={inputValue}
-          onChange={handleInputChange}
-          onFocus={() => inputValue.length > 1 && setShow(true)}
-          placeholder={t('bnb_listing.search.location_placeholder', 'Dove vuoi andare?')}
-          className="w-full h-full px-4 bg-transparent border-none focus:ring-0 text-lg font-medium text-gray-800 placeholder:text-gray-400 outline-none"
-          autoComplete="off"
-        />
-        {show && suggestions.length > 0 && (
-          <div className="absolute top-full left-0 mt-2 w-full bg-white rounded-xl shadow-xl border border-gray-100 max-h-60 overflow-y-auto z-50">
-            {suggestions.map((it, idx) => (
-              <button key={idx} type="button" onClick={() => handleSelect(it)} className="w-full text-left px-4 py-3 hover:bg-[#F0FDF9] hover:text-[#33594C] transition-colors border-b border-gray-50 last:border-0 group">
-                <div className="font-bold text-sm text-gray-800 group-hover:text-[#33594C]">{it.city}</div>
-                <div className="text-xs text-gray-400 group-hover:text-[#68B49B]/70">{it.province}, {it.region}</div>
-              </button>
-            ))}
-          </div>
-        )}
-        {show && inputValue.length > 1 && suggestions.length === 0 && (
-          <div className="absolute top-full left-0 mt-2 w-full bg-white rounded-xl shadow-xl border border-gray-100 p-4 text-center text-gray-400 text-sm z-50">
-            {t('bnb.search.not_found_citys', 'Nessuna città trovata')}
-          </div>
-        )}
-      </div>
-    </div>
-  );
-};
 
 /* --------------  EditableInput  -------------- */
 const EditableInput = ({ label, value, onChange, type = 'text', large = false, placeholder = '', icon: Icon, className = '', required = false }) => (
@@ -184,7 +61,7 @@ const EditableInput = ({ label, value, onChange, type = 'text', large = false, p
 );
 
 /* --------------  EditableTextarea  -------------- */
-const EditableTextarea = ({ label, value, onChange, rows = 4, required = false }) => (
+const EditableTextarea = ({ label, value, onChange, rows = 4, required = false, ...props }) => (
   <div className="group">
     {label && (
       <label className="block text-xs font-bold text-gray-400 uppercase tracking-wider mb-1.5 ml-1">
@@ -196,7 +73,13 @@ const EditableTextarea = ({ label, value, onChange, rows = 4, required = false }
       onChange={e => onChange(e.target.value)}
       rows={rows}
       className={`${HOGU_THEME.inputBase} resize-none leading-relaxed`}
+      {...props}
     />
+    {props.maxLength && (
+      <div className="text-right text-xs text-gray-400 mt-1">
+        {value?.length || 0} / {props.maxLength}
+      </div>
+    )}
   </div>
 );
 
@@ -206,7 +89,7 @@ const ImageUploadCard = ({ src, onDelete, isMain = false, isNew = false }) => {
 
   return (
     <div className={`relative rounded-2xl overflow-hidden group ${isMain ? 'col-span-2 row-span-2 aspect-video' : 'aspect-[4/3]'}`}>
-      <img src={src} alt="Gallery" className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105" />
+      <SafeImage src={src} alt="Gallery" className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105" />
       <div className="absolute inset-0 bg-black/60 opacity-0 group-hover:opacity-100 transition-all flex items-center justify-center gap-2">
         <button
           onClick={onDelete}
@@ -329,7 +212,7 @@ const MusicThemeSelector = ({ selectedThemes, onChange }) => {
 };
 
 /* --------------  GenderPriceCard  -------------- */
-const GenderPriceCard = ({ label, value, onChange, icon: Icon, placeholder = '0', pt4 = "", p4 = "" }) => {
+const GenderPriceCard = ({ label, value, onChange, icon: Icon, placeholder = '0', pt4 = "", p4 = "", description, onDescriptionChange }) => {
   const { t } = useTranslation();
   return (
     <div className={`${pt4}`}>
@@ -353,6 +236,18 @@ const GenderPriceCard = ({ label, value, onChange, icon: Icon, placeholder = '0'
               <span className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400">€</span>
             </div>
           </div>
+          {onDescriptionChange && (
+            <div className="relative">
+              <label className="text-[10px] uppercase font-bold text-gray-400">{t('EventServiceEditPage.descriptionLabel', 'Descrizione')}</label>
+              <input
+                type="text"
+                value={description}
+                onChange={e => onDescriptionChange(e.target.value)}
+                placeholder={t('EventServiceEditPage.descriptionPlaceholder', 'Es. Ingresso con consumazione')}
+                className="w-full px-4 py-3 rounded-xl border border-gray-200 text-sm focus:border-[#68B49B] outline-none"
+              />
+            </div>
+          )}
         </div>
       </div>
     </div>
@@ -363,7 +258,7 @@ const GenderPriceCard = ({ label, value, onChange, icon: Icon, placeholder = '0'
  * PAGINA PRINCIPALE - MODIFICA + CREAZIONE
  * ========================================================= */
 export const EventServiceEditPageBase = () => {
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
   const { id } = useParams(); // eventId dalla URL
   const navigate = useNavigate();
   const isEditMode = !!id;
@@ -373,6 +268,8 @@ export const EventServiceEditPageBase = () => {
   const [errorMessage, setErrorMessage] = useState('');
   const [isLoading, setIsLoading] = useState(isEditMode);
   const [isSaving, setIsSaving] = useState(false);
+  const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
+  const [isDeleting, setIsDeleting] = useState(false);
 
   // clubId ottenuto dalla risposta del backend
   const [clubId, setClubId] = useState(null);
@@ -396,7 +293,11 @@ export const EventServiceEditPageBase = () => {
     tableMaxPax: 0,
     useGenderPricing: false,
     maleTicketPrice: 0,
-    femaleTicketPrice: 0
+    femaleTicketPrice: 0,
+    maleDescription: '',
+    femaleDescription: '',
+    vipTableDescription: '',
+    ticketDescription: ''
   });
 
   const [images, setImages] = useState([]); // URL completi per visualizzazione
@@ -420,7 +321,16 @@ export const EventServiceEditPageBase = () => {
     today.setHours(0, 0, 0, 0);
 
     if (!formData.title.trim()) errors.push(t('EventServiceEditPage.val_title', 'Nome evento è obbligatorio'));
-    if (!formData.description.trim()) errors.push(t('EventServiceEditPage.val_desc', 'Descrizione è obbligatoria'));
+    
+    const desc = formData.description.trim();
+    if (!desc) {
+      errors.push(t('EventServiceEditPage.val_desc', 'Descrizione è obbligatoria'));
+    } else if (desc.length < 10) {
+      errors.push(t('EventServiceEditPage.val_desc_min', 'La descrizione deve essere di almeno 10 caratteri'));
+    } else if (desc.length > 1000) {
+      errors.push(t('EventServiceEditPage.val_desc_max', 'La descrizione non può superare i 1000 caratteri'));
+    }
+
     if (!formData.city.trim()) errors.push(t('EventServiceEditPage.val_city', 'Città è obbligatoria'));
     if (!formData.address.trim()) errors.push(t('EventServiceEditPage.val_addr', 'Indirizzo è obbligatorio'));
     if (!formData.musicThemes.length) errors.push(t('EventServiceEditPage.val_theme', 'Tema musicale è obbligatorio'));
@@ -474,10 +384,12 @@ export const EventServiceEditPageBase = () => {
           return isoString.replace(/:\d{2}(\.\d{3})?Z$/, '').slice(0, 16);
         };
 
+        const cityStr = getDisplayLocation(ev.serviceLocale?.[0], i18n.language);
+
         setFormData({
           title: ev.name || '',
           description: ev.description || '',
-          city: ev.serviceLocale?.[0]?.city + ', ' + ev.serviceLocale?.[0]?.state || '',
+          city: cityStr,
           address: ev.serviceLocale?.[0]?.address || '',
           isActive: ev.isActive ?? true,
           eventDateTime: {
@@ -496,7 +408,11 @@ export const EventServiceEditPageBase = () => {
           tableMaxPax: vip?.capacity || 0,
           useGenderPricing: !!(male || female),
           maleTicketPrice: male?.price || 0,
-          femaleTicketPrice: female?.price || 0
+          femaleTicketPrice: female?.price || 0,
+          maleDescription: male?.description || t('EventServiceEditPage.priceMale', 'Ingresso Uomo'),
+          femaleDescription: female?.description || t('EventServiceEditPage.priceFemale', 'Ingresso Donna'),
+          vipTableDescription: vip?.description || t('EventServiceEditPage.priceVipTable', 'Tavolo VIP'),
+          ticketDescription: std?.description || t('EventServiceEditPage.ticketStandard', 'Ingresso in Lista')
         });
 
         // Costruisci path completo per ogni immagine esistente
@@ -534,6 +450,23 @@ export const EventServiceEditPageBase = () => {
     URL.revokeObjectURL(preview);
   };
 
+  /* ------  ELIMINAZIONE ------ */
+  const handleDelete = async () => {
+    if (!id) return;
+    try {
+      setIsDeleting(true);
+      await clubService.deleteEventProvider(id);
+      navigate('/provider/dashboard');
+    } catch (error) {
+      console.error('Errore delete:', error);
+      setErrorMessage(t('EventServiceEditPage.deleteError', 'Impossibile eliminare l\'evento'));
+      setShowError(true);
+    } finally {
+      setIsDeleting(false);
+      setShowDeleteConfirm(false);
+    }
+  };
+
   /* ------  SALVATAGGIO ------ */
   const handleSave = async () => {
     const errors = validate();
@@ -559,13 +492,42 @@ export const EventServiceEditPageBase = () => {
       basePrice = validPrices.length > 0 ? Math.min(...validPrices) : 0;
 
       if (malePrice > 0) {
-        pricingConfigurations.push({ pricingType: 'MALE', price: malePrice, capacity: null, isActive: true });
+        pricingConfigurations.push({ 
+            pricingType: 'MALE', 
+            price: malePrice, 
+            capacity: null, 
+            isActive: true,
+            description: formData.maleDescription || t('EventServiceEditPage.priceMale', 'Ingresso Uomo')
+        });
       }
       if (femalePrice > 0) {
-        pricingConfigurations.push({ pricingType: 'FEMALE', price: femalePrice, capacity: null, isActive: true });
+        pricingConfigurations.push({ 
+            pricingType: 'FEMALE', 
+            price: femalePrice, 
+            capacity: null, 
+            isActive: true,
+            description: formData.femaleDescription || t('EventServiceEditPage.priceFemale', 'Ingresso Donna')
+        });
       }
     } else {
       basePrice = parseFloat(formData.ticketPrice) || 0;
+      // Se il prezzo standard è > 0, potremmo voler aggiungere una configurazione STANDARD,
+      // ma il codice originale non lo faceva esplicitamente qui nel blocco else, 
+      // si limitava a settare basePrice.
+      // Tuttavia, se vogliamo salvare la descrizione del biglietto standard, dovremmo probabilmente
+      // aggiungere una configurazione STANDARD se il backend lo supporta/aspetta,
+      // oppure il backend usa basePrice come default.
+      // Guardando fetchEvent, c'è un pricingType 'STANDARD'.
+      // Per sicurezza, se c'è un prezzo standard > 0, aggiungiamo la config STANDARD.
+      if (basePrice > 0) {
+          pricingConfigurations.push({
+              pricingType: 'STANDARD',
+              price: basePrice,
+              capacity: null,
+              isActive: true,
+              description: formData.ticketDescription || t('EventServiceEditPage.ticketStandard', 'Ingresso in Lista')
+          });
+      }
     }
 
     if (formData.useVipTable && parseFloat(formData.tablePrice) > 0) {
@@ -573,22 +535,12 @@ export const EventServiceEditPageBase = () => {
         pricingType: 'VIP_TABLE',
         price: parseFloat(formData.tablePrice),
         capacity: parseInt(formData.tableMaxPax, 10) || null,
-        isActive: true
+        isActive: true,
+        description: formData.vipTableDescription || t('EventServiceEditPage.priceVipTable', 'Tavolo VIP')
       });
     }
 
-    const cityParts = formData.city.split(',').map(part => part.trim());
-    const city = cityParts[0] || '';
-    const state = cityParts[1] || '';
-
-    const serviceLocale = [{
-      serviceType: 'CLUB',
-      language: 'it',
-      country: 'IT',
-      state: state,
-      city: city,
-      address: formData.address
-    }];
+    const serviceLocale = createLocationPayload(formData.city, formData.address, 'CLUB');
 
     const payload = {
       name: formData.title,
@@ -653,7 +605,6 @@ export const EventServiceEditPageBase = () => {
   const pageTitle = isEditMode ? t('EventServiceEditPage.title', 'Modifica Evento') : 'Crea Nuovo Evento';
   const breadcrumbsItems = [
     { label: 'Dashboard', href: '/provider/dashboard' },
-    { label: 'I miei Eventi', href: '/provider/events' },
     { label: pageTitle, href: '#' }
   ];
 
@@ -737,6 +688,8 @@ export const EventServiceEditPageBase = () => {
                 onChange={v => handle('description', v)}
                 rows={4}
                 required
+                maxLength={1000}
+                placeholder={t('EventServiceEditPage.descPlaceholder', 'Inserisci una descrizione di almeno 10 caratteri...')}
               />
             </section>
 
@@ -773,7 +726,7 @@ export const EventServiceEditPageBase = () => {
             {/* ATMOSFERA */}
             <section className={`${HOGU_THEME.cardBase} p-8`}>
               <h3 className="text-xl font-bold text-gray-900 mb-6 flex items-center gap-2">
-                <Info size={24} className={`text-[${HOGU_COLORS.primary}]`} />
+                <ChevronRight size={24} className={`text-[${HOGU_COLORS.primary}]`} />
                 {t('EventServiceEditPage.atmosphere', 'Atmosfera & Selezione')}
               </h3>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -875,6 +828,16 @@ export const EventServiceEditPageBase = () => {
                       </div>
                     </div>
                   </div>
+                  <div className="mt-4">
+                      <label className="text-[10px] uppercase font-bold text-[#68B49B]">{t('EventServiceEditPage.descriptionLabel', 'Descrizione')}</label>
+                      <input
+                        type="text"
+                        value={formData.vipTableDescription}
+                        onChange={e => handle('vipTableDescription', e.target.value)}
+                        placeholder={t('EventServiceEditPage.vipDescPlaceholder', 'Es. Tavolo in zona esclusiva con bottiglia inclusa')}
+                        className="w-full px-4 py-3 rounded-xl border border-[#68B49B]/30 text-sm text-[#33594C] focus:border-[#68B49B] outline-none bg-white"
+                      />
+                  </div>
                 </div>
               )}
 
@@ -884,6 +847,8 @@ export const EventServiceEditPageBase = () => {
                   label={t('EventServiceEditPage.ticketStandard', 'Ingresso in Lista')}
                   value={formData.ticketPrice}
                   onChange={v => handle('ticketPrice', v)}
+                  description={formData.ticketDescription}
+                  onDescriptionChange={v => handle('ticketDescription', v)}
                   icon={Ticket}
                   pt4='pt-4'
                 />
@@ -898,12 +863,16 @@ export const EventServiceEditPageBase = () => {
                         label={t('EventServiceEditPage.male', 'Uomo')}
                         value={formData.maleTicketPrice}
                         onChange={v => handle('maleTicketPrice', v)}
+                        description={formData.maleDescription}
+                        onDescriptionChange={v => handle('maleDescription', v)}
                         icon={Ticket}
                       />
                       <GenderPriceCard
                         label={t('EventServiceEditPage.female', 'Donna')}
                         value={formData.femaleTicketPrice}
                         onChange={v => handle('femaleTicketPrice', v)}
+                        description={formData.femaleDescription}
+                        onDescriptionChange={v => handle('femaleDescription', v)}
                         icon={Ticket}
                       />
                     </div>
@@ -915,7 +884,10 @@ export const EventServiceEditPageBase = () => {
             {/* GALLERY */}
             <section className={`${HOGU_THEME.cardBase} p-8`}>
               <div className="flex justify-between items-center mb-6">
-                <h3 className="text-xl font-bold text-gray-900">{t('EventServiceEditPage.galleryTitle', 'Media Gallery')}</h3>
+                <h3 className="text-xl font-bold text-gray-900 flex items-center justify-between">
+                  {t('EventServiceEditPage.galleryTitle', 'Media Gallery')}
+                  <span className="text-xs font-normal text-gray-400">{images.length + newImages.length} foto</span>
+                </h3>
                 <label className={`text-[${HOGU_COLORS.primary}] font-bold text-sm flex items-center gap-2 hover:underline cursor-pointer`}>
                   <Upload size={18} />
                   {t('EventServiceEditPage.upload', 'Carica')}
@@ -950,34 +922,25 @@ export const EventServiceEditPageBase = () => {
               <p className="text-xs text-gray-500 mt-6">
                 {t('EventServiceEditPage.imagesNote', 'Passa il mouse sulle immagini per eliminarle (icona cestino). Le immagini rimosse verranno eliminate definitivamente al salvataggio.')}
               </p>
-            </section>
-          </div>
 
-          {/* RIGHT SIDEBAR */}
-          <div className="lg:col-span-1">
-            <div className="sticky top-24 space-y-6">
-              <div className={`${HOGU_THEME.cardBase} p-6 shadow-[0_8px_30px_rgb(0,0,0,0.08)]`}>
-                <h3 className="text-lg font-bold text-gray-900 mb-4 flex items-center gap-2">
-                  <Info size={18} className={`text-[${HOGU_COLORS.primary}]`} />
-                  {t('EventServiceEditPage.infoService', 'Info Servizio')}
-                </h3>
-                <div className="space-y-1">
-                  <InfoAccordionItem icon={CalendarCheck} colorClass="bg-blue-50 text-blue-600" title={t('EventServiceEditPage.bookings', 'Prenotazioni')} description={t('EventServiceEditPage.bookingsDesc', 'Descrizione')} />
-                  <InfoAccordionItem icon={CreditCard} colorClass="bg-emerald-50 text-emerald-600" title={t('EventServiceEditPage.payments', 'Pagamenti')} description={t('EventServiceEditPage.paymentsDesc', 'Descrizione pagamenti')} />
-                  <InfoAccordionItem icon={FileText} colorClass="bg-purple-50 text-purple-600" title={t('EventServiceEditPage.commissions', 'Commissioni')} description={t('EventServiceEditPage.commissionsDesc', 'Descrizione commissioni')} />
-                </div>
-              </div>
-
-              <div className={`${HOGU_THEME.cardBase} p-6 shadow-[0_8px_30px_rgb(0,0,0,0.08)]`}>
-                <h3 className="text-lg font-bold text-gray-900 mb-4">{t('EventServiceEditPage.publish', 'Pubblicazione')}</h3>
-                <div className="flex items-center justify-between p-4 bg-gray-50 rounded-xl border border-gray-100 mb-6">
+              <div className="mt-6 pt-4 border-t border-gray-100">
+                <h4 className="text-sm font-bold text-gray-900 mb-4">
+                  {t('EventServiceEditPage.publish', 'Pubblicazione')}
+                </h4>
+                <div className="flex items-center justify-between p-4 bg-gray-50 rounded-xl border border-gray-100">
                   <div className="flex items-center gap-3">
                     <div className={`p-2 rounded-lg ${formData.isActive ? 'bg-green-100 text-green-600' : 'bg-gray-200 text-gray-500'}`}>
                       {formData.isActive ? <Eye size={20} /> : <EyeOff size={20} />}
                     </div>
                     <div>
-                      <p className="font-bold text-sm text-gray-900">{t('EventServiceEditPage.visibility', 'Visibilità')}</p>
-                      <p className="text-xs text-gray-500">{formData.isActive ? t('EventServiceEditPage.online', 'Online') : t('EventServiceEditPage.hidden', 'Nascosto')}</p>
+                      <p className="font-bold text-sm text-gray-900">
+                        {t('EventServiceEditPage.visibility', 'Visibilità')}
+                      </p>
+                      <p className="text-xs text-gray-500">
+                        {formData.isActive
+                          ? t('EventServiceEditPage.online', 'Online')
+                          : t('EventServiceEditPage.hidden', 'Nascosto')}
+                      </p>
                     </div>
                   </div>
                   <label className="relative inline-flex items-center cursor-pointer">
@@ -990,19 +953,31 @@ export const EventServiceEditPageBase = () => {
                     <div className="w-11 h-6 bg-gray-200 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-0.5 after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-green-500"></div>
                   </label>
                 </div>
-                <button
-                  onClick={handleSave}
-                  disabled={isSaving}
-                  className={`w-full py-4 rounded-xl font-bold text-lg text-white shadow-xl shadow-slate-500/20 flex items-center justify-center gap-2 transition-all
-                    ${isSaving ? 'bg-gray-400 cursor-not-allowed' : 'bg-slate-800 hover:bg-slate-700 hover:scale-[1.02]'}`}
-                >
-                  {isSaving ? t('EventServiceEditPage.saving', 'Salvataggio...') : (
-                    <>
-                      <Save size={20} />
-                      {isEditMode ? t('EventServiceEditPage.saveBtn', 'Salva Modifiche') : 'Crea Evento'}
-                    </>
-                  )}
-                </button>
+              </div>
+            </section>
+          </div>
+
+          {/* RIGHT SIDEBAR */}
+          <div className="lg:col-span-1">
+            <div className="sticky top-24 space-y-6">
+
+              <div className={`${HOGU_THEME.cardBase} p-6 shadow-[0_8px_30px_rgb(0,0,0,0.08)]`}>
+                <h3 className="text-lg font-bold text-gray-900 mb-4">
+                  {t('EventServiceEditPage.publish', 'Pubblicazione')}
+                </h3>
+                <p className="text-xs text-gray-500 mb-4">
+                  {t('EventServiceEditPage.publishHint', 'Gestisci visibilità e salvataggio dalla sezione foto e dalla barra in basso.')}
+                </p>
+                {isEditMode && (
+                  <button
+                    onClick={() => setShowDeleteConfirm(true)}
+                    type="button"
+                    className="w-full mt-3 py-4 rounded-xl font-bold text-lg text-red-500 bg-red-50 hover:bg-red-100 border border-red-200 flex items-center justify-center gap-2 transition-all"
+                  >
+                    <Trash2 size={20} />
+                    {t('EventServiceEditPage.deleteBtn', 'Elimina Evento')}
+                  </button>
+                )}
               </div>
 
               <div className="bg-slate-50 rounded-[2rem] p-6 border border-slate-200">
@@ -1016,17 +991,60 @@ export const EventServiceEditPageBase = () => {
         </div>
       </div>
 
+      <div className="max-w-7xl mx-auto px-4 lg:px-8 mt-8">
+        <div className="bg-white rounded-[2rem] p-6 shadow-sm border border-gray-100 flex flex-col md:flex-row items-center justify-between gap-4 sticky bottom-4 z-40">
+          <div className="flex-1 flex flex-col gap-2">
+            <div className="flex items-center gap-2">
+              <span className="text-sm font-medium text-gray-600">
+                {t('EventServiceEditPage.publishStatusLabel', 'Stato pubblicazione:')}
+              </span>
+              <span className={`px-3 py-1 rounded-full text-xs font-bold ${formData.isActive ? 'bg-green-100 text-green-700' : 'bg-gray-200 text-gray-600'}`}>
+                {formData.isActive ? t('EventServiceEditPage.online', 'Online') : t('EventServiceEditPage.hidden', 'Nascosto')}
+              </span>
+            </div>
+            <div className="text-xs text-gray-500 font-medium">
+              {t('EventServiceEditPage.requiredNote', 'I campi contrassegnati con * sono obbligatori.')}
+            </div>
+          </div>
+          <button
+            onClick={handleSave}
+            disabled={isSaving}
+            className={`w-full md:w-auto px-10 py-4 rounded-xl font-bold text-white shadow-lg shadow-slate-500/20 hover:shadow-xl hover:-translate-y-1 transition-all flex items-center justify-center gap-2 ${
+              isSaving ? 'bg-gray-400 cursor-not-allowed' : 'bg-slate-800 hover:bg-slate-700'
+            }`}
+          >
+            {isSaving ? t('EventServiceEditPage.saving', 'Salvataggio...') : (
+              <>
+                <Save size={20} />
+                {isEditMode ? t('EventServiceEditPage.saveBtn', 'Salva Modifiche') : 'Crea Evento'}
+              </>
+            )}
+          </button>
+        </div>
+      </div>
+
       <SuccessModal 
         isOpen={showSuccess}
         onClose={() => {
           setShowSuccess(false);
-          if (!isEditMode) navigate('/provider/events');
+          navigate('/provider/dashboard');
         }}
         title={isEditMode ? t('EventServiceEditPage.successTitle', 'Evento Salvato') : 'Evento Creato'}
         message={isEditMode 
           ? t('EventServiceEditPage.successMsg', 'L\'Evento è stato salvato correttamente')
           : 'Il nuovo evento è stato creato con successo!'}
         confirmText={t('EventServiceEditPage.close', 'Chiudi')}
+      />
+
+      <ConfirmModal
+        isOpen={showDeleteConfirm}
+        onClose={() => setShowDeleteConfirm(false)}
+        onConfirm={handleDelete}
+        title={t('EventServiceEditPage.deleteTitle', 'Elimina Evento')}
+        message={t('EventServiceEditPage.deleteConfirm', 'Sei sicuro di voler eliminare questo evento? Questa azione non può essere annullata.')}
+        confirmText={t('common.confirm', 'Elimina')}
+        cancelText={t('common.cancel', 'Annulla')}
+        isDeleting={isDeleting}
       />
 
       {showError && (

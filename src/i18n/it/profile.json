@@ -1,0 +1,107 @@
+{
+  "title": "Sicurezza Account",
+  "subtitle": "Gestisci le tue credenziali e monitora l'accesso al tuo account per garantire la massima protezione dei tuoi dati.",
+  "privacy_card": {
+    "title": "Privacy First",
+    "description": "HOGU non condividerà mai la tua password. Se noti attività sospette, cambia immediatamente le credenziali.",
+    "support": "Contatta Supporto Sicurezza"
+  },
+  "personal_data": {
+    "title": "Dati Personali",
+    "subtitle": "Aggiorna il tuo nome e indirizzo di fatturazione.",
+    "business_name": "Nome Attività",
+    "first_name": "Nome",
+    "last_name": "Cognome",
+    "business_name_placeholder": "Nome dell'attività",
+    "first_name_placeholder": "Il tuo nome",
+    "last_name_placeholder": "Il tuo cognome",
+    "city": "Città / Località",
+    "vat_number": "Partita IVA",
+    "fiscal_code": "Codice Fiscale",
+    "vat_placeholder": "La tua Partita IVA",
+    "fiscal_code_placeholder": "Codice Fiscale",
+    "address": "Indirizzo",
+    "address_placeholder": "Via / Piazza, n. civico",
+    "zip_code": "CAP",
+    "save_changes": "Salva Modifiche",
+    "saving": "Salvataggio..."
+  },
+  "email": {
+    "title": "Indirizzo Email",
+    "subtitle": "Gestisci l'email per le notifiche e il login.",
+    "verified": "Verificata",
+    "new_email": "Nuova Email",
+    "placeholder": "nome@esempio.com",
+    "verification_notice": "Invieremo un link di verifica al nuovo indirizzo.",
+    "cancel": "Annulla",
+    "send_verification": "Invia Verifica"
+  },
+  "password": {
+    "title": "Reimposta Password",
+    "subtitle": "Ti consigliamo di usare una password sicura.",
+    "current": "Password Attuale",
+    "new": "Nuova Password",
+    "confirm": "Conferma Nuova Password",
+    "new_placeholder": "Almeno 8 caratteri",
+    "confirm_placeholder": "Ripeti password",
+    "update": "Aggiorna Password",
+    "updating": "Aggiornamento...",
+    "strength": {
+      "title": "Sicurezza",
+      "placeholder": "Inserisci Password",
+      "weak": "Debole",
+      "good": "Buona",
+      "strong": "Forte"
+    },
+    "requirements": {
+      "length": "8+ Caratteri",
+      "uppercase": "Lettera Maiuscola",
+      "lowercase": "Lettera Minuscola",
+      "number": "Numero",
+      "symbol": "Carattere Speciale (@$!%*?&)"
+    }
+  },
+  "delete_account": {
+    "title": "Elimina Account",
+    "subtitle": "Azioni irreversibili sul tuo account.",
+    "warning_title": "Elimina Account",
+    "warning_description": "Una volta eliminato l'account, i tuoi dati personali verranno anonimizzati. Questa azione non può essere annullata.",
+    "provider_warning": " Anche i servizi offerti e i documenti caricati verranno disabilitati.",
+    "confirm_button": "Elimina Account",
+    "modal_title": "Sei assolutamente sicuro?",
+    "modal_description": "Questa azione è definitiva. Il tuo profilo verrà eliminato e non potrai più accedere con queste credenziali.",
+    "modal_data_notice": "Le attività e prenotazioni passate verranno conservate in forma anonima.",
+    "modal_provider_alert": "ATTENZIONE: Tutti i servizi offerti saranno contrassegnati come cancellati e i documenti invalidati.",
+    "confirm_delete": "Sì, elimina il mio account",
+    "deleting": "Eliminazione in corso...",
+    "cancel": "Annulla"
+  },
+  "modals": {
+    "profile_updated": {
+      "title": "Profilo Aggiornato",
+      "message": "I tuoi dati personali sono stati aggiornati con successo.",
+      "close": "Chiudi"
+    },
+    "password_updated": {
+      "title": "Password Aggiornata!",
+      "message": "La tua password è stata modificata con successo. Utilizza la nuova password al prossimo accesso.",
+      "close": "Chiudi"
+    }
+  },
+  "errors": {
+    "name_required": "Il nome è obbligatorio.",
+    "vat_invalid": "Partita IVA non valida",
+    "update_failed": "Errore durante l'aggiornamento del profilo.",
+    "password_required": "Tutti i campi sono obbligatori.",
+    "passwords_mismatch": "Le password non coincidono.",
+    "password_requirements": "La password deve rispettare tutti i requisiti di sicurezza.",
+    "password_update_failed": "Errore durante l'aggiornamento della password.",
+    "delete_pending_commissions": "Impossibile eliminare l'account: ci sono commissioni in sospeso da pagare per il tuo ristorante.",
+    "delete_pending_bookings": "Impossibile eliminare l'account: ci sono prenotazioni in attesa di conferma.",
+    "delete_failed": "Errore durante l'eliminazione dell'account."
+  },
+  "breadcrumbs": {
+    "dashboard": "Dashboard",
+    "security": "Sicurezza & Login"
+  }
+}

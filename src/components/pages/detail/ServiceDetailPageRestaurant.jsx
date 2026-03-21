@@ -1,30 +1,93 @@
 import React, { useState, useEffect, useMemo, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Calendar, Utensils, Star, MapPin, Clock, ChefHat, Sparkles, BookOpen } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
+import { Calendar, Utensils, Star, MapPin, Clock, ChefHat, Sparkles, BookOpen, Navigation, ChevronDown, ChevronUp } from 'lucide-react';
 
 import { HOGU_COLORS, HOGU_THEME } from '../../../config/theme.js';
 
 // --- IMPORT COMPONENTI RIUTILIZZABILI --
 import { PrimaryButton, PrimaryEmphasis } from '../../ui/Button.jsx';
+import { getServiceLocalization } from '../../../utils/dateUtils.js';
+
+import { LiveViewersFloatingBadge } from '../../../components/ui/LiveViewersBadge.jsx';
+
 import { ServiceHeaderDetail } from '../../../components/ui/ServiceHeaderDetail.jsx';
 import { ServiceImageGallery } from '../../../components/ui/ServiceImageGallery.jsx';
 import { Breadcrumbs } from '../../ui/Breadcrumbs.jsx';
-import { LocationAddress } from '../../ui/LocationAddress.jsx';
 import LoadingScreen from '../../ui/LoadingScreen.jsx';
 import ErrorModal from '../../ui/ErrorModal.jsx';
+import MapLoadingSkeleton from '../../ui/MapLoadingSkeleton.jsx';
 
-import { ServiceUnavailableOverlay } from './ServiceUnavailableOverlay.jsx'; 
+import ServiceUnavailablePage from '../ServiceUnavailablePage.jsx';
 
 // --- API ---
 import { restaurantService, mapService, infoService } from '../../../api/apiClient.js';
 
 // Base URL immagini
-const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:8080';
+const ENV_URL = import.meta.env.VITE_API_BASE_URL;
+const DYNAMIC_URL = `${window.location.protocol}//${window.location.hostname}:8080`;
+const API_BASE_URL =
+    ENV_URL && ENV_URL.includes('localhost') && window.location.hostname !== 'localhost'
+        ? DYNAMIC_URL
+        : (ENV_URL || DYNAMIC_URL);
 const IMG_BASE_URL = `${API_BASE_URL}/uploads/`;
+
+// --- COMPONENTI INTERNI ---
+const ExpandableDescription = ({ text }) => {
+    const { t } = useTranslation('restaurant');
+    const [isExpanded, setIsExpanded] = useState(false);
+    const [shouldTruncate, setShouldTruncate] = useState(false);
+    const textRef = useRef(null);
+
+    useEffect(() => {
+        // Calcolo approssimativo per decidere se troncare (es. se più di 300 caratteri)
+        if (text && text.length > 300) {
+            setShouldTruncate(true);
+        }
+    }, [text]);
+
+    if (!text) return null;
+
+    if (!shouldTruncate) {
+        return <p className="text-gray-600 text-base md:text-lg leading-relaxed whitespace-pre-line">{text}</p>;
+    }
+
+    return (
+        <div className="relative">
+            <div className={`relative transition-all duration-500 ease-in-out ${isExpanded ? '' : 'max-h-[120px] overflow-hidden'}`}>
+                <p ref={textRef} className="text-gray-600 text-base md:text-lg leading-relaxed whitespace-pre-line">
+                    {text}
+                </p>
+
+                {/* Sfumatura quando chiuso */}
+                {!isExpanded && (
+                    <div className="absolute bottom-0 left-0 w-full h-16 bg-gradient-to-t from-white to-transparent pointer-events-none" />
+                )}
+            </div>
+
+            <button
+                onClick={() => setIsExpanded(!isExpanded)}
+                className={`mt-2 flex items-center gap-1.5 text-[${HOGU_COLORS.primary}] font-semibold text-sm hover:opacity-80 transition-opacity focus:outline-none`}
+            >
+                {isExpanded ? (
+                    <>
+                        {t('expandable.showLess')}
+                        <ChevronUp className="w-4 h-4" />
+                    </>
+                ) : (
+                    <>
+                        {t('expandable.showMore')}
+                        <ChevronDown className="w-4 h-4" />
+                    </>
+                )}
+            </button>
+        </div>
+    );
+};
 
 // --- 1. COMPONENTE MAPPA (LEAFLET) ---
 const LeafletMapClub = ({ lat, lon, name }) => {
-    // ... (Codice mappa invariato)
+    const { t } = useTranslation('restaurant');
     const mapId = "service-map-container";
     const mapInitializedRef = useRef(false);
 
@@ -77,20 +140,15 @@ const LeafletMapClub = ({ lat, lon, name }) => {
         };
     }, [lat, lon, name]);
 
-    if (!lat || !lon) return (
-        <div className="h-72 md:h-[480px] w-full rounded-2xl bg-gray-50 flex flex-col items-center justify-center border border-dashed border-gray-300 animate-pulse mb-6">
-            <MapPin className="text-gray-300 w-12 h-12 mb-3" />
-            <span className="text-gray-400 text-sm font-medium">Caricamento mappa...</span>
-        </div>
-    );
+    if (!lat || !lon) return <MapLoadingSkeleton />;
 
     return (
-        <div className="relative group rounded-3xl overflow-hidden shadow-lg border border-gray-100 mb-6 transition-all duration-300 hover:shadow-xl">
-            <div id={mapId} className="h-72 md:h-[480px] w-full z-0" />
-            <div className="absolute bottom-0 left-0 right-0 bg-white/95 backdrop-blur-md px-5 py-3 text-xs text-gray-500 border-t border-gray-100 flex items-center justify-between z-[400]">
+        <div className="relative group rounded-2xl md:rounded-3xl overflow-hidden shadow-lg border border-gray-100 mb-4 md:mb-6 transition-all duration-300 hover:shadow-xl">
+            <div id={mapId} className="h-64 md:h-[480px] w-full z-0" />
+            <div className="absolute bottom-0 left-0 right-0 bg-white/95 backdrop-blur-md px-4 py-2 md:px-5 md:py-3 text-xs text-gray-500 border-t border-gray-100 flex items-center justify-between z-[400]">
                 <div className="flex items-center gap-2">
                     <div className={`w-2 h-2 rounded-full bg-[${HOGU_COLORS.primary}] animate-pulse`}></div>
-                    <span className="font-medium">Posizione verificata</span>
+                    <span className="font-medium">{t('map.verifiedPosition')}</span>
                 </div>
                 <span className="opacity-60 text-[10px] uppercase tracking-wider">Stadia Maps ©</span>
             </div>
@@ -100,33 +158,33 @@ const LeafletMapClub = ({ lat, lon, name }) => {
 
 // --- 2. SEZIONE MENU (ELEGANCE) ---
 const RestaurantMenuSection = ({ menuList, dailySpecials }) => {
-    // ... (Codice menu invariato)
+    const { t } = useTranslation('restaurant');
     if ((!menuList || menuList.length === 0) && (!dailySpecials || dailySpecials.length === 0)) {
         return (
             <div className="mt-16 p-12 bg-gray-50/30 rounded-[2rem] border border-dashed border-gray-200 text-center">
                 <div className="bg-white p-5 rounded-full inline-flex shadow-[0_4px_20px_rgba(0,0,0,0.05)] mb-5">
                     <Utensils className="h-7 w-7 text-gray-300" strokeWidth={1.5} />
                 </div>
-                <h3 className="text-xl font-medium text-gray-900 mb-2">Menu non disponibile</h3>
-                <p className="text-gray-500 text-base">Al momento il menu digitale non è visibile.</p>
+                <h3 className="text-xl font-medium text-gray-900 mb-2">{t('menu.notAvailable')}</h3>
+                <p className="text-gray-500 text-base">{t('menu.notAvailableDesc')}</p>
             </div>
         );
     }
 
     const MenuItemStandard = ({ name, price, description }) => (
-        <div className="flex justify-between items-start group w-full mb-6 py-1 border-b border-gray-50 last:border-0">
-            <div className="flex flex-col pr-8">
-                <span className={`text-[17px] font-medium text-gray-900 leading-tight group-hover:text-[${HOGU_COLORS.primary}] transition-colors`}>
+        <div className="flex justify-between items-start group w-full mb-3 md:mb-6 py-0.5 border-b border-gray-50 last:border-0">
+            <div className="flex flex-col pr-4 md:pr-8">
+                <span className={`text-[14px] md:text-[17px] font-medium text-gray-900 leading-tight group-hover:text-[${HOGU_COLORS.primary}] transition-colors`}>
                     {name}
                 </span>
                 {description && (
-                    <span className="text-sm text-gray-500 mt-1 leading-snug">
+                    <span className="text-[11px] md:text-sm text-gray-500 mt-0.5 leading-snug">
                         {description}
                     </span>
                 )}
             </div>
             {price !== undefined && (
-                <span className="text-[16px] font-semibold text-gray-900 whitespace-nowrap pt-0.5">
+                <span className="text-[14px] md:text-[16px] font-semibold text-gray-900 whitespace-nowrap pt-0.5">
                     € {parseFloat(price).toFixed(2)}
                 </span>
             )}
@@ -134,50 +192,50 @@ const RestaurantMenuSection = ({ menuList, dailySpecials }) => {
     );
 
     const MenuItemSpecial = ({ name, price, description }) => (
-        <div className="flex flex-col items-center text-center group relative p-4">
-            <span className="text-2xl font-serif text-gray-900 mb-2 leading-tight group-hover:text-amber-700 transition-colors">
+        <div className="flex flex-col items-center text-center group relative p-3 md:p-4">
+            <span className="text-xl md:text-2xl font-serif text-gray-900 mb-1 md:mb-2 leading-tight group-hover:text-amber-700 transition-colors">
                 {name}
             </span>
             {description && (
-                <span className="text-sm text-gray-500 mb-3 italic max-w-xs">
+                <span className="text-xs md:text-sm text-gray-500 mb-2 md:mb-3 italic max-w-xs">
                     {description}
                 </span>
             )}
-            <div className="w-12 h-px bg-amber-400 mb-3 opacity-0 transform translate-y-2 group-hover:opacity-100 group-hover:translate-y-0 transition-all duration-300"></div>
-            <span className="text-lg font-bold text-amber-600 bg-amber-50/50 px-4 py-1 rounded-full border border-amber-100">
+            <div className="w-12 h-px bg-amber-400 mb-2 md:mb-3 opacity-0 transform translate-y-2 group-hover:opacity-100 group-hover:translate-y-0 transition-all duration-300"></div>
+            <span className="text-base md:text-lg font-bold text-amber-600 bg-amber-50/50 px-3 md:px-4 py-0.5 md:py-1 rounded-full border border-amber-100">
                 € {parseFloat(price).toFixed(2)}
             </span>
         </div>
     );
 
     return (
-        <div className="mt-16 relative">
-            <div className="flex items-center gap-3 mb-8">
-                <div className={`p-3 rounded-xl bg-[${HOGU_COLORS.primary}]/10`}>
-                    <Utensils className={`w-6 h-6 text-[${HOGU_COLORS.primary}]`} />
+        <div className="mt-6 md:mt-16 relative">
+            <div className="flex items-center gap-3 mb-4 md:mb-8">
+                <div className={`p-2 md:p-3 rounded-xl bg-[${HOGU_COLORS.primary}]/10`}>
+                    <Utensils className={`w-5 h-5 md:w-6 md:h-6 text-[${HOGU_COLORS.primary}]`} />
                 </div>
-                <h2 className="text-2xl font-bold tracking-tight text-gray-900">Il Nostro Menu</h2>
+                <h2 className="text-lg md:text-2xl font-bold tracking-tight text-gray-900">{t('menu.title')}</h2>
             </div>
 
-            <div className="bg-white rounded-[2.5rem] p-8 md:p-12 shadow-[0_10px_40px_-10px_rgba(0,0,0,0.05)] border border-gray-100/50">
+            <div className="bg-white rounded-2xl md:rounded-[2.5rem] p-4 md:p-12 shadow-[0_10px_40px_-10px_rgba(0,0,0,0.05)] border border-gray-100/50">
                 {dailySpecials && dailySpecials.items && dailySpecials.items.length > 0 && (
-                    <div className="mb-16 pb-12 border-b border-gray-100">
-                        <div className="flex items-center justify-center gap-6 mb-10">
-                            <div className="h-px w-20 bg-gradient-to-r from-transparent to-amber-300"></div>
+                    <div className="mb-6 md:mb-16 pb-6 md:pb-12 border-b border-gray-100">
+                        <div className="flex items-center justify-center gap-4 md:gap-6 mb-4 md:mb-10">
+                            <div className="h-px w-12 md:w-20 bg-gradient-to-r from-transparent to-amber-300"></div>
                             <div className="flex flex-col items-center text-amber-600">
-                                <ChefHat className="w-8 h-8 mb-2" strokeWidth={1.5} />
+                                <ChefHat className="w-6 h-6 md:w-8 md:h-8 mb-2" strokeWidth={1.5} />
                                 <div className="flex items-center gap-2">
-                                    <Sparkles className="w-4 h-4 opacity-60" />
-                                    <h3 className="text-xl font-serif font-bold tracking-wider uppercase text-gray-900">
-                                        La Selezione dello Chef
+                                    <Sparkles className="w-3 h-3 md:w-4 md:h-4 opacity-60" />
+                                    <h3 className="text-lg md:text-xl font-serif font-bold tracking-wider uppercase text-gray-900">
+                                        {t('menu.chefSelection')}
                                     </h3>
-                                    <Sparkles className="w-4 h-4 opacity-60" />
+                                    <Sparkles className="w-3 h-3 md:w-4 md:h-4 opacity-60" />
                                 </div>
-                                <span className="text-sm text-amber-600/70 font-medium mt-1 italic">Edizione Limitata</span>
+                                <span className="text-xs md:text-sm text-amber-600/70 font-medium mt-1 italic">{t('menu.limitedEdition')}</span>
                             </div>
-                            <div className="h-px w-20 bg-gradient-to-l from-transparent to-amber-300"></div>
+                            <div className="h-px w-12 md:w-20 bg-gradient-to-l from-transparent to-amber-300"></div>
                         </div>
-                        <div className="flex flex-col items-center space-y-4 px-4 md:px-12">
+                        <div className="flex flex-col items-center space-y-4 px-0 md:px-12">
                             {dailySpecials.items.map((item, i) => (
                                 <MenuItemSpecial key={i} name={item.name} price={item.price} description={item.description} />
                             ))}
@@ -185,21 +243,21 @@ const RestaurantMenuSection = ({ menuList, dailySpecials }) => {
                     </div>
                 )}
 
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-x-20 gap-y-16">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-x-20 gap-y-6 md:gap-y-16">
                     {menuList.map((section, idx) => (
                         <div key={idx} className="break-inside-avoid">
-                            <div className="mb-10 flex flex-col items-center">
-                                <h3 className={`text-sm font-bold uppercase tracking-[0.2em] text-gray-400 mb-4`}>
+                            <div className="mb-4 md:mb-10 flex flex-col items-center">
+                                <h3 className={`text-[11px] md:text-sm font-bold uppercase tracking-[0.2em] text-gray-800 mb-2 md:mb-4`}>
                                     {section.category}
                                 </h3>
-                                <div className="h-px w-24 bg-gradient-to-r from-transparent via-gray-200 to-transparent"></div>
+                                <div className="h-px w-24 bg-gradient-to-r from-transparent via-gray-300 to-transparent"></div>
                             </div>
                             <div className="">
                                 {section.items && section.items.map((item, i) => (
-                                    <MenuItemStandard 
-                                        key={i} 
-                                        name={item.name} 
-                                        price={item.price} 
+                                    <MenuItemStandard
+                                        key={i}
+                                        name={item.name}
+                                        price={item.price}
                                         description={item.description}
                                     />
                                 ))}
@@ -208,9 +266,9 @@ const RestaurantMenuSection = ({ menuList, dailySpecials }) => {
                     ))}
                 </div>
 
-                <div className="mt-16 pt-8 border-t border-gray-50 flex flex-col items-center text-center text-xs text-gray-400 font-light spacing-y-2">
-                    <span className="">Le immagini sono a scopo illustrativo. Gli ingredienti possono variare in base alla stagionalità.</span>
-                    <span className="mt-1 font-medium text-gray-500">* Coperto e bevande esclusi se non specificato diversamente.</span>
+                <div className="mt-4 md:mt-10 pt-4 md:pt-6 border-t border-gray-50 flex flex-col items-center text-center text-xs text-gray-400 font-light spacing-y-2">
+                    <span className="">{t('menu.disclaimer1')}</span>
+                    <span className="mt-0.5 font-medium text-gray-500">{t('menu.disclaimer2')}</span>
                 </div>
             </div>
         </div>
@@ -228,10 +286,10 @@ const generateTimeSlots = () => {
     return slots;
 };
 
-const formatDateDocs = (dateString) => {
+const formatDateDocs = (dateString, lang = 'it-IT') => {
     if (!dateString) return '';
     const date = new Date(dateString);
-    return new Intl.DateTimeFormat('it-IT', {
+    return new Intl.DateTimeFormat(lang, {
         weekday: 'long',
         day: 'numeric',
         month: 'long'
@@ -239,22 +297,22 @@ const formatDateDocs = (dateString) => {
 };
 
 const BookingFormContent = ({ step, setStep, data, setData, basePrice, onConfirm, timeSlots }) => {
-    // ... (Codice BookingFormContent invariato dal turno precedente)
+    const { t, i18n } = useTranslation('restaurant');
     const updateGuests = (increment) => {
         setData(prev => {
-            const newVal = prev.guests + increment;
+            const currentGuests = typeof prev.guests === 'string' ? parseInt(prev.guests, 10) : prev.guests;
+            const newVal = currentGuests + increment;
             if (newVal < 1 || newVal > 20) return prev;
             return { ...prev, guests: newVal };
         });
     };
-    const estimatedTotal = basePrice * data.guests;
 
     return (
         <div className="flex flex-col h-full">
             <div className="flex-1 min-h-[240px] flex flex-col">
                 {step === 1 && (
                     <div className="animate-in fade-in slide-in-from-right-8 duration-300 flex flex-col h-full justify-center">
-                        <label className="text-sm font-medium text-gray-500 mb-3 text-center">Quando vuoi venire?</label>
+                        <label className="text-sm font-medium text-gray-500 mb-3 text-center">{t('booking.when')}</label>
                         <div className="relative group">
                             <div className={`absolute inset-0 bg-[${HOGU_COLORS.primary}]/5 rounded-2xl`}></div>
                             <div className={`relative border-2 border-[${HOGU_COLORS.primary}]/20 bg-white rounded-2xl p-4 flex items-center gap-4`}>
@@ -268,13 +326,13 @@ const BookingFormContent = ({ step, setStep, data, setData, basePrice, onConfirm
                             </div>
                         </div>
                         <p className="text-xs text-center text-gray-400 mt-6">
-                            La data è stata pre-selezionata per te.
+                            {t('booking.preSelected')}
                         </p>
                     </div>
                 )}
                 {step === 2 && (
                     <div className="animate-in fade-in slide-in-from-right-8 duration-300">
-                        <label className="text-sm font-medium text-gray-500 mb-3 text-center block">A che ora?</label>
+                        <label className="text-sm font-medium text-gray-500 mb-3 text-center block">{t('booking.time')}</label>
                         <div className="grid grid-cols-3 gap-2 max-h-[240px] overflow-y-auto pr-1 custom-scrollbar">
                             {timeSlots.map(time => (
                                 <button
@@ -299,9 +357,9 @@ const BookingFormContent = ({ step, setStep, data, setData, basePrice, onConfirm
                                     <Calendar size={14} style={{ color: HOGU_COLORS.primary }} />
                                 </div>
                                 <div className="flex flex-col">
-                                    <span className="text-[10px] text-gray-400 font-bold uppercase tracking-wide">Data</span>
+                                    <span className="text-[10px] text-gray-400 font-bold uppercase tracking-wide">{t('booking.dateLabel')}</span>
                                     <span className="text-xs font-bold text-gray-900 capitalize leading-tight">
-                                        {formatDateDocs(data.date)}
+                                        {formatDateDocs(data.date, i18n.language === 'it' ? 'it-IT' : 'en-US')}
                                     </span>
                                 </div>
                             </div>
@@ -311,33 +369,25 @@ const BookingFormContent = ({ step, setStep, data, setData, basePrice, onConfirm
                                     <Clock size={14} style={{ color: HOGU_COLORS.primary }} />
                                 </div>
                                 <div className="flex flex-col">
-                                    <span className="text-[10px] text-gray-400 font-bold uppercase tracking-wide">Ora</span>
+                                    <span className="text-[10px] text-gray-400 font-bold uppercase tracking-wide">{t('booking.timeLabel')}</span>
                                     <span className="text-xs font-bold text-gray-900 leading-tight">
                                         {data.time}
                                     </span>
                                 </div>
                             </div>
                         </div>
-                        <label className="text-sm font-medium text-gray-500 mb-4 text-center block">Numero di ospiti</label>
+                        <label className="text-sm font-medium text-gray-500 mb-4 text-center block">{t('booking.guestsLabel')}</label>
                         <div className="flex items-center justify-center gap-6 mb-8">
                             <button onClick={() => updateGuests(-1)} className="w-12 h-12 rounded-full border-2 border-gray-100 flex items-center justify-center text-gray-400 hover:bg-gray-50 text-2xl pb-1">-</button>
                             <span className="text-3xl font-bold text-gray-900">{data.guests}</span>
                             <button onClick={() => updateGuests(1)} className={`w-12 h-12 rounded-full border-2 border-[${HOGU_COLORS.primary}]/30 flex items-center justify-center text-[${HOGU_COLORS.primary}] hover:bg-[${HOGU_COLORS.primary}] hover:text-white text-2xl pb-1`}>+</button>
                         </div>
-                        {basePrice > 0 && (
-                            <div className="mt-auto bg-gray-50 p-4 rounded-xl border border-dashed border-gray-200">
-                                <div className="flex justify-between items-center font-bold text-gray-900 text-lg">
-                                    <span>Totale stimato</span>
-                                    <span>€{estimatedTotal.toFixed(2)}</span>
-                                </div>
-                            </div>
-                        )}
                     </div>
                 )}
             </div>
             <div className="mt-6 flex gap-3 pt-4 border-t border-gray-50">
                 {step > 1 && (
-                    <button onClick={() => setStep(p => p - 1)} className="px-5 py-3 rounded-xl font-medium text-gray-400 hover:bg-gray-50">Indietro</button>
+                    <button onClick={() => setStep(p => p - 1)} className="px-5 py-3 rounded-xl font-medium text-gray-400 hover:bg-gray-50">{t('booking.back')}</button>
                 )}
                 <PrimaryButton
                     onClick={() => {
@@ -347,7 +397,7 @@ const BookingFormContent = ({ step, setStep, data, setData, basePrice, onConfirm
                     disabled={(step === 1 && !data.date) || (step === 2 && !data.time) || (step === 3 && !data.guests)}
                     className="flex-1 py-4 text-base font-bold shadow-lg"
                 >
-                    {step === 3 ? 'Conferma' : 'Continua'}
+                    {step === 3 ? t('booking.confirm') : t('booking.continue')}
                 </PrimaryButton>
             </div>
         </div>
@@ -356,7 +406,7 @@ const BookingFormContent = ({ step, setStep, data, setData, basePrice, onConfirm
 
 // --- SIDEBAR DESKTOP ---
 const DesktopBookingWidget = ({ onConfirmBooking, basePrice, initialDate, initialTime, initialPersons }) => {
-    // ... (Codice DesktopBookingWidget invariato)
+    const { t } = useTranslation('restaurant');
     const [step, setStep] = useState((initialDate && initialTime) ? 3 : 1);
     const [data, setData] = useState({
         date: initialDate || '',
@@ -386,10 +436,10 @@ const DesktopBookingWidget = ({ onConfirmBooking, basePrice, initialDate, initia
             <div className="px-6 pt-6 pb-4 bg-white relative z-10">
                 <div className="flex justify-between items-center mb-4">
                     <h2 className="text-xl font-bold text-gray-900 flex items-center gap-2">
-                        <Calendar className="w-5 h-5" style={{ color: HOGU_COLORS.primary }} /> Prenota
+                        <Calendar className="w-5 h-5" style={{ color: HOGU_COLORS.primary }} /> {t('booking.prenotaTitle')}
                     </h2>
                     <span className="text-xs font-semibold text-gray-400 bg-gray-50 px-2 py-1 rounded-md uppercase">
-                        Step {step}/3
+                        {t('booking.step')} {step}/3
                     </span>
                 </div>
                 <div className="h-1 w-full bg-gray-100 rounded-full overflow-hidden">
@@ -416,7 +466,7 @@ const DesktopBookingWidget = ({ onConfirmBooking, basePrice, initialDate, initia
 
 // --- MOBILE SHEET ---
 const MobileBookingSheet = ({ onConfirmBooking, basePrice, initialDate, initialTime, initialPersons }) => {
-    // ... (Codice MobileBookingSheet invariato)
+    const { t } = useTranslation('restaurant');
     const [isOpen, setIsOpen] = useState(false);
     const [step, setStep] = useState((initialDate && initialTime) ? 3 : 1);
     const [data, setData] = useState({
@@ -449,20 +499,20 @@ const MobileBookingSheet = ({ onConfirmBooking, basePrice, initialDate, initialT
 
     return (
         <>
-            <div className="fixed bottom-0 left-0 right-0 z-[900] bg-white border-t border-gray-100 p-4 shadow-[0_-5px_20px_rgba(0,0,0,0.1)] md:hidden safe-area-bottom">
+            <div className="fixed bottom-0 left-0 right-0 z-[900] bg-white/95 backdrop-blur-md border-t border-gray-200/50 p-4 shadow-[0_-5px_20px_rgba(0,0,0,0.1)] md:hidden safe-area-bottom rounded-t-2xl">
                 <div className="flex items-center justify-between gap-4 max-w-md mx-auto">
                     <div className="flex flex-col">
-                        <span className="text-[10px] text-gray-500 uppercase tracking-wide font-semibold">Prezzo medio</span>
+                        <span className="text-[10px] text-gray-500 uppercase tracking-wide font-semibold">{t('booking.avgPrice')}</span>
                         <div className="flex items-baseline gap-1">
-                            <span className={`text-xl font-bold text-[${HOGU_COLORS.primary}]`}>€ {basePrice}</span>
-                            <span className="text-xs text-gray-400">/persona</span>
+                            <span className="text-xl font-bold text-gray-900">€ {typeof basePrice === 'number' ? basePrice.toFixed(2) : basePrice}</span>
+                            <span className="text-xs text-gray-400">{t('booking.perPerson')}</span>
                         </div>
                     </div>
                     <PrimaryEmphasis
                         onClick={() => setIsOpen(true)}
-                        className={`flex-1 py-3 text-base shadow-lg shadow-[${HOGU_COLORS.primary}]/25 active:scale-95 transition-transform`}
+                        className={`flex-1 py-3 text-base shadow-lg shadow-[${HOGU_COLORS.primary}]/25 active:scale-95 transition-transform rounded-xl`}
                     >
-                        Prenota Tavolo
+                        {t('booking.bookTable')}
                     </PrimaryEmphasis>
                 </div>
             </div>
@@ -480,8 +530,8 @@ const MobileBookingSheet = ({ onConfirmBooking, basePrice, initialDate, initialT
                 </div>
                 <div className="px-6 pt-2 pb-4 border-b border-gray-50 flex justify-between items-center bg-white rounded-t-[2rem]">
                     <div>
-                        <h3 className="text-xl font-bold text-gray-900 tracking-tight">Prenota tavolo</h3>
-                        <p className="text-xs text-gray-400 font-medium">Completa in 3 passaggi</p>
+                        <h3 className="text-xl font-bold text-gray-900 tracking-tight">{t('booking.bookTable')}</h3>
+                        <p className="text-xs text-gray-400 font-medium">{t('booking.completeSteps')}</p>
                     </div>
                     <div className={`w-10 h-10 rounded-full bg-[${HOGU_COLORS.primary}]/10 flex items-center justify-center font-bold text-[${HOGU_COLORS.primary}] text-sm`}>
                         {step}/3
@@ -505,6 +555,7 @@ const MobileBookingSheet = ({ onConfirmBooking, basePrice, initialDate, initialT
 
 // --- 4. PAGINA DETTAGLIO PRINCIPALE ---
 export const ServiceDetailPageRestaurant = ({ id, dateFrom, timeFrom, totalPersons }) => {
+    const { t } = useTranslation('restaurant');
     const navigate = useNavigate();
 
     const [service, setService] = useState(null);
@@ -528,31 +579,12 @@ export const ServiceDetailPageRestaurant = ({ id, dateFrom, timeFrom, totalPerso
                     infoService.getInfoRestaurant()
                 ]);
 
-                let coords = { lat: null, lon: null };
-                let addressToGeocode = "";
-                if (restaurantData.serviceLocale) {
-                    const locale = restaurantData.serviceLocale.find(l => l.language === 'it') || restaurantData.serviceLocale[0];
-                    if (locale) addressToGeocode = `${locale.address}, ${locale.city}, ${locale.state}, ${locale.country}`;
-                }
-
-                if (addressToGeocode) {
-                    try {
-                        const mapData = await mapService.getCoordinatesFromAddress(addressToGeocode);
-                        if (mapData && mapData.latitude) {
-                            coords = { lat: mapData.latitude, lon: mapData.longitude };
-                        }
-                    } catch (mapError) {
-                        console.warn("Non è stato possibile caricare la mappa:", mapError);
-                    }
-                }
-
                 setService(restaurantData);
                 setUrgencyCount(infoData);
-                setMapCoordinates(coords);
 
             } catch (err) {
                 console.error(err);
-                setError(err.message || "Errore nel caricamento.");
+                setError(err.message || t('error.loading'));
                 loadedId.current = null;
             } finally {
                 setLoading(false);
@@ -561,6 +593,39 @@ export const ServiceDetailPageRestaurant = ({ id, dateFrom, timeFrom, totalPerso
 
         fetchAllData();
     }, [id]);
+
+    // --- GEOCODING ISOLATO ---
+    useEffect(() => {
+        if (!service) return;
+
+        const fetchCoordinates = async () => {
+            const locale = service.serviceLocale?.find(l => l.language === 'it') ||
+                service.serviceLocale?.[0] || {};
+
+            const addressParts = [
+                locale.address?.trim(),
+                locale.city?.trim(),
+                locale.country?.trim()
+            ].filter(Boolean);
+
+            const fullAddress = addressParts.join(', ');
+
+            if (fullAddress && fullAddress !== ',') {
+                try {
+                    const mapData = await mapService.getCoordinatesFromAddress(fullAddress);
+                    if (mapData?.latitude && mapData?.longitude) {
+                        setMapCoordinates({ lat: mapData.latitude, lon: mapData.longitude });
+                    }
+                } catch (mapError) {
+                    console.warn("Geocoding fallito (indirizzo:", fullAddress, "):", mapError);
+                }
+            } else {
+                console.info("Indirizzo non sufficiente per geocoding → mappa non caricata");
+            }
+        };
+
+        fetchCoordinates();
+    }, [service]);
 
     const parsedData = useMemo(() => {
         if (!service) return null;
@@ -607,7 +672,18 @@ export const ServiceDetailPageRestaurant = ({ id, dateFrom, timeFrom, totalPerso
     }, [service, id]);
 
     const handleBookingRedirect = (bookingData) => {
-        navigate('/payment/summary', { state: { booking: bookingData, service: parsedData } });
+        const total = parsedData.price * bookingData.guests;
+        navigate('/payment/summary', {
+            state: {
+                booking: {
+                    ...bookingData,
+                    serviceId: service.id,
+                    serviceType: 'RESTAURANT',
+                    total: total
+                },
+                service: parsedData
+            }
+        });
     };
 
     if (loading) return <LoadingScreen isLoading={true} />;
@@ -620,9 +696,13 @@ export const ServiceDetailPageRestaurant = ({ id, dateFrom, timeFrom, totalPerso
 
     if (!parsedData) return null;
 
+    if (!parsedData.available) {
+        return <ServiceUnavailablePage />;
+    }
+
     const breadcrumbsItems = [
-        { label: 'Home', href: '/' },
-        { label: 'Ristoranti', href: '/service/restaurant' },
+        { label: t('breadcrumb.home'), href: '/' },
+        { label: t('breadcrumb.restaurants'), href: '/service/restaurant' },
         { label: parsedData.title }
     ];
 
@@ -631,35 +711,31 @@ export const ServiceDetailPageRestaurant = ({ id, dateFrom, timeFrom, totalPerso
             {/* Sfondo sfumato */}
             <div className="absolute top-0 left-0 w-full h-96 bg-gradient-to-b from-gray-50 to-white -z-10"></div>
 
-            {/* --- OVERLAY NON DISPONIBILE --- */}
-            {!parsedData.available && (
-                <ServiceUnavailableOverlay
-                    onSearchSimilar={() => navigate('/service/restaurant')}
-                    onGoBack={() => navigate('/')}
-                />
-            )}
-
             <div className="max-w-7xl mx-auto px-4 py-6 lg:px-8 lg:py-10">
                 <Breadcrumbs items={breadcrumbsItems} className="mb-6 opacity-80" />
 
-                <ServiceHeaderDetail title={parsedData.title} urgencyCount={urgencyCount} />
+                <ServiceHeaderDetail title={parsedData.title} />
 
-                <div className="grid grid-cols-1 lg:grid-cols-12 gap-10">
+                <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 md:gap-10">
                     {/* COLONNA SINISTRA */}
-                    <div className="lg:col-span-8 space-y-12">
-                        <div className="rounded-3xl overflow-hidden shadow-sm border border-gray-100">
-                            <ServiceImageGallery images={parsedData.images} />
+                    <div className="lg:col-span-8 space-y-8 md:space-y-12">
+                        <div className="-mx-4 md:mx-0 rounded-none md:rounded-3xl overflow-hidden shadow-none md:shadow-sm border-y md:border border-gray-100 md:border-gray-100">
+                            <ServiceImageGallery
+                                images={parsedData.images}
+                                mainImageHeight="h-64 md:h-96"
+                                thumbnailHeight="h-20"
+                            />
                         </div>
 
                         <section>
                             {/* --- HEADER UNIFORME --- */}
-                            <div className="flex items-center gap-3 mb-6">
-                                <div className={`p-3 rounded-xl bg-[${HOGU_COLORS.primary}]/10`}>
-                                    <BookOpen className={`w-6 h-6 text-[${HOGU_COLORS.primary}]`} />
+                            <div className="flex items-center gap-3 mb-4 md:mb-6">
+                                <div className={`p-2 md:p-3 rounded-xl bg-[${HOGU_COLORS.primary}]/10`}>
+                                    <BookOpen className={`w-5 h-5 md:w-6 md:h-6 text-[${HOGU_COLORS.primary}]`} />
                                 </div>
-                                <h2 className="text-2xl font-bold tracking-tight text-gray-900">L'Esperienza</h2>
+                                <h2 className="text-lg md:text-2xl font-bold tracking-tight text-gray-900">{t('experience.title')}</h2>
                             </div>
-                            <p className="text-gray-600 text-lg leading-relaxed whitespace-pre-line">{parsedData.description}</p>
+                            <ExpandableDescription text={parsedData.description} />
                         </section>
 
                         <RestaurantMenuSection
@@ -669,15 +745,38 @@ export const ServiceDetailPageRestaurant = ({ id, dateFrom, timeFrom, totalPerso
 
                         <section className="pt-8 border-t border-gray-100">
                             {/* --- HEADER UNIFORME --- */}
-                            <div className="flex items-center gap-3 mb-6">
-                                <div className={`p-3 rounded-xl bg-[${HOGU_COLORS.primary}]/10`}>
-                                    <MapPin className={`w-6 h-6 text-[${HOGU_COLORS.primary}]`} />
+                            <div className="flex items-center gap-3 mb-4 md:mb-6">
+                                <div className={`p-2 md:p-3 rounded-xl bg-[${HOGU_COLORS.primary}]/10`}>
+                                    <MapPin className={`w-5 h-5 md:w-6 md:h-6 text-[${HOGU_COLORS.primary}]`} />
                                 </div>
-                                <h2 className="text-2xl font-bold tracking-tight text-gray-900">Dove trovarci</h2>
+                                <h2 className="text-lg md:text-2xl font-bold tracking-tight text-gray-900">{t('map.whereToFindUs')}</h2>
                             </div>
                             <LeafletMapClub lat={mapCoordinates.lat} lon={mapCoordinates.lon} name={parsedData.title} />
-                            <div className="pl-2 border-l-4 border-gray-200">
-                                <LocationAddress address={parsedData.displayAddress} />
+
+                            {/* Address Card Elegante (Responsive) */}
+                            <div className="mt-4 md:mt-6">
+                                <div className="bg-white rounded-2xl p-5 shadow-[0_8px_30px_rgba(0,0,0,0.06)] border border-gray-100 flex flex-col md:flex-row md:items-center md:justify-between gap-4">
+                                    <div className="flex items-start gap-4">
+                                        <div className={`p-3 rounded-2xl bg-[${HOGU_COLORS.primary}]/10 shrink-0`}>
+                                            <MapPin className={`w-6 h-6 text-[${HOGU_COLORS.primary}]`} />
+                                        </div>
+                                        <div className="flex flex-col gap-1">
+                                            <span className="text-[11px] font-bold uppercase tracking-wider text-gray-400">{t('map.whereWeAre')}</span>
+                                            <p className="text-gray-900 font-medium leading-relaxed text-sm md:text-base">
+                                                {parsedData.displayAddress}
+                                            </p>
+                                        </div>
+                                    </div>
+                                    <a
+                                        href={`https://www.google.com/maps/dir/?api=1&destination=${encodeURIComponent(parsedData.displayAddress)}`}
+                                        target="_blank"
+                                        rel="noopener noreferrer"
+                                        className={`w-full md:w-auto md:min-w-[200px] py-3 md:px-6 rounded-xl bg-gray-50 hover:bg-gray-100 text-gray-900 font-semibold text-sm flex items-center justify-center gap-2 transition-colors border border-gray-200 active:scale-[0.98]`}
+                                    >
+                                        <span>{t('map.getDirections')}</span>
+                                        <Navigation className="w-4 h-4" />
+                                    </a>
+                                </div>
                             </div>
                         </section>
                     </div>
@@ -705,6 +804,8 @@ export const ServiceDetailPageRestaurant = ({ id, dateFrom, timeFrom, totalPerso
                 initialTime={timeFrom}
                 initialPersons={totalPersons}
             />
+
+            {urgencyCount > 0 && <LiveViewersFloatingBadge count={urgencyCount} className="!bottom-24 md:!bottom-6" />}
         </div>
     );
 };

@@ -1,0 +1,49 @@
+{
+  "expandable": {
+    "showLess": "Mostra meno",
+    "showMore": "Mostra altro"
+  },
+  "map": {
+    "verifiedPosition": "Posizione verificata",
+    "whereToFindUs": "Dove trovarci",
+    "whereWeAre": "Dove siamo",
+    "getDirections": "Ottieni indicazioni"
+  },
+  "menu": {
+    "notAvailable": "Menu non disponibile",
+    "notAvailableDesc": "Al momento il menu digitale non è visibile.",
+    "title": "Il Nostro Menu",
+    "chefSelection": "La Selezione dello Chef",
+    "limitedEdition": "Edizione Limitata",
+    "disclaimer1": "Le immagini sono a scopo illustrativo. Gli ingredienti possono variare in base alla stagionalità.",
+    "disclaimer2": "* Coperto e bevande esclusi se non specificato diversamente."
+  },
+  "booking": {
+    "when": "Quando vuoi venire?",
+    "preSelected": "La data è stata pre-selezionata per te.",
+    "time": "A che ora?",
+    "dateLabel": "Data",
+    "timeLabel": "Ora",
+    "guestsLabel": "Numero di ospiti",
+    "back": "Indietro",
+    "confirm": "Conferma",
+    "continue": "Continua",
+    "prenotaTitle": "Prenota",
+    "step": "Step",
+    "avgPrice": "Prezzo medio",
+    "perPerson": "/persona",
+    "bookTable": "Prenota Tavolo",
+    "completeSteps": "Completa in 3 passaggi"
+  },
+  "error": {
+    "loading": "Errore nel caricamento."
+  },
+  "breadcrumb": {
+    "home": "Home",
+    "restaurants": "Ristoranti"
+  },
+  "experience": {
+    "title": "L'Esperienza"
+  },
+  "live_viewers": "{{count}} persone stanno guardando"
+}

@@ -110,7 +110,7 @@ const RestaurantResultCard = ({ service, onClick }) => {
             onClick={onClick}
         >
             <div
-                className="md:w-1/3 h-40 md:h-auto relative overflow-hidden bg-gray-50 flex items-center justify-center p-3 md:p-4 isolate transform-gpu"
+                className="md:w-1/3 h-[200px] md:h-[240px] relative overflow-hidden bg-gray-50 flex items-center justify-center p-3 md:p-4 isolate transform-gpu shrink-0"
                 style={{ WebkitMaskImage: '-webkit-radial-gradient(white, black)' }}
             >
                 <div className="absolute top-4 left-4 z-20">

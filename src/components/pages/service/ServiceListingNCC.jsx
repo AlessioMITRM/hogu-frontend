@@ -15,9 +15,10 @@ import { PageHeader } from '../../ui/PageHeader.jsx';
 import { nccService } from '../../../api/apiClient.js';
 import { CityAutocomplete } from '../../ui/CityAutocomplete.jsx';
 import SafeImage from '../../ui/SafeImage.jsx';
-
 import { HOGU_COLORS, HOGU_THEME } from '../../../config/theme.js';
 import { createLocationPayload, getLocationData, processLocations } from "../../../utils/locationUtils.js";
+
+const MOBILE_FONT = "font-['SF_Pro_Text',_Roboto,_'Inter',_system-ui,_sans-serif]";
 
 const breadcrumbsItems = [
     { labelKey: 'breadcrumbs.home', href: '/' },
@@ -80,7 +81,7 @@ const PRESET_LOCATIONS = [
 // --- CONTAINER INPUT ---
 const SearchInputContainer = ({ label, icon: Icon, children, className = '', required = false }) => (
     <div className={`flex flex-col gap-1 lg:gap-2 flex-1 min-w-0 md:min-w-[200px] ${className}`}>
-        <label className={`flex items-center gap-1.5 text-[9px] md:text-xs font-bold uppercase tracking-wide text-[${HOGU_COLORS.subtleText}] ml-1`}>
+        <label className={`flex items-center gap-1.5 ${MOBILE_FONT} text-[12px] leading-[16px] font-normal md:text-xs md:font-bold uppercase tracking-wide text-[${HOGU_COLORS.subtleText}] ml-1`}>
             <Icon size={12} className={`text-[${HOGU_COLORS.primary}]`} />
             {label} {required && <span className="text-red-500">*</span>}
         </label>
@@ -93,7 +94,7 @@ const SearchInputContainer = ({ label, icon: Icon, children, className = '', req
 // --- CONTAINER MERGED INPUT (Desktop) ---
 const MergedLocationInput = ({ label, icon: Icon, cityComponent, addressComponent }) => (
     <div className="flex flex-col gap-2 flex-1 min-w-0">
-        <label className={`flex items-center gap-2 text-[10px] md:text-xs font-bold uppercase tracking-wide text-[${HOGU_COLORS.subtleText}] ml-1`}>
+        <label className={`flex items-center gap-2 ${MOBILE_FONT} text-[12px] leading-[16px] font-normal md:text-xs md:font-bold uppercase tracking-wide text-[${HOGU_COLORS.subtleText}] ml-1`}>
             <Icon size={14} className={`text-[${HOGU_COLORS.primary}]`} />
             {label}
         </label>
@@ -137,7 +138,7 @@ function PassengerSelector({ value, onChange }) {
     return (
         <div className="flex items-center justify-between w-full h-full px-2">
             <IconButton icon={Minus} onClick={handleDecrement} disabled={value <= 1} sizeClass="w-8 h-8" />
-            <span className="text-lg font-bold text-gray-700 w-8 text-center">{value}</span>
+            <span className={`${MOBILE_FONT} text-[16px] leading-[24px] font-semibold text-gray-700 w-8 text-center md:text-lg md:font-bold`}>{value}</span>
             <IconButton icon={Plus} onClick={handleIncrement} colorClass="text-[#68B49B]" sizeClass="w-8 h-8" />
         </div>
     );
@@ -168,16 +169,16 @@ function MobileLocationSelector({ label, icon: Icon, city, address, onSelect, pl
     return (
         <>
             <div className="flex flex-col gap-1 flex-1" onClick={() => setIsOpen(true)}>
-                <label className={`flex items-center gap-1.5 text-[9px] font-bold uppercase tracking-wide text-[${HOGU_COLORS.subtleText}] ml-1`}>
+                <label className={`flex items-center gap-1.5 ${MOBILE_FONT} text-[12px] leading-[16px] font-normal uppercase tracking-wide text-[${HOGU_COLORS.subtleText}] ml-1`}>
                     <Icon size={12} className={`text-[${HOGU_COLORS.primary}]`} />
                     {label}
                 </label>
                 <div className="bg-white p-2 rounded-xl border border-gray-100 shadow-sm flex items-center justify-between h-[42px] active:scale-[0.98] transition-transform">
                     <div className="flex flex-col overflow-hidden w-full pr-2">
-                        <span className={`text-xs font-bold truncate ${city ? 'text-gray-800' : 'text-gray-400'}`}>
+                        <span className={`${MOBILE_FONT} text-[16px] leading-[24px] font-semibold truncate ${city ? 'text-gray-800' : 'text-gray-400'}`}>
                             {city || placeholder}
                         </span>
-                        {address && <span className="text-[9px] text-gray-500 truncate leading-tight">{address}</span>}
+                        {address && <span className={`${MOBILE_FONT} text-[14px] leading-[20px] font-normal text-gray-500 truncate leading-tight`}>{address}</span>}
                     </div>
                     <ChevronDown size={14} className="text-gray-400 flex-shrink-0" />
                 </div>
@@ -189,7 +190,7 @@ function MobileLocationSelector({ label, icon: Icon, city, address, onSelect, pl
                         <button onClick={() => setIsOpen(false)} className="p-2 -ml-2 rounded-full hover:bg-gray-100">
                             <ChevronLeft size={24} className="text-gray-700" />
                         </button>
-                        <h3 className="text-lg font-bold text-gray-800">{t('ncc_listing.search.select_label', { label: label })}</h3>
+                        <h3 className={`${MOBILE_FONT} text-[18px] leading-[24px] font-semibold text-gray-800 md:text-lg md:font-bold`}>{t('ncc_listing.search.select_label', { label: label })}</h3>
                     </div>
 
                     <div className="flex-1 overflow-y-auto p-4 flex flex-col gap-6 safe-area-bottom">
@@ -201,14 +202,16 @@ function MobileLocationSelector({ label, icon: Icon, city, address, onSelect, pl
                                 onChange={setTempCity}
                                 placeholder={t('ncc_listing.search.city_search_placeholder')}
                                 className="z-[50]"
+                                labelClassName={`${MOBILE_FONT} !text-[12px] !leading-[16px] !font-normal !uppercase md:!text-xs md:!font-bold`}
+                                inputClassName={`${MOBILE_FONT} text-[16px] leading-[24px] font-normal md:font-medium`}
                             />
                             <div className="flex flex-col gap-2">
-                                <label className="flex items-center gap-2 text-xs font-bold uppercase tracking-wide text-gray-400 ml-1">
+                                <label className={`flex items-center gap-2 ${MOBILE_FONT} text-[12px] leading-[16px] font-normal uppercase tracking-wide text-gray-400 ml-1 md:text-xs md:font-bold`}>
                                     <Navigation size={14} className="text-[#68B49B]" /> {t('ncc_listing.search.address_label')}
                                 </label>
                                 <input
                                     type="text"
-                                    className="w-full p-4 bg-gray-50 rounded-xl border border-gray-200 focus:border-[#68B49B] outline-none font-medium text-gray-700"
+                                    className={`w-full p-4 bg-gray-50 rounded-xl border border-gray-200 focus:border-[#68B49B] outline-none ${MOBILE_FONT} text-[16px] leading-[24px] font-normal text-gray-700 md:font-medium`}
                                     placeholder={t('ncc_listing.search.address_placeholder')}
                                     value={tempAddress}
                                     onChange={(e) => setTempAddress(e.target.value)}
@@ -217,7 +220,7 @@ function MobileLocationSelector({ label, icon: Icon, city, address, onSelect, pl
                         </div>
 
                         <div>
-                            <p className="text-xs font-bold text-gray-400 uppercase tracking-wide mb-3">{t('ncc_listing.search.suggested_label')}</p>
+                            <p className={`${MOBILE_FONT} text-[12px] leading-[16px] font-normal text-gray-400 uppercase tracking-wide mb-3 md:text-xs md:font-bold`}>{t('ncc_listing.search.suggested_label')}</p>
                             <div className="grid grid-cols-2 gap-3">
                                 {PRESET_LOCATIONS.map((p, i) => (
                                     <button
@@ -227,9 +230,9 @@ function MobileLocationSelector({ label, icon: Icon, city, address, onSelect, pl
                                     >
                                         <div className="flex items-center gap-2 mb-1">
                                             {p.type === 'airport' ? <Plane size={14} className="text-blue-500" /> : <Train size={14} className="text-orange-500" />}
-                                            <span className="text-xs font-bold text-gray-800">{p.labelKey ? t(p.labelKey) : p.label}</span>
+                                            <span className={`${MOBILE_FONT} text-[12px] leading-[16px] font-semibold text-gray-800 md:text-xs md:font-bold`}>{p.labelKey ? t(p.labelKey) : p.label}</span>
                                         </div>
-                                        <span className="text-[10px] text-gray-500 truncate w-full">{p.city}</span>
+                                        <span className={`${MOBILE_FONT} text-[10px] text-gray-500 truncate w-full`}>{p.city}</span>
                                     </button>
                                 ))}
                             </div>
@@ -251,8 +254,8 @@ function MobileLocationSelector({ label, icon: Icon, city, address, onSelect, pl
 function PrimaryButton({ children, onClick, className = '', disabled = false, type = 'button', style = {} }) {
     return (
         <button type={type} onClick={onClick} disabled={disabled} style={style}
-            className={`bg-[#68B49B] text-white ${HOGU_THEME.fontFamily}
-        px-6 py-3 lg:px-8 lg:py-4 text-base lg:text-lg font-bold rounded-2xl transition-all duration-300 ease-out
+            className={`bg-[#68B49B] text-white ${HOGU_THEME.fontFamily} ${MOBILE_FONT}
+        px-6 py-3 lg:px-8 lg:py-4 text-[16px] leading-[20px] font-semibold md:text-base md:font-bold lg:text-lg rounded-2xl transition-all duration-300 ease-out
         shadow-[0_8px_20px_-6px_rgba(104,180,155,0.5)] hover:shadow-[0_12px_25px_-8px_rgba(104,180,155,0.7)]
         hover:-translate-y-0.5 active:translate-y-0 disabled:opacity-50 disabled:cursor-not-allowed
         flex items-center justify-center gap-2 ${className}`}>
@@ -329,26 +332,26 @@ const NCCResultCard = ({ service, searchParams, navigate }) => {
                     <div className="w-full">
                         <div className="flex justify-between items-start">
                             <div>
-                                <h2 className="text-base md:text-xl font-bold text-slate-800 group-hover:text-[#68B49B] transition-colors">
+                                <h2 className={`${MOBILE_FONT} text-[22px] leading-[28px] font-semibold md:text-base md:text-xl md:font-bold text-slate-800 group-hover:text-[#68B49B] transition-colors leading-tight`}>
                                     {service.name}
                                 </h2>
-                                <p className="text-xs md:text-base font-medium text-slate-500">{service.car}</p>
+                                <p className={`${MOBILE_FONT} text-[14px] leading-[20px] font-normal text-slate-500 md:text-xs md:text-base md:font-medium`}>{service.car}</p>
                             </div>
                             {service.rating && service.rating > 0 && (
                                 <div className="flex items-center gap-1 bg-yellow-50 px-2 py-1 rounded-lg">
                                     <Star size={14} className="text-yellow-400 fill-yellow-400" />
-                                    <span className="font-bold text-sm text-slate-700">{service.rating}</span>
+                                    <span className={`${MOBILE_FONT} text-[14px] leading-[20px] font-semibold text-slate-700 md:text-sm md:font-bold`}>{service.rating}</span>
                                 </div>
                             )}
                         </div>
                     </div>
                 </div>
 
-                <div className="flex flex-wrap gap-3 mt-2 md:mt-2">
-                    <span className="flex items-center gap-1.5 text-xs font-medium text-[#68B49B] bg-[#F0FDF9] px-2.5 py-1 rounded-md">
+                <div className="flex flex-wrap gap-2 md:gap-3 mt-2 md:mt-2">
+                    <span className={`${MOBILE_FONT} flex items-center gap-1 text-[12px] leading-[16px] font-normal text-[#68B49B] bg-[#F0FDF9] px-2.5 py-1 rounded-md md:text-xs md:font-medium`}>
                         <Users size={12} /> Max {service.numberOfSeats || t('ncc_listing.card.max_pax')}
                     </span>
-                    <span className="flex items-center gap-1.5 text-xs font-medium text-blue-600 bg-blue-50 px-2.5 py-1 rounded-md">
+                    <span className={`${MOBILE_FONT} flex items-center gap-1 text-[12px] leading-[16px] font-normal text-blue-600 bg-blue-50 px-2.5 py-1 rounded-md md:text-xs md:font-medium`}>
                         <ShieldCheck size={12} /> {t('ncc_listing.card.guaranteed')}
                     </span>
                 </div>
@@ -356,24 +359,24 @@ const NCCResultCard = ({ service, searchParams, navigate }) => {
                 <div className="md:hidden border-t border-gray-200 my-1.5" />
 
                 <div className={`mt-1 mb-1 md:my-2 pl-1 ${isExpanded ? 'block' : 'hidden md:block'}`}>
-                    <p className="text-gray-500 text-xs md:text-sm leading-relaxed mb-2 line-clamp-2">
+                    <p className={`${MOBILE_FONT} text-[14px] leading-[20px] font-normal text-gray-500 md:text-xs md:text-sm md:leading-relaxed mb-2 line-clamp-2`}>
                         {service.description || t('ncc_listing.card.default_description')}
                     </p>
 
                     {/* Mobile Price */}
                     <div className="mt-2 md:hidden">
-                        <p className="text-xs text-gray-400 font-medium uppercase tracking-wider">{t('ncc_listing.card.estimated_rate')}</p>
+                        <p className={`${MOBILE_FONT} text-[12px] leading-[16px] font-normal text-gray-400 mb-1`}>{t('ncc_listing.card.estimated_rate')}</p>
                         <div className="flex items-baseline gap-1">
-                            <span className="text-xl font-extrabold text-gray-800">€ {Math.floor(service.price)}</span>
-                            <span className="text-xs text-gray-500">,{(service.price % 1).toFixed(2).substring(2)}</span>
+                            <span className={`${MOBILE_FONT} text-[22px] leading-[28px] font-bold text-gray-800`}>€ {Math.floor(service.price)}</span>
+                            <span className={`${MOBILE_FONT} text-[14px] leading-[20px] font-normal text-gray-500`}>,{(service.price % 1).toFixed(2).substring(2)}</span>
                         </div>
                         {service.pricePerKm && (
-                            <div className="text-xs font-semibold text-slate-400 mt-1">
+                            <div className={`${MOBILE_FONT} text-[14px] leading-[20px] font-normal text-slate-400 mt-1`}>
                                 ~ € {service.pricePerKm} / km
                             </div>
                         )}
                         {service.distanceKm && (
-                            <div className="text-xs font-semibold text-slate-400 mt-1">
+                            <div className={`${MOBILE_FONT} text-[14px] leading-[20px] font-normal text-slate-400 mt-1`}>
                                 ~ {Number(service.distanceKm).toFixed(2).replace('.', ',')} km
                             </div>
                         )}
@@ -389,7 +392,7 @@ const NCCResultCard = ({ service, searchParams, navigate }) => {
                             e.stopPropagation();
                             setIsExpanded(!isExpanded);
                         }}
-                        className="flex items-center gap-1 text-[11px] font-bold text-[#68B49B] uppercase tracking-wide bg-gray-50 px-3 py-1.5 rounded-full hover:bg-gray-100 transition-colors"
+                        className={`flex items-center gap-1 ${MOBILE_FONT} text-[16px] leading-[20px] font-semibold text-[#68B49B] bg-gray-50 px-3 py-1.5 rounded-full hover:bg-gray-100 transition-colors`}
                     >
                         {isExpanded ? (
                             <>
@@ -802,7 +805,7 @@ export const ServiceListingNCC = () => {
                                 key={number}
                                 onClick={() => handlePageChange(number)}
                                 disabled={isLoading}
-                                className={`w-10 h-10 rounded-full font-bold text-sm transition-all ${currentPage === number ? 'bg-[#68B49B] text-white shadow-lg shadow-[#68B49B]/30' : 'text-gray-600 hover:bg-gray-100'}`}
+                                className={`w-10 h-10 rounded-full font-semibold ${MOBILE_FONT} text-[16px] leading-[20px] transition-all md:font-bold md:text-sm ${currentPage === number ? 'bg-[#68B49B] text-white shadow-lg shadow-[#68B49B]/30' : 'text-gray-600 hover:bg-gray-100'}`}
                             >
                                 {number}
                             </button>
@@ -924,7 +927,7 @@ export const ServiceListingNCC = () => {
                                     <input
                                         type="date"
                                         min={todayString}
-                                        className="w-full h-full px-2 lg:px-3 bg-transparent border-none focus:ring-0 text-sm font-medium text-gray-700 outline-none cursor-pointer"
+                                        className={`w-full h-full px-2 lg:px-3 bg-transparent border-none focus:ring-0 ${MOBILE_FONT} text-[16px] leading-[24px] font-normal text-gray-700 outline-none cursor-pointer md:text-sm md:font-medium`}
                                         value={search.dateOut}
                                         onChange={(e) => {
                                             const newDate = e.target.value;
@@ -946,7 +949,7 @@ export const ServiceListingNCC = () => {
 
                                 <SearchInputContainer label={t('ncc_listing.search.time')} icon={Clock}>
                                     <select
-                                        className="w-full h-full px-2 lg:px-3 bg-transparent border-none focus:ring-0 text-sm font-medium text-gray-700 outline-none cursor-pointer text-center appearance-none"
+                                        className={`w-full h-full px-2 lg:px-3 bg-transparent border-none focus:ring-0 ${MOBILE_FONT} text-[16px] leading-[24px] font-normal text-gray-700 outline-none cursor-pointer text-center appearance-none md:text-sm md:font-medium`}
                                         value={search.timeOut}
                                         onChange={(e) => setSearch({ ...search, timeOut: e.target.value })}
                                         required
@@ -1007,13 +1010,13 @@ export const ServiceListingNCC = () => {
                                             <Plane size={14} className="lg:w-5 lg:h-5" />
                                         </div>
                                         <div>
-                                            <p className="text-xs lg:text-sm font-bold text-gray-700 leading-tight">{t(route.displayFromKey)}</p>
-                                            <p className="text-[10px] lg:text-xs text-gray-400">{t('ncc_listing.popular_routes.to', { destination: t(route.displayToKey) })}</p>
+                                            <p className={`${MOBILE_FONT} text-[16px] leading-[20px] font-semibold text-gray-700 leading-tight md:text-xs md:text-sm md:font-bold`}>{t(route.displayFromKey)}</p>
+                                            <p className={`${MOBILE_FONT} text-[12px] leading-[16px] font-normal text-gray-400 md:text-[10px] md:text-xs`}>{t('ncc_listing.popular_routes.to', { destination: t(route.displayToKey) })}</p>
                                         </div>
                                     </div>
                                     <div className="text-right shrink-0 ml-2">
-                                        <p className="text-[9px] lg:text-xs text-gray-400">{t('ncc_listing.popular_routes.from')}</p>
-                                        <p className="text-sm lg:text-lg font-bold text-[#68B49B]">€{route.price}</p>
+                                        <p className={`${MOBILE_FONT} text-[12px] leading-[16px] font-normal text-gray-400 md:text-[9px] md:text-xs`}>{t('ncc_listing.popular_routes.from')}</p>
+                                        <p className={`${MOBILE_FONT} text-[18px] leading-[24px] font-semibold text-[#68B49B] md:text-sm md:text-lg md:font-bold`}>€{route.price}</p>
                                     </div>
                                 </div>
                             ))}
@@ -1022,9 +1025,9 @@ export const ServiceListingNCC = () => {
                 )}
 
                 {isLoading && !hasSearched && (
-                    <div className="mt-12 flex flex-col gap-4 animate-pulse">
+                    <div className="mt-12 flex flex-col gap-3 md:gap-4 animate-pulse">
                         {[1, 2, 3].map(i => (
-                            <div key={i} className="h-48 bg-gray-200 rounded-3xl w-full"></div>
+                            <div key={i} className="h-44 md:h-48 bg-gray-200 rounded-2xl md:rounded-3xl w-full"></div>
                         ))}
                     </div>
                 )}
@@ -1032,10 +1035,10 @@ export const ServiceListingNCC = () => {
                 {hasSearched && (
                     <div className="mt-6 md:mt-12" id="ncc-results-section" ref={resultsSectionRef}>
                         <div className="flex items-center justify-between mb-4 md:mb-8">
-                            <h2 className="text-lg md:text-2xl font-bold text-slate-800">
+                            <h2 className={`${MOBILE_FONT} text-[22px] leading-[28px] font-semibold text-slate-800 md:text-lg md:text-2xl md:font-bold`}>
                                 <span className="text-[#68B49B]">{totalElements}</span> {t('ncc_listing.results.available_vehicles', { count: totalElements })}
                             </h2>
-                            <span className="text-sm text-gray-400 font-medium">
+                            <span className={`${MOBILE_FONT} text-[14px] leading-[20px] font-normal text-gray-400 md:text-sm md:font-medium`}>
                                 {t('ncc_listing.results.page_of', { current: currentPage, total: totalPages > 0 ? totalPages : 1 })}
                             </span>
                         </div>
@@ -1043,8 +1046,8 @@ export const ServiceListingNCC = () => {
                         {services.length === 0 ? (
                             <div className="text-center py-10 md:py-20 bg-white rounded-2xl md:rounded-3xl border border-gray-100">
                                 <CarFront size={48} className="mx-auto text-gray-300 mb-4" />
-                                <h3 className="text-xl font-bold text-gray-600">{t('ncc_listing.results.not_found')}</h3>
-                                <p className="text-gray-400">{t('ncc_listing.results.no_results_retry')}</p>
+                                <h3 className={`${MOBILE_FONT} text-[18px] leading-[24px] font-semibold text-gray-600 md:text-xl md:font-bold`}>{t('ncc_listing.results.not_found')}</h3>
+                                <p className={`${MOBILE_FONT} text-[14px] leading-[20px] font-normal text-gray-400`}>{t('ncc_listing.results.no_results_retry')}</p>
                             </div>
                         ) : (
                             <div className={`${isLoading ? 'opacity-50 pointer-events-none' : 'opacity-100'} transition-opacity duration-200`}>

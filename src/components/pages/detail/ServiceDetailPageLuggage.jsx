@@ -653,7 +653,7 @@ export const ServiceDetailPageLuggage = ({ id: propId }) => {
                 totalPrice={totalPrice}
             />
 
-            {urgencyCount > 0 && <LiveViewersFloatingBadge count={urgencyCount} className="!bottom-24 md:!bottom-6" />}
+            {urgencyCount > 0 && <LiveViewersFloatingBadge count={urgencyCount} />}
         </div>
     );
 };

@@ -19,6 +19,8 @@ import LoadingScreen from "../../ui/LoadingScreen.jsx";
 import ErrorModal from "../../ui/ErrorModal.jsx";
 import { slugify } from '../../../utils/slugify.js';
 
+const MOBILE_FONT = "font-['SF_Pro_Text',_Roboto,_'Inter',_system-ui,_sans-serif]";
+
 const breadcrumbsItems = [
     { labelKey: 'breadcrumbs.home', href: '/' },
     { labelKey: 'breadcrumbs.luggage', href: '/service/luggage' }
@@ -27,7 +29,7 @@ const breadcrumbsItems = [
 // --- CONTAINER INPUT ---
 const SearchInputContainer = ({ label, icon: Icon, children, className = '', required = false }) => (
     <div className={`flex flex-col gap-1 lg:gap-3 flex-1 min-w-0 md:min-w-[200px] ${className}`}>
-        <label className={`flex items-center gap-1.5 text-[9px] md:text-xs font-bold uppercase tracking-wide text-[${HOGU_COLORS.subtleText}] ml-1`}>
+        <label className={`flex items-center gap-1.5 ${MOBILE_FONT} text-[12px] leading-[16px] font-normal md:text-xs md:font-bold uppercase tracking-wide text-[${HOGU_COLORS.subtleText}] ml-1`}>
             <Icon size={12} className={`text-[${HOGU_COLORS.primary}]`} />
             {label} {required && <span className="text-red-500">*</span>}
         </label>
@@ -60,8 +62,8 @@ function IconButton({ onClick, icon: Icon, disabled, colorClass = "text-gray-600
 function PrimaryButton({ children, onClick, className = '', disabled = false, type = 'button', style = {} }) {
     return (
         <button type={type} onClick={onClick} disabled={disabled} style={style}
-            className={`bg-[#68B49B] text-white ${HOGU_THEME.fontFamily}
-        px-6 py-3 lg:px-8 lg:py-4 text-base lg:text-lg font-bold rounded-2xl transition-all duration-300 ease-out
+            className={`bg-[#68B49B] text-white ${HOGU_THEME.fontFamily} ${MOBILE_FONT}
+        px-6 py-3 lg:px-8 lg:py-4 text-[16px] leading-[20px] font-semibold md:text-base md:font-bold lg:text-lg rounded-2xl transition-all duration-300 ease-out
         shadow-[0_8px_20px_-6px_rgba(104,180,155,0.5)] hover:shadow-[0_12px_25px_-8px_rgba(104,180,155,0.7)]
         hover:-translate-y-0.5 active:translate-y-0 disabled:opacity-50 disabled:cursor-not-allowed
         flex items-center justify-center gap-2 ${className}`}>
@@ -102,8 +104,8 @@ const LuggageSelectorCard = ({ bag, onUpdateQuantity }) => {
                     <Luggage size={bag.id === 'S' ? 18 : bag.id === 'M' ? 22 : 26} />
                 </div>
                 <div>
-                    <p className={`text-xs sm:text-sm font-bold ${isSelected ? 'text-[#33594C]' : 'text-gray-700'}`}>{t(bag.labelKey)}</p>
-                    <p className="hidden sm:block text-[10px] text-gray-400 sm:mt-0.5 leading-tight">{t(bag.descKey)}</p>
+                    <p className={`${MOBILE_FONT} text-[14px] leading-[20px] font-normal md:text-[11px] md:font-bold md:text-xs sm:text-sm ${isSelected ? 'text-[#33594C]' : 'text-gray-700'}`}>{t(bag.labelKey)}</p>
+                    <p className={`hidden sm:block ${MOBILE_FONT} text-[12px] leading-[16px] font-normal text-gray-400 sm:mt-0.5 leading-tight md:text-[10px]`}>{t(bag.descKey)}</p>
                 </div>
             </div>
 
@@ -190,9 +192,9 @@ function MobileCombinedScheduleSelector({
         <>
             <div className="w-full h-full px-2 text-left flex items-center justify-between cursor-pointer" onClick={() => setIsOpen(true)}>
                 <div className="flex items-center justify-between w-full">
-                    <span className="font-bold text-[11px] text-gray-800 truncate flex-1 text-left leading-tight">{formatDateTime(depositDate, depositTime)}</span>
+                    <span className={`${MOBILE_FONT} text-[16px] leading-[24px] font-semibold text-gray-800 truncate flex-1 text-left leading-tight md:text-[11px] md:font-bold`}>{formatDateTime(depositDate, depositTime)}</span>
                     <ArrowRight size={12} className="text-gray-400 mx-1 flex-shrink-0" />
-                    <span className="font-bold text-[11px] text-gray-800 truncate flex-1 text-right leading-tight">{formatDateTime(pickupDate, pickupTime)}</span>
+                    <span className={`${MOBILE_FONT} text-[16px] leading-[24px] font-semibold text-gray-800 truncate flex-1 text-right leading-tight md:text-[11px] md:font-bold`}>{formatDateTime(pickupDate, pickupTime)}</span>
                 </div>
                 <ChevronDown size={14} className="text-gray-400 flex-shrink-0 ml-1" />
             </div>
@@ -203,22 +205,22 @@ function MobileCombinedScheduleSelector({
                         <button onClick={() => setIsOpen(false)} className="p-2 -ml-2 rounded-full hover:bg-gray-100 transition-colors">
                             <ChevronLeft size={24} className="text-gray-700" />
                         </button>
-                        <h3 className="text-lg font-bold text-gray-800">{t('luggage_listing.search.select_times')}</h3>
+                        <h3 className={`${MOBILE_FONT} text-[22px] leading-[28px] font-semibold text-gray-800 md:text-lg md:font-bold`}>{t('luggage_listing.search.select_times')}</h3>
                     </div>
 
                     <div className="p-4 flex flex-col gap-4 overflow-y-auto flex-1">
                         {/* Deposit Card */}
                         <div className="bg-white p-5 rounded-3xl shadow-sm border border-gray-100">
-                            <h4 className="font-bold text-[#68B49B] flex items-center gap-2 mb-2 text-sm uppercase tracking-wide">
+                            <h4 className={`${MOBILE_FONT} text-[12px] leading-[16px] font-normal md:font-bold text-[#68B49B] flex items-center gap-2 mb-2 md:text-sm uppercase tracking-wide`}>
                                 <Calendar size={18} /> {t('luggage_listing.search.deposit')}
                             </h4>
                             <div className="grid grid-cols-2 gap-3">
                                 <div className="flex flex-col gap-1.5 min-w-0">
-                                    <label className={`text-[10px] md:text-xs font-bold uppercase tracking-wide text-[${HOGU_COLORS.subtleText}] ml-1`}>{t('luggage_listing.search.date')}</label>
+                                    <label className={`${MOBILE_FONT} text-[12px] leading-[16px] font-normal md:font-bold uppercase tracking-wide text-[${HOGU_COLORS.subtleText}] ml-1 md:text-[10px] md:text-xs`}>{t('luggage_listing.search.date')}</label>
                                     <div className="relative w-full">
                                         <input
                                             type="date"
-                                            className="w-full h-[56px] px-3 bg-gray-50 rounded-2xl border-transparent focus:bg-white focus:border-[#68B49B] focus:ring-4 focus:ring-[#68B49B]/10 outline-none font-bold text-gray-700 transition-all text-sm sm:text-base cursor-pointer"
+                                            className={`w-full h-[56px] px-3 bg-gray-50 rounded-2xl border-transparent focus:bg-white focus:border-[#68B49B] focus:ring-4 focus:ring-[#68B49B]/10 outline-none ${MOBILE_FONT} text-[16px] leading-[24px] font-semibold text-gray-700 transition-all md:text-sm sm:text-base cursor-pointer`}
                                             value={depositDate}
                                             min={minDate}
                                             onChange={(e) => onUpdate('depositDate', e.target.value)}
@@ -228,11 +230,11 @@ function MobileCombinedScheduleSelector({
                                     </div>
                                 </div>
                                 <div className="flex flex-col gap-1.5 min-w-0">
-                                    <label className={`text-[10px] md:text-xs font-bold uppercase tracking-wide text-[${HOGU_COLORS.subtleText}] ml-1`}>{t('luggage_listing.search.time')}</label>
+                                    <label className={`${MOBILE_FONT} text-[12px] leading-[16px] font-normal md:font-bold uppercase tracking-wide text-[${HOGU_COLORS.subtleText}] ml-1 md:text-[10px] md:text-xs`}>{t('luggage_listing.search.time')}</label>
                                     <div className="relative w-full">
                                         <input
                                             type="time"
-                                            className="w-full h-[56px] px-3 bg-gray-50 rounded-2xl border-transparent focus:bg-white focus:border-[#68B49B] focus:ring-4 focus:ring-[#68B49B]/10 outline-none font-bold text-gray-700 transition-all text-sm sm:text-base cursor-pointer"
+                                            className={`w-full h-[56px] px-3 bg-gray-50 rounded-2xl border-transparent focus:bg-white focus:border-[#68B49B] focus:ring-4 focus:ring-[#68B49B]/10 outline-none ${MOBILE_FONT} text-[16px] leading-[24px] font-semibold text-gray-700 transition-all md:text-sm sm:text-base cursor-pointer`}
                                             value={depositTime}
                                             onChange={(e) => onUpdate('depositTime', e.target.value)}
                                             onClick={(e) => e.target.showPicker?.()}
@@ -252,16 +254,16 @@ function MobileCombinedScheduleSelector({
 
                         {/* Pickup Card */}
                         <div className="bg-white p-5 rounded-3xl shadow-sm border border-gray-100">
-                            <h4 className="font-bold text-[#68B49B] flex items-center gap-2 mb-2 text-sm uppercase tracking-wide">
+                            <h4 className={`${MOBILE_FONT} text-[12px] leading-[16px] font-normal md:font-bold text-[#68B49B] flex items-center gap-2 mb-2 md:text-sm uppercase tracking-wide`}>
                                 <Clock size={18} /> {t('luggage_listing.search.pickup')}
                             </h4>
                             <div className="grid grid-cols-2 gap-3">
                                 <div className="flex flex-col gap-1.5 min-w-0">
-                                    <label className={`text-[10px] md:text-xs font-bold uppercase tracking-wide text-[${HOGU_COLORS.subtleText}] ml-1`}>{t('luggage_listing.search.date')}</label>
+                                    <label className={`${MOBILE_FONT} text-[12px] leading-[16px] font-normal md:font-bold uppercase tracking-wide text-[${HOGU_COLORS.subtleText}] ml-1 md:text-[10px] md:text-xs`}>{t('luggage_listing.search.date')}</label>
                                     <div className="relative w-full">
                                         <input
                                             type="date"
-                                            className="w-full h-[56px] px-3 bg-gray-50 rounded-2xl border-transparent focus:bg-white focus:border-[#68B49B] focus:ring-4 focus:ring-[#68B49B]/10 outline-none font-bold text-gray-700 transition-all text-sm sm:text-base cursor-pointer"
+                                            className={`w-full h-[56px] px-3 bg-gray-50 rounded-2xl border-transparent focus:bg-white focus:border-[#68B49B] focus:ring-4 focus:ring-[#68B49B]/10 outline-none ${MOBILE_FONT} text-[16px] leading-[24px] font-semibold text-gray-700 transition-all md:text-sm sm:text-base cursor-pointer`}
                                             value={pickupDate}
                                             min={depositDate || minDate}
                                             onChange={(e) => onUpdate('pickupDate', e.target.value)}
@@ -271,11 +273,11 @@ function MobileCombinedScheduleSelector({
                                     </div>
                                 </div>
                                 <div className="flex flex-col gap-1.5 min-w-0">
-                                    <label className={`text-[10px] md:text-xs font-bold uppercase tracking-wide text-[${HOGU_COLORS.subtleText}] ml-1`}>{t('luggage_listing.search.time')}</label>
+                                    <label className={`${MOBILE_FONT} text-[12px] leading-[16px] font-normal md:font-bold uppercase tracking-wide text-[${HOGU_COLORS.subtleText}] ml-1 md:text-[10px] md:text-xs`}>{t('luggage_listing.search.time')}</label>
                                     <div className="relative w-full">
                                         <input
                                             type="time"
-                                            className="w-full h-[56px] px-3 bg-gray-50 rounded-2xl border-transparent focus:bg-white focus:border-[#68B49B] focus:ring-4 focus:ring-[#68B49B]/10 outline-none font-bold text-gray-700 transition-all text-sm sm:text-base cursor-pointer"
+                                            className={`w-full h-[56px] px-3 bg-gray-50 rounded-2xl border-transparent focus:bg-white focus:border-[#68B49B] focus:ring-4 focus:ring-[#68B49B]/10 outline-none ${MOBILE_FONT} text-[16px] leading-[24px] font-semibold text-gray-700 transition-all md:text-sm sm:text-base cursor-pointer`}
                                             value={pickupTime}
                                             onChange={(e) => onUpdate('pickupTime', e.target.value)}
                                             onClick={(e) => e.target.showPicker?.()}
@@ -288,7 +290,7 @@ function MobileCombinedScheduleSelector({
                     </div>
 
                     <div className="mt-auto p-4 border-t border-gray-100 bg-white safe-area-bottom shadow-[0_-4px_20px_-8px_rgba(0,0,0,0.1)] z-10">
-                        <PrimaryButton onClick={() => setIsOpen(false)} className="w-full !rounded-xl !py-4 text-lg shadow-lg shadow-[#68B49B]/30">
+                        <PrimaryButton onClick={() => setIsOpen(false)} className={`w-full !rounded-xl !py-4 ${MOBILE_FONT} !text-[16px] !leading-[20px] !font-semibold shadow-lg shadow-[#68B49B]/30 md:text-lg md:font-bold`}>
                             {t('luggage_listing.search.confirm_times')}
                         </PrimaryButton>
                     </div>
@@ -307,7 +309,7 @@ function MobileLuggageSelector({ bags, onUpdateQuantity }) {
     return (
         <>
             <div className="w-full h-full px-2 text-left flex items-center justify-between cursor-pointer" onClick={() => setIsOpen(true)}>
-                <span className="text-xs font-bold text-gray-800 shrink-0">
+                <span className={`${MOBILE_FONT} text-[16px] leading-[24px] font-semibold text-gray-800 shrink-0 md:text-xs md:font-bold`}>
                     {totalBags > 0 ? t('luggage_listing.card.luggage_count', { count: totalBags }) : t('luggage_listing.search.select')}
                 </span>
                 <div className="flex items-center gap-1 overflow-hidden justify-end flex-1 ml-2">
@@ -327,7 +329,7 @@ function MobileLuggageSelector({ bags, onUpdateQuantity }) {
                         <button onClick={() => setIsOpen(false)} className="p-2 -ml-2 rounded-full hover:bg-gray-100">
                             <ChevronLeft size={24} className="text-gray-700" />
                         </button>
-                        <h3 className="text-lg font-bold text-gray-800">{t('luggage_listing.search.select_luggage')}</h3>
+                        <h3 className={`${MOBILE_FONT} text-[22px] leading-[28px] font-semibold text-gray-800 md:text-lg md:font-bold`}>{t('luggage_listing.search.select_luggage')}</h3>
                     </div>
 
                     <div className="p-6 flex flex-col bg-white">
@@ -342,8 +344,8 @@ function MobileLuggageSelector({ bags, onUpdateQuantity }) {
                                             <Luggage size={iconSize} />
                                         </div>
                                         <div>
-                                            <p className="font-bold text-gray-800 text-base">{t(bag.labelKey)}</p>
-                                            <p className="text-xs text-gray-500 font-medium">{t(bag.descKey)}</p>
+                                            <p className={`${MOBILE_FONT} text-[16px] leading-[24px] font-semibold text-gray-800 md:text-base md:font-bold`}>{t(bag.labelKey)}</p>
+                                            <p className={`${MOBILE_FONT} text-[14px] leading-[20px] font-normal text-gray-500 md:text-xs md:font-medium`}>{t(bag.descKey)}</p>
                                         </div>
                                     </div>
                                     <div className="flex items-center gap-4">
@@ -351,7 +353,7 @@ function MobileLuggageSelector({ bags, onUpdateQuantity }) {
                                             className="w-10 h-10 rounded-full border border-gray-200 text-gray-500 flex items-center justify-center transition-colors disabled:opacity-30">
                                             <Minus size={18} strokeWidth={3} />
                                         </button>
-                                        <span className="text-lg font-black text-gray-800 w-5 text-center">{bag.quantity}</span>
+                                        <span className={`${MOBILE_FONT} text-[18px] leading-[24px] font-semibold text-gray-800 w-5 text-center md:text-lg md:font-black`}>{bag.quantity}</span>
                                         <button type="button" onClick={() => onUpdateQuantity(bag.id, 1)}
                                             className="w-10 h-10 rounded-full bg-[#68B49B] text-white flex items-center justify-center transition-transform active:scale-90 shadow-md">
                                             <Plus size={18} strokeWidth={3} />
@@ -363,7 +365,7 @@ function MobileLuggageSelector({ bags, onUpdateQuantity }) {
                     </div>
 
                     <div className="mt-auto p-4 border-t border-gray-100 bg-white safe-area-bottom">
-                        <PrimaryButton onClick={() => setIsOpen(false)} className="w-full !rounded-xl !py-3">
+                        <PrimaryButton onClick={() => setIsOpen(false)} className={`${MOBILE_FONT} !text-[16px] !leading-[20px] !font-semibold w-full !rounded-xl !py-3`}>
                             {t('luggage_listing.search.confirm_count', { count: totalBags })}
                         </PrimaryButton>
                     </div>
@@ -472,29 +474,29 @@ const LuggageResultCard = ({ service, totalBags, onClick, searchCriteria }) => {
 
             <div className="px-3 pb-3 pt-1.5 md:p-8 flex-1 flex flex-col">
                 <div className="flex justify-between items-start mb-2">
-                    <h3 className={`text-base md:text-2xl font-bold ${HOGU_THEME.text} group-hover:text-[#68B49B] transition-colors uppercase leading-tight`}>{service.name}</h3>
+                    <h3 className={`${MOBILE_FONT} text-[22px] leading-[28px] font-semibold md:text-2xl md:font-bold ${HOGU_THEME.text} group-hover:text-[#68B49B] transition-colors uppercase leading-tight`}>{service.name}</h3>
                 </div>
-                <p className={`text-[11px] md:text-sm mt-0 flex items-center gap-1 text-[${HOGU_COLORS.subtleText}]`}>
+                <p className={`${MOBILE_FONT} text-[14px] leading-[20px] font-normal md:text-[11px] md:text-sm mt-0 flex items-center gap-1 text-[${HOGU_COLORS.subtleText}]`}>
                     <MapPin size={14} /> {service.location || service.address}
                 </p>
 
                 <div className={`mt-1 mb-1 md:my-2 ${isExpanded ? 'block' : 'hidden md:block'}`}>
-                    <p className="text-gray-500 text-xs md:text-sm leading-relaxed line-clamp-2 md:line-clamp-3">
+                    <p className={`${MOBILE_FONT} text-[14px] leading-[20px] font-normal text-gray-500 md:text-xs md:text-sm md:leading-relaxed line-clamp-2 md:line-clamp-3`}>
                         {service.description}
                     </p>
-                    <div className="flex flex-wrap gap-x-4 gap-y-2 mb-4 mt-3 text-xs text-gray-500 font-medium">
+                    <div className={`flex flex-wrap gap-x-4 gap-y-2 mb-4 mt-3 ${MOBILE_FONT} text-[12px] leading-[16px] font-normal text-gray-500 md:text-xs md:font-medium`}>
                         <span className="flex items-center gap-1"><CheckCircle2 size={12} className="text-[#68B49B]" /> {t('luggage_listing.card.feature_insurance')}</span>
                         <span className="flex items-center gap-1"><CheckCircle2 size={12} className="text-[#68B49B]" /> {t('luggage_listing.card.feature_cancellation')}</span>
                     </div>
 
                     {/* Mobile Price */}
                     <div className="mt-2 md:hidden">
-                        <p className="text-[10px] text-gray-400 uppercase font-bold tracking-wider mb-0.5">
+                        <p className={`${MOBILE_FONT} text-[12px] leading-[16px] font-normal md:font-bold text-gray-400 uppercase tracking-wider mb-0.5 md:text-[10px]`}>
                             {t('luggage_listing.card.estimated_total')}
                         </p>
                         <div className="flex items-baseline gap-1">
-                            <span className={`text-xl font-extrabold text-[${HOGU_COLORS.dark}]`}>€{totalPrice}</span>
-                            <span className="text-xs text-gray-400 font-medium ml-1">
+                            <span className={`${MOBILE_FONT} text-[22px] leading-[28px] font-bold text-[${HOGU_COLORS.dark}] md:text-xl md:font-extrabold`}>€{totalPrice}</span>
+                            <span className={`${MOBILE_FONT} text-[12px] leading-[16px] font-normal text-gray-400 md:font-medium ml-1 md:text-xs`}>
                                 (€{pricePerBag} {t('luggage_listing.card.bag_per_day', '/ bag / day')})
                             </span>
                         </div>
@@ -510,7 +512,7 @@ const LuggageResultCard = ({ service, totalBags, onClick, searchCriteria }) => {
                             e.stopPropagation();
                             setIsExpanded(!isExpanded);
                         }}
-                        className="flex items-center gap-1 text-[11px] font-bold text-[#68B49B] uppercase tracking-wide bg-gray-50 px-3 py-1.5 rounded-full hover:bg-gray-100 transition-colors"
+                        className={`flex items-center gap-1 ${MOBILE_FONT} text-[16px] leading-[20px] font-semibold text-[#68B49B] bg-gray-50 px-3 py-1.5 rounded-full hover:bg-gray-100 transition-colors md:text-[11px] md:font-bold md:uppercase md:tracking-wide`}
                     >
                         {isExpanded ? (
                             <>
@@ -836,7 +838,7 @@ function ServiceListingLuggage() {
                         <button
                             key={number}
                             onClick={() => handlePageChange(number)}
-                            className={`w-10 h-10 rounded-full font-bold text-sm transition-all ${currentPage === number ? 'bg-[#68B49B] text-white shadow-lg shadow-[#68B49B]/30' : 'text-gray-600 hover:bg-gray-100'}`}
+                            className={`w-10 h-10 rounded-full ${MOBILE_FONT} text-[16px] leading-[20px] font-semibold md:font-bold md:text-sm transition-all ${currentPage === number ? 'bg-[#68B49B] text-white shadow-lg shadow-[#68B49B]/30' : 'text-gray-600 hover:bg-gray-100'}`}
                         >
                             {number}
                         </button>
@@ -960,8 +962,8 @@ function ServiceListingLuggage() {
                                         onChange={(val) => updateCriteria('location', val)}
                                         icon={MapPin}
                                         className="w-full z-[100]"
-                                        inputClassName="text-left text-sm"
-                                        labelClassName={`!text-[${HOGU_COLORS.subtleText}] !text-[9px]`}
+                                        inputClassName={`${MOBILE_FONT} bg-white text-left text-[16px] leading-[24px] font-normal md:text-sm md:font-medium`}
+                                        labelClassName={`${MOBILE_FONT} !text-[${HOGU_COLORS.subtleText}] !text-[12px] !leading-[16px] !font-normal md:!text-[9px] md:!font-bold`}
                                         placeholder={t('luggage_listing.search.location_placeholder', "Dove ti serve il deposito?")}
                                     />
                                 </div>
@@ -988,7 +990,7 @@ function ServiceListingLuggage() {
                                 <PrimaryButton
                                     type="submit"
                                     disabled={isLoading}
-                                    className="w-full h-[42px] !rounded-xl !text-sm !py-0"
+                                    className={`w-full h-[42px] !rounded-xl ${MOBILE_FONT} !text-[16px] !leading-[20px] !font-semibold !py-0 md:!text-sm`}
                                 >
                                     {isLoading ? (
                                         <><Loader2 className="animate-spin" size={16} />{t('luggage_listing.search.searching', 'Cercando...')}</>
@@ -1009,10 +1011,10 @@ function ServiceListingLuggage() {
                 {hasSearched && (
                     <div className="mt-6 md:mt-12" id="results-section" ref={resultsSectionRef}>
                         <div className="flex items-center justify-between mb-4 md:mb-8">
-                            <h2 className="text-lg md:text-2xl font-bold text-slate-800">
+                            <h2 className={`${MOBILE_FONT} text-[22px] leading-[28px] font-semibold text-slate-800 md:text-2xl md:font-bold`}>
                                 <span className="text-[#68B49B]">{totalElements}</span> {t('luggage_listing.results.available_deposits', { count: totalElements })}
                             </h2>
-                            <span className="text-sm text-gray-400 font-medium">
+                            <span className={`${MOBILE_FONT} text-[14px] leading-[20px] font-normal text-gray-400 md:font-medium md:text-sm`}>
                                 {t('luggage_listing.results.page_of', { current: currentPage, total: totalPages > 0 ? totalPages : 1 })}
                             </span>
                         </div>
@@ -1022,8 +1024,8 @@ function ServiceListingLuggage() {
                                 <div className="inline-block p-4 rounded-full bg-gray-50 mb-4">
                                     <Search className="text-gray-300" size={40} />
                                 </div>
-                                <h3 className="text-xl font-bold text-gray-600">{t('luggage_listing.results.no_deposits_found')}</h3>
-                                <p className="text-gray-400">{t('luggage_listing.results.retry_search')}</p>
+                                <h3 className={`${MOBILE_FONT} text-[18px] leading-[24px] font-semibold text-gray-600 md:text-xl md:font-bold`}>{t('luggage_listing.results.no_deposits_found')}</h3>
+                                <p className={`${MOBILE_FONT} text-[14px] leading-[20px] font-normal text-gray-400`}>{t('luggage_listing.results.retry_search')}</p>
                             </div>
                         ) : (
                             <div className={`${isLoading ? 'opacity-50 pointer-events-none' : 'opacity-100'} transition-opacity duration-200`}>

@@ -34,6 +34,9 @@ import { CityAutocomplete } from "../../ui/CityAutocomplete.jsx";
 import { HOGU_COLORS, HOGU_THEME } from '../../../config/theme.js';
 
 
+const MOBILE_FONT = "font-['SF_Pro_Text',_Roboto,_'Inter',_system-ui,_sans-serif]";
+
+
 const breadcrumbsItems = [
   { labelKey: "breadcrumbs.home", href: "/" },
   { labelKey: "breadcrumbs.bnb", href: "/service/bnb" },
@@ -56,8 +59,8 @@ function PrimaryButton({
       disabled={disabled}
       style={style}
       className={`
-        bg-[#68B49B] text-white ${HOGU_THEME.fontFamily}
-        px-6 py-3 lg:px-8 lg:py-4 text-base lg:text-lg font-bold rounded-2xl transition-all duration-300 ease-out
+        bg-[#68B49B] text-white ${HOGU_THEME.fontFamily} ${MOBILE_FONT}
+        px-6 py-3 lg:px-8 lg:py-4 text-[16px] leading-[20px] font-semibold md:text-base md:font-bold lg:text-lg rounded-2xl transition-all duration-300 ease-out
         shadow-[0_8px_20px_-6px_rgba(104,180,155,0.5)] 
         hover:shadow-[0_12px_25px_-8px_rgba(104,180,155,0.7)]
         hover:-translate-y-0.5 active:translate-y-0
@@ -74,7 +77,7 @@ function PrimaryButton({
 const SearchInputContainer = ({ label, icon: Icon, children, className = "" }) => (
   <div className={`flex flex-col gap-1 lg:gap-3 flex-1 min-w-0 ${className}`}>
     <label
-      className={`flex items-center gap-1.5 text-[9px] md:text-xs font-bold uppercase tracking-wide text-[${HOGU_COLORS.subtleText}] ml-1`}
+      className={`flex items-center gap-1.5 ${MOBILE_FONT} text-[12px] leading-[16px] font-normal md:text-xs md:font-bold uppercase tracking-wide text-[${HOGU_COLORS.subtleText}] ml-1`}
     >
       <Icon size={12} className={`text-[${HOGU_COLORS.primary}]`} />
       {label}
@@ -104,7 +107,7 @@ const GuestRoomModal = ({
         >
           <Icon size={18} />
         </div>
-        <span className={`text-sm font-semibold text-gray-700`}>{label}</span>
+        <span className={`${MOBILE_FONT} text-[14px] leading-[20px] font-semibold text-gray-700`}>{label}</span>
       </div>
       <div className="flex items-center gap-3">
         <button
@@ -117,7 +120,7 @@ const GuestRoomModal = ({
         >
           <Minus size={14} strokeWidth={3} />
         </button>
-        <span className="w-4 text-center font-bold text-gray-800">{value}</span>
+        <span className={`${MOBILE_FONT} text-[16px] leading-[20px] w-4 text-center font-bold text-gray-800`}>{value}</span>
         <button
           onClick={(e) => {
             e.preventDefault();
@@ -134,10 +137,10 @@ const GuestRoomModal = ({
   return (
     <div className="absolute top-full mt-3 left-0 w-full md:w-80 bg-white rounded-2xl shadow-xl border border-gray-100 z-50 p-5 animate-in fade-in zoom-in-95 duration-200">
       <div className="flex justify-between items-center mb-4">
-        <h3 className="text-sm font-bold uppercase tracking-wide text-gray-400">
+        <h3 className={`${MOBILE_FONT} text-[12px] leading-[16px] font-bold uppercase tracking-wide text-gray-400`}>
           {t('bnb_listing.modal.title')}
         </h3>
-        <button onClick={onClose} className="text-xs text-[#68B49B] font-bold hover:underline">
+        <button onClick={onClose} className={`text-xs ${MOBILE_FONT} text-[#68B49B] font-bold hover:underline`}>
           {t('bnb_listing.modal.close_button')}
         </button>
       </div>
@@ -218,10 +221,10 @@ const BnBResultCard = ({ service, onClick, nights }) => {
         <div className="flex justify-between items-start mb-2 md:mb-1">
           <div className="w-full">
             <div className="flex justify-between items-start">
-              <h2 className={`text-base md:text-2xl font-bold ${HOGU_THEME.text} group-hover:text-[#68B49B] transition-colors uppercase leading-tight`}>{service.name}</h2>
+              <h2 className={`${MOBILE_FONT} text-[22px] leading-[28px] font-semibold md:text-base md:text-2xl md:font-bold ${HOGU_THEME.text} group-hover:text-[#68B49B] transition-colors uppercase leading-tight`}>{service.name}</h2>
             </div>
             <div className="flex items-center gap-2 mt-1 mb-0 md:mb-4">
-              <p className={`text-[11px] md:text-sm flex items-center gap-1 ${HOGU_THEME.subtleText}`}>
+              <p className={`${MOBILE_FONT} text-[14px] leading-[20px] font-normal md:text-[11px] md:text-sm flex items-center gap-1 ${HOGU_THEME.subtleText}`}>
                 <MapPin size={12} className="text-[#68B49B]" /> {displayLocation}
               </p>
             </div>
@@ -231,18 +234,18 @@ const BnBResultCard = ({ service, onClick, nights }) => {
         <div className="md:hidden border-t border-gray-200 my-1.5" />
 
         <div className={`mt-1 mb-1 md:my-2 pl-1 ${isExpanded ? 'block' : 'hidden md:block'}`}>
-          <p className="text-gray-500 text-xs md:text-sm leading-relaxed mb-4 line-clamp-2">
+          <p className={`${MOBILE_FONT} text-[14px] leading-[20px] font-normal text-gray-500 md:text-xs md:text-sm md:leading-relaxed mb-4 line-clamp-2`}>
             {service.description}
           </p>
 
           {/* Prezzo Mobile visibile solo se espanso */}
           <div className="mt-2 md:hidden">
-            <p className="text-xs text-gray-400 font-medium uppercase tracking-wider mb-1">
+            <p className={`${MOBILE_FONT} text-[12px] leading-[16px] font-normal text-gray-400 mb-1`}>
               {t('bnb_listing.search_results.total_per_night', { nights: nights, unit: nights === 1 ? t('bnb_listing.search_results.night') : t('bnb_listing.search_results.nights') })}
             </p>
             <div className="flex items-baseline gap-1">
-              <span className="text-xl font-extrabold text-gray-800">{formattedTotalPrice}</span>
-              <span className="text-xs text-gray-500">
+              <span className={`${MOBILE_FONT} text-[22px] leading-[28px] font-bold text-gray-800`}>{formattedTotalPrice}</span>
+              <span className={`${MOBILE_FONT} text-[14px] leading-[20px] font-normal text-gray-500`}>
                 {new Intl.NumberFormat(i18n.language === 'it' ? 'it-IT' : 'en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 }).format(service.pricePerNight)}{t('bnb_listing.card.currency')} {t('bnb_listing.card.per_night')}
               </span>
             </div>
@@ -258,7 +261,7 @@ const BnBResultCard = ({ service, onClick, nights }) => {
               e.stopPropagation();
               setIsExpanded(!isExpanded);
             }}
-            className="flex items-center gap-1 text-[11px] font-bold text-[#68B49B] uppercase tracking-wide bg-gray-50 px-3 py-1.5 rounded-full hover:bg-gray-100 transition-colors"
+            className={`flex items-center gap-1 ${MOBILE_FONT} text-[16px] leading-[20px] font-semibold text-[#68B49B] bg-gray-50 px-3 py-1.5 rounded-full hover:bg-gray-100 transition-colors`}
           >
             {isExpanded ? (
               <>
@@ -610,8 +613,8 @@ export const ServiceListingBnB = () => {
                   onChange={setCity}
                   icon={Search}
                   className="w-full z-[100]"
-                  labelClassName={`!text-[${HOGU_COLORS.subtleText}] !text-[9px]`}
-                  inputClassName="text-left text-sm"
+                  labelClassName={`!text-[${HOGU_COLORS.subtleText}] ${MOBILE_FONT} !text-[12px] !leading-[16px] !font-normal md:!text-xs md:!font-bold md:uppercase`}
+                  inputClassName={`${MOBILE_FONT} text-left text-[16px] leading-[24px] font-normal md:text-sm`}
                   placeholder={t('bnb_listing.search.location_placeholder', "Dove vuoi andare?")}
                 />
               </div>
@@ -620,7 +623,7 @@ export const ServiceListingBnB = () => {
               <SearchInputContainer label={t('bnb_listing.search.check_in')} icon={Calendar}>
                 <input
                   type="date"
-                  className="w-full h-full px-2 bg-transparent border-none focus:ring-0 text-sm font-medium text-gray-700 outline-none cursor-pointer"
+                  className={`w-full h-full px-2 bg-transparent border-none focus:ring-0 ${MOBILE_FONT} text-[16px] leading-[24px] font-normal text-gray-700 outline-none cursor-pointer md:text-sm md:font-medium`}
                   min={new Date().toISOString().split("T")[0]}
                   value={checkIn}
                   onChange={(e) => setCheckIn(e.target.value)}
@@ -631,7 +634,7 @@ export const ServiceListingBnB = () => {
               <SearchInputContainer label={t('bnb_listing.search.check_out')} icon={Calendar}>
                 <input
                   type="date"
-                  className="w-full h-full px-2 bg-transparent border-none focus:ring-0 text-sm font-medium text-gray-700 outline-none cursor-pointer"
+                  className={`w-full h-full px-2 bg-transparent border-none focus:ring-0 ${MOBILE_FONT} text-[16px] leading-[24px] font-normal text-gray-700 outline-none cursor-pointer md:text-sm md:font-medium`}
                   min={checkIn || new Date().toISOString().split("T")[0]}
                   value={checkOut}
                   onChange={(e) => setCheckOut(e.target.value)}
@@ -646,8 +649,8 @@ export const ServiceListingBnB = () => {
                     onClick={() => setIsGuestModalOpen((prev) => !prev)}
                     className="w-full h-full px-2 text-left flex flex-col justify-center hover:bg-gray-50 rounded-xl transition-colors outline-none"
                   >
-                    <span className="text-xs font-bold text-gray-800 truncate">{guestButtonText}</span>
-                    <span className="text-[10px] text-gray-400 truncate">{roomButtonText}</span>
+                    <span className={`${MOBILE_FONT} text-[16px] leading-[24px] font-semibold text-gray-800 truncate md:text-xs md:font-bold`}>{guestButtonText}</span>
+                    <span className={`${MOBILE_FONT} text-[14px] leading-[16px] font-normal text-gray-400 truncate md:text-[10px]`}>{roomButtonText}</span>
                   </button>
                 </SearchInputContainer>
                 {isGuestModalOpen && (
@@ -689,7 +692,7 @@ export const ServiceListingBnB = () => {
                 <SearchInputContainer label={t('bnb_listing.search.check_in')} icon={Calendar} className="min-w-0">
                   <input
                     type="date"
-                    className="w-full h-full px-3 bg-transparent border-none focus:ring-0 text-sm font-medium text-gray-700 outline-none cursor-pointer"
+                    className="w-full h-full px-3 bg-transparent border-none focus:ring-0 md:text-lg md:font-medium text-gray-700 outline-none cursor-pointer"
                     min={new Date().toISOString().split("T")[0]}
                     value={checkIn}
                     onChange={(e) => setCheckIn(e.target.value)}
@@ -698,7 +701,7 @@ export const ServiceListingBnB = () => {
                 <SearchInputContainer label={t('bnb_listing.search.check_out')} icon={Calendar} className="min-w-0">
                   <input
                     type="date"
-                    className="w-full h-full px-3 bg-transparent border-none focus:ring-0 text-sm font-medium text-gray-700 outline-none cursor-pointer"
+                    className="w-full h-full px-3 bg-transparent border-none focus:ring-0 md:text-lg md:font-medium text-gray-700 outline-none cursor-pointer"
                     min={checkIn || new Date().toISOString().split("T")[0]}
                     value={checkOut}
                     onChange={(e) => setCheckOut(e.target.value)}
@@ -713,8 +716,8 @@ export const ServiceListingBnB = () => {
                     onClick={() => setIsGuestModalOpen((prev) => !prev)}
                     className="w-full h-full px-4 text-left flex flex-col justify-center hover:bg-gray-50 rounded-xl transition-colors outline-none"
                   >
-                    <span className="text-sm font-bold text-gray-800 truncate">{guestButtonText}</span>
-                    <span className="text-xs text-gray-400 truncate">{roomButtonText}</span>
+                    <span className="md:text-lg md:font-bold text-gray-800 truncate">{guestButtonText}</span>
+                    <span className="md:text-sm text-gray-400 truncate">{roomButtonText}</span>
                   </button>
                 </SearchInputContainer>
                 {isGuestModalOpen && (
@@ -752,14 +755,14 @@ export const ServiceListingBnB = () => {
           {hasSearched && (
             <div className="mt-6 md:mt-12 relative z-10" id="bnb-results-section" ref={resultsSectionRef}>
               <div className="flex items-center justify-between mb-4 md:mb-8">
-                <h2 className={`text-lg md:text-2xl font-bold text-[${HOGU_COLORS.dark}]`}>
+                <h2 className={`${MOBILE_FONT} text-[22px] leading-[28px] font-semibold text-[${HOGU_COLORS.dark}] md:text-lg md:text-2xl md:font-bold`}>
                   <span className="text-[#68B49B]">
                     {services.length}
                   </span>{" "}
                   {t('bnb_listing.search_results.available_accommodations', { count: services.length })}
                 </h2>
                 {services.length > 0 && (
-                  <span className="text-sm text-gray-400 font-medium">
+                  <span className={`${MOBILE_FONT} text-[14px] leading-[20px] font-normal text-gray-400 md:text-sm md:font-medium`}>
                     {t('bnb_listing.search_results.page_of', { current: currentPage, total: totalPages > 0 ? totalPages : 1 })}
                   </span>
                 )}
@@ -770,7 +773,7 @@ export const ServiceListingBnB = () => {
                   <div className="w-20 h-20 bg-gray-50 rounded-full flex items-center justify-center mx-auto mb-4">
                     <Search size={30} className="text-gray-300" />
                   </div>
-                  <h3 className="text-lg font-bold text-gray-700">
+                  <h3 className={`${MOBILE_FONT} text-[18px] leading-[24px] font-semibold text-gray-700 md:text-lg md:font-bold`}>
                     {t('bnb_listing.search_results.no_results_title')}
                   </h3>
                 </div>
@@ -806,7 +809,7 @@ export const ServiceListingBnB = () => {
                             key={number}
                             onClick={() => handlePageChange(number)}
                             disabled={loading}
-                            className={`w-10 h-10 rounded-full font-bold text-sm transition-all ${currentPage === number ? 'bg-[#68B49B] text-white shadow-lg shadow-[#68B49B]/30' : 'text-gray-600 hover:bg-gray-100'}`}
+                            className={`w-10 h-10 rounded-full font-semibold ${MOBILE_FONT} text-[16px] leading-[20px] transition-all md:font-bold md:text-sm ${currentPage === number ? 'bg-[#68B49B] text-white shadow-lg shadow-[#68B49B]/30' : 'text-gray-600 hover:bg-gray-100'}`}
                           >
                             {number}
                           </button>

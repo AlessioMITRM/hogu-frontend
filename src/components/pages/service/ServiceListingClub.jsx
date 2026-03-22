@@ -21,6 +21,8 @@ import { HOGU_COLORS, HOGU_THEME } from '../../../config/theme.js';
 import { slugify } from '../../../utils/slugify.js';
 import { createLocationPayload } from "../../../utils/locationUtils.js";
 
+const MOBILE_FONT = "font-['SF_Pro_Text',_Roboto,_'Inter',_system-ui,_sans-serif]";
+
 
 const breadcrumbsItems = [
     { labelKey: 'breadcrumbs.home', href: '/' },
@@ -33,7 +35,7 @@ function Tag({ children, className = '' }) {
     return (
         <span className={`
       bg-purple-50 text-purple-700 border border-purple-100
-      px-3 py-1 text-[11px] uppercase tracking-wider font-bold rounded-full inline-flex items-center
+      px-3 py-1 ${MOBILE_FONT} text-[12px] leading-[16px] font-semibold md:text-[11px] md:font-bold uppercase tracking-wider rounded-full inline-flex items-center
       ${className}
     `}>
             {children}
@@ -49,8 +51,8 @@ function PrimaryButton({ children, onClick, className = '', disabled = false, ty
             disabled={disabled}
             style={style}
             className={`
-        bg-[#68B49B] text-white ${HOGU_THEME.fontFamily}
-        px-6 py-3 lg:px-8 lg:py-4 text-base lg:text-lg font-bold rounded-2xl transition-all duration-300 ease-out
+        bg-[#68B49B] text-white ${HOGU_THEME.fontFamily} ${MOBILE_FONT}
+        px-6 py-3 lg:px-8 lg:py-4 text-[16px] leading-[20px] font-semibold md:text-base md:font-bold lg:text-lg rounded-2xl transition-all duration-300 ease-out
         shadow-[0_8px_20px_-6px_rgba(104,180,155,0.5)] 
         hover:shadow-[0_12px_25px_-8px_rgba(104,180,155,0.7)]
         hover:-translate-y-0.5 active:translate-y-0
@@ -66,7 +68,7 @@ function PrimaryButton({ children, onClick, className = '', disabled = false, ty
 
 const SearchInputContainer = ({ label, icon: Icon, children, className = '' }) => (
     <div className={`flex flex-col gap-1 lg:gap-3 flex-1 min-w-0 ${className}`}>
-        <label className={`flex items-center gap-1.5 text-[9px] md:text-xs font-bold uppercase tracking-wide text-[${HOGU_COLORS.subtleText}] ml-1`}>
+        <label className={`flex items-center gap-1.5 ${MOBILE_FONT} text-[12px] leading-[16px] font-normal md:text-xs md:font-bold uppercase tracking-wide text-[${HOGU_COLORS.subtleText}] ml-1`}>
             <Icon size={12} className={`text-[${HOGU_COLORS.primary}]`} />
             {label}
         </label>
@@ -197,7 +199,7 @@ const ClubResultCard = ({ service, onDetailClick, isTableReserved, isToday }) =>
         >
             <div className="md:w-1/3 h-40 md:h-72 relative overflow-hidden bg-gray-50 flex items-center justify-center md:p-4">
                 <div className="absolute top-4 left-4 z-10 flex flex-col items-start gap-2">
-                    <Tag className="bg-white/95 backdrop-blur !border-none text-gray-800 shadow-sm !text-[#68B49B]">
+                    <Tag className={`bg-white/95 backdrop-blur !border-none text-gray-800 shadow-sm !text-[#68B49B] ${MOBILE_FONT} !text-[12px] !leading-[16px] !font-semibold md:!text-[11px] md:!font-bold`}>
                         {service.theme ? (
                             <>
                                 <ThemeIcon size={12} className="mr-1" /> {service.theme}
@@ -224,15 +226,15 @@ const ClubResultCard = ({ service, onDetailClick, isTableReserved, isToday }) =>
 
             <div className="px-3 pb-3 pt-1.5 md:p-8 flex-1 flex flex-col">
                 <div className="flex justify-between items-start mb-2 md:mb-1">
-                    <h2 className={`text-base md:text-2xl font-bold ${HOGU_THEME.text} group-hover:text-[#68B49B] transition-colors uppercase leading-tight`}>{service.name}</h2>
+                    <h2 className={`${MOBILE_FONT} text-[22px] leading-[28px] font-semibold md:text-base md:text-2xl md:font-bold ${HOGU_THEME.text} group-hover:text-[#68B49B] transition-colors uppercase leading-tight`}>{service.name}</h2>
                 </div>
-                <div className={`text-[11px] md:text-sm mt-0 flex items-center flex-wrap gap-3 ${HOGU_THEME.subtleText}`}>
+                <div className={`${MOBILE_FONT} text-[14px] leading-[20px] font-normal md:text-[11px] md:text-sm mt-0 flex items-center flex-wrap gap-3 ${HOGU_THEME.subtleText}`}>
                     <span className="flex items-center gap-1">
                         <MapPin size={12} className="text-[#68B49B]" /> {locationString}
                     </span>
                     {timeString && (
-                        <span className="flex items-center gap-1.5 text-slate-600 font-semibold bg-slate-50 px-2.5 py-1 rounded-full border border-slate-100 shadow-sm whitespace-nowrap">
-                            <Clock size={12} className="text-[#68B49B]" />
+                        <span className={`${MOBILE_FONT} text-[14px] leading-[20px] font-semibold flex items-center gap-1.5 text-slate-600 md:font-semibold bg-slate-50 px-2.5 py-1 rounded-full border border-slate-100 shadow-sm whitespace-nowrap md:text-xs`}>
+                             <Clock size={12} className="text-[#68B49B]" />
                             <span className="capitalize">{timeString}</span>
                         </span>
                     )}
@@ -240,7 +242,7 @@ const ClubResultCard = ({ service, onDetailClick, isTableReserved, isToday }) =>
                 <div className="md:hidden border-t border-gray-200 my-1.5" />
 
                 <div className={`mt-1 mb-1 md:my-2 pl-1 ${isExpanded ? 'block' : 'hidden md:block'}`}>
-                    <p className="text-gray-500 text-xs md:text-sm leading-relaxed line-clamp-2 md:line-clamp-3">
+                    <p className={`${MOBILE_FONT} text-[14px] leading-[20px] font-normal text-gray-500 md:text-xs md:text-sm md:leading-relaxed line-clamp-2 md:line-clamp-3`}>
                         {service.description}
                     </p>
                 </div>
@@ -254,17 +256,17 @@ const ClubResultCard = ({ service, onDetailClick, isTableReserved, isToday }) =>
                             e.stopPropagation();
                             setIsExpanded(!isExpanded);
                         }}
-                        className="flex items-center gap-1 text-[11px] font-bold text-[#68B49B] uppercase tracking-wide bg-gray-50 px-3 py-1.5 rounded-full hover:bg-gray-100 transition-colors"
+                        className={`flex items-center gap-1 ${MOBILE_FONT} text-[16px] leading-[20px] font-semibold text-[#68B49B] bg-gray-50 px-3 py-1.5 rounded-full hover:bg-gray-100 transition-colors md:text-[11px] md:font-bold md:uppercase md:tracking-wide`}
                     >
                         {isExpanded ? (
                             <>
                                 <ChevronDown size={14} className="rotate-180 transition-transform" />
-                                Nascondi
+                                {t('club_listing.card.hide_details', 'Nascondi')}
                             </>
                         ) : (
                             <>
                                 <ChevronDown size={14} className="transition-transform" />
-                                Info & Prezzi
+                                {t('club_listing.card.info_prices', 'Info & Prezzi')}
                             </>
                         )}
                     </button>
@@ -286,36 +288,36 @@ const ClubResultCard = ({ service, onDetailClick, isTableReserved, isToday }) =>
           `}>
                     <div className="flex flex-col md:flex-row gap-3 md:gap-8 flex-1">
                         <div className={`${isTableReserved ? 'opacity-50 grayscale' : 'opacity-100'} transition-all`}>
-                            <p className="text-[10px] text-black uppercase font-bold tracking-wider mb-1 md:mb-2">
+                            <p className={`${MOBILE_FONT} text-[12px] leading-[16px] font-normal md:text-[10px] md:font-bold uppercase tracking-wider text-black mb-1 md:mb-2`}>
                                 {t('club_listing.card.entry_label', 'Ingresso')}
                             </p>
                             <div className="flex flex-col gap-1">
-                                <div className="flex items-center justify-between md:justify-start gap-4 text-sm font-bold text-black px-2 py-1">
-                                    <span className="text-gray-400 font-medium text-xs uppercase">Uomo</span>
+                                <div className={`flex items-center justify-between md:justify-start gap-4 ${MOBILE_FONT} text-[16px] leading-[24px] font-semibold text-black px-2 py-1 md:text-sm md:font-bold`}>
+                                    <span className={`${MOBILE_FONT} text-[12px] font-normal text-gray-400 font-medium uppercase md:text-xs`}>Uomo</span>
                                     <span className="text-black">{manPrice ? `€${manPrice.toFixed(2)}` : `€${service.price.toFixed(2)}`}</span>
                                 </div>
-                                <div className="flex items-center justify-between md:justify-start gap-4 text-sm font-bold text-black px-2 py-1">
-                                    <span className="text-gray-400 font-medium text-xs uppercase">Donna</span>
+                                <div className={`flex items-center justify-between md:justify-start gap-4 ${MOBILE_FONT} text-[16px] leading-[24px] font-semibold text-black px-2 py-1 md:text-sm md:font-bold`}>
+                                    <span className={`${MOBILE_FONT} text-[12px] font-normal text-gray-400 font-medium uppercase md:text-xs`}>Donna</span>
                                     <span className="text-black">{womanPrice ? `€${womanPrice.toFixed(2)}` : `€${service.price.toFixed(2)}`}</span>
                                 </div>
                             </div>
                         </div>
                         <div className="hidden md:block w-[1px] bg-gray-100 h-auto"></div>
                         <div className={`${!isTableReserved ? 'opacity-70' : 'opacity-100'} transition-all`}>
-                            <p className="text-[10px] text-black uppercase font-bold tracking-wider mb-1 md:mb-2 flex items-center gap-1">
+                            <p className={`${MOBILE_FONT} text-[12px] leading-[16px] font-normal md:text-[10px] md:font-bold uppercase tracking-wider text-black mb-1 md:mb-2 flex items-center gap-1`}>
                                 <Armchair size={12} className="text-[#68B49B]" />
                                 {t('club_listing.card.min_spend_label', 'Tavoli')}
                             </p>
                             <div className="flex items-baseline gap-1">
                                 {tablePrice ? (
-                                    <div className="flex items-center justify-between md:justify-start gap-4 text-sm font-bold text-black bg-[#F0FDF4] px-2 py-1 rounded-lg border border-[#68B49B]/30 shadow-sm w-full">
-                                        <span className="text-xs text-[#2F5E4E] font-medium uppercase">Da</span>
-                                        <span className="text-black text-base">
+                                    <div className={`flex items-center justify-between md:justify-start gap-4 ${MOBILE_FONT} text-[16px] font-semibold text-black bg-[#F0FDF4] px-2 py-1 rounded-lg border border-[#68B49B]/30 shadow-sm w-full md:text-sm md:font-bold`}>
+                                        <span className={`${MOBILE_FONT} text-[12px] font-normal text-[#2F5E4E] font-medium uppercase md:text-xs`}>Da</span>
+                                        <span className="text-black text-[18px] leading-[24px] md:text-base">
                                             €{tablePrice}
                                         </span>
                                     </div>
                                 ) : (
-                                    <span className="text-xs font-bold text-gray-400 italic px-2 py-1">
+                                    <span className={`${MOBILE_FONT} text-[12px] font-normal text-gray-400 italic px-2 py-1 md:text-xs md:font-bold`}>
                                         Non disponibile
                                     </span>
                                 )}
@@ -569,8 +571,8 @@ export const ServiceListingClub = () => {
                                     onChange={setCity}
                                     icon={MapPin}
                                     className="w-full z-[100]"
-                                    inputClassName="text-left text-sm"
-                                    labelClassName={`!text-[${HOGU_COLORS.subtleText}] !text-[9px]`}
+                                    inputClassName={`${MOBILE_FONT} bg-white text-left text-[16px] leading-[24px] font-normal md:text-sm md:font-medium`}
+                                    labelClassName={`${MOBILE_FONT} !text-[${HOGU_COLORS.subtleText}] !text-[12px] !leading-[16px] !font-normal md:!text-[9px] md:!font-bold`}
                                     placeholder={t('club_listing.search.city_placeholder', "Dove vuoi andare?")}
                                 />
                             </div>
@@ -581,7 +583,7 @@ export const ServiceListingClub = () => {
                                     <select
                                         value={eventType}
                                         onChange={(e) => setEventType(e.target.value)}
-                                        className="w-full h-full object-cover md:object-contain md:mix-blend-multiply transition-transform duration-500 group-hover:scale-105 drop-shadow-xl max-h-[200px] text-sm font-medium text-gray-700 outline-none cursor-pointer appearance-none"
+                                        className={`w-full h-full bg-white transition-all duration-300 ${MOBILE_FONT} text-[16px] leading-[24px] font-normal text-gray-700 outline-none cursor-pointer appearance-none md:text-sm md:font-medium`}
                                     >
                                         <option value="">{t('club_listing.search.select_type')}</option>
                                         <option value="djset">{t('club_listing.search.type_djset')}</option>
@@ -602,13 +604,13 @@ export const ServiceListingClub = () => {
                                     min={new Date().toISOString().split("T")[0]}
                                     value={eventDate}
                                     onChange={(e) => setEventDate(e.target.value)}
-                                    className="w-full h-full px-2 bg-transparent border-none focus:ring-0 text-sm font-medium text-gray-700 outline-none cursor-pointer"
+                                    className={`w-full h-full px-2 bg-white border-none focus:ring-0 ${MOBILE_FONT} text-[16px] leading-[24px] font-normal text-gray-700 outline-none cursor-pointer md:text-sm md:font-medium`}
                                 />
                             </SearchInputContainer>
 
                             {/* Toggle Tavolo */}
                             <div className="flex flex-col gap-1 min-w-0">
-                                <label className={`flex items-center gap-1.5 text-[9px] font-bold uppercase tracking-wide text-[${HOGU_COLORS.subtleText}] ml-1`}>
+                                <label className={`flex items-center gap-1.5 ${MOBILE_FONT} text-[12px] leading-[16px] font-normal uppercase tracking-wide text-[${HOGU_COLORS.subtleText}] ml-1 md:text-[9px] md:font-bold`}>
                                     <Armchair size={12} className={`text-[${HOGU_COLORS.primary}]`} />
                                     {t('club_listing.search.table_label')}
                                 </label>
@@ -617,7 +619,7 @@ export const ServiceListingClub = () => {
                                         }`}
                                     onClick={() => setReserveTable(!reserveTable)}
                                 >
-                                    <span className={`text-xs font-bold truncate ${reserveTable ? 'text-[#33594C]' : 'text-gray-500'}`}>
+                                    <span className={`${MOBILE_FONT} text-[14px] leading-[20px] font-semibold truncate ${reserveTable ? 'text-[#33594C]' : 'text-gray-500'} md:text-xs md:font-bold`}>
                                         {reserveTable ? t('club_listing.search.table_premium') : t('club_listing.search.entry_only')}
                                     </span>
                                     <div className={`w-5 h-5 rounded-full flex items-center justify-center transition-all border shrink-0 ${reserveTable ? 'bg-[#68B49B] border-[#68B49B] text-white' : 'bg-gray-100 border-gray-200 text-transparent'
@@ -629,8 +631,8 @@ export const ServiceListingClub = () => {
 
                             {/* Bottone Cerca — spacer + bottone allineato */}
                             <div className="flex flex-col gap-1 min-w-0">
-                                <span className="text-[9px] font-bold uppercase tracking-wide opacity-0 select-none ml-1">_</span>
-                                <PrimaryButton type="submit" disabled={loading || !city || !eventDate} className="w-full h-[42px] !rounded-xl !px-4 !text-sm !py-0">
+                                <span className={`text-[9px] font-bold uppercase tracking-wide opacity-0 select-none ml-1`}>_</span>
+                                <PrimaryButton type="submit" disabled={loading || !city || !eventDate} className="w-full h-[42px] !rounded-xl !px-4 !text-[16px] !py-0 md:!text-sm">
                                     {loading ? (
                                         <><Loader2 className="animate-spin" size={16} />{t('club_listing.search.searching', 'Cercando...')}</>
                                     ) : (
@@ -731,11 +733,11 @@ export const ServiceListingClub = () => {
                     {hasSearched && (
                         <div className="mt-6 md:mt-12" id="club-results-section" ref={resultsSectionRef}>
                             <div className="flex flex-col md:flex-row items-center justify-between mb-4 md:mb-8 gap-4 text-center md:text-left">
-                                <h2 className={`text-lg md:text-2xl font-bold text-[${HOGU_COLORS.dark}]`}>
+                                <h2 className={`${MOBILE_FONT} text-[22px] leading-[28px] font-semibold text-[${HOGU_COLORS.dark}] md:text-lg md:text-2xl md:font-bold`}>
                                     <span className="text-[#68B49B]">{services.length}</span> {t('club_listing.results.found', { count: services.length })}
                                 </h2>
                                 {services.length > 0 && (
-                                    <span className="text-sm text-gray-400 font-medium">
+                                    <span className={`${MOBILE_FONT} text-[14px] leading-[20px] font-normal text-gray-400 md:text-sm md:font-medium`}>
                                         Pagina {currentPage} di {totalPages}
                                     </span>
                                 )}
@@ -744,7 +746,7 @@ export const ServiceListingClub = () => {
                             {services.length === 0 ? (
                                 <div className="text-center py-10 md:py-20 bg-white rounded-2xl md:rounded-3xl border border-gray-100">
                                     <Music size={40} className="text-gray-300 mx-auto mb-4" />
-                                    <h3 className="text-lg font-bold text-gray-700">{t('club_listing.results.no_events')}</h3>
+                                    <h3 className={`${MOBILE_FONT} text-[18px] leading-[24px] font-semibold text-gray-700 md:text-lg md:font-bold`}>{t('club_listing.results.no_events')}</h3>
                                 </div>
                             ) : (
                                 <>
@@ -775,7 +777,7 @@ export const ServiceListingClub = () => {
                                                         key={number}
                                                         onClick={() => handlePageChange(number)}
                                                         disabled={loading}
-                                                        className={`w-10 h-10 rounded-full font-bold text-sm transition-all ${currentPage === number ? 'bg-[#68B49B] text-white shadow-lg shadow-[#68B49B]/30' : 'text-gray-600 hover:bg-gray-100'}`}
+                                                        className={`w-10 h-10 rounded-full font-semibold ${MOBILE_FONT} text-[16px] leading-[20px] transition-all md:font-bold md:text-sm ${currentPage === number ? 'bg-[#68B49B] text-white shadow-lg shadow-[#68B49B]/30' : 'text-gray-600 hover:bg-gray-100'}`}
                                                     >
                                                         {number}
                                                     </button>

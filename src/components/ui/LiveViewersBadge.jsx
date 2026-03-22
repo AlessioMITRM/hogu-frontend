@@ -32,7 +32,7 @@ export const LiveViewersFloatingBadge = ({ count, className = "" }) => {
     if (!count || count <= 0 || !isVisible) return null;
 
     return (
-        <div className={`fixed bottom-6 left-1/2 -translate-x-1/2 md:left-auto md:right-8 md:translate-x-0 z-50 pointer-events-none animate-fade-in-up ${className}`}>
+        <div className={`fixed top-4 left-1/2 -translate-x-1/2 md:top-auto md:bottom-6 md:left-auto md:right-8 md:translate-x-0 z-50 pointer-events-none animate-fade-in-up ${className}`}>
              <div className="bg-white/90 backdrop-blur-xl shadow-[0_8px_30px_rgb(0,0,0,0.12)] border border-white/50 pl-5 pr-2 py-2 rounded-full flex items-center gap-3 pointer-events-auto transition-all hover:scale-105">
                 <LiveViewersBadge count={count} />
                 

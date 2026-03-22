@@ -2,6 +2,7 @@ import React from 'react';
 import { useTranslation } from 'react-i18next';
 import { ArrowRight, Sparkles } from 'lucide-react';
 import { HOGU_COLORS, HOGU_THEME } from '../../../config/theme.js';
+const MOBILE_FONT = "font-['SF_Pro_Text',_Roboto,_Inter,_system-ui,_sans-serif]";
 
 
 // --- COMPONENTI UI HELPERS (Locali per portabilità) ---
@@ -21,13 +22,13 @@ const GlassTag = ({ children, className = '' }) => (
 const HeroButtonPrimary = ({ children, onClick }) => (
   <button
     onClick={onClick}
-    className="
+    className={`
       w-full sm:w-auto justify-center
-      px-5 py-2.5 md:px-8 md:py-4 rounded-xl md:rounded-2xl text-sm md:text-lg font-bold text-[#1A202C] bg-white 
+      px-5 py-2.5 md:px-8 md:py-4 rounded-xl md:rounded-2xl ${MOBILE_FONT} text-[16px] leading-[20px] font-semibold md:text-lg md:font-bold text-[#1A202C] bg-white 
       hover:bg-gray-50 transition-all duration-300 ease-out 
       shadow-[0_0_20px_rgba(255,255,255,0.3)] hover:shadow-[0_0_30px_rgba(255,255,255,0.5)]
       hover:-translate-y-1 active:translate-y-0 flex items-center gap-2 group
-    "
+    `}
   >
     {children}
     <ArrowRight size={20} className="group-hover:translate-x-1 transition-transform" />
@@ -38,12 +39,12 @@ const HeroButtonPrimary = ({ children, onClick }) => (
 const HeroButtonSecondary = ({ children, onClick }) => (
   <button
     onClick={onClick}
-    className="
+    className={`
       w-full sm:w-auto justify-center
-      px-5 py-2.5 md:px-8 md:py-4 rounded-xl md:rounded-2xl text-sm md:text-lg font-bold text-white border border-white/30 
+      px-5 py-2.5 md:px-8 md:py-4 rounded-xl md:rounded-2xl ${MOBILE_FONT} text-[16px] leading-[20px] font-semibold md:text-lg md:font-bold text-white border border-white/30 
       bg-white/5 backdrop-blur-sm hover:bg-white/10 hover:border-white/50
       transition-all duration-300 ease-out flex items-center gap-2
-    "
+    `}
   >
     {children}
   </button>
@@ -84,8 +85,8 @@ export const HeroSection = ({ setPage }) => {
         {/* <GlassTag className="mb-6">Nuova Piattaforma 2025</GlassTag> */}
 
         {/* Titolo Principale */}
-        {/* Mobile: text-4xl, Desktop: text-7xl. Leading tight per evitare spazi enormi tra le righe */}
-        <h1 className="text-3xl sm:text-5xl md:text-6xl lg:text-7xl font-extrabold text-white leading-[1.1] tracking-tight mb-2 md:mb-8 drop-shadow-2xl">
+        {/* Mobile: text-[28px], Desktop: text-7xl. Leading tight per evitare spazi enormi tra le righe */}
+        <h1 className={`${MOBILE_FONT} text-[28px] leading-[34px] font-bold sm:text-5xl md:text-6xl lg:text-7xl md:font-extrabold text-white tracking-tight mb-2 md:mb-8 drop-shadow-2xl`}>
           {t('hero.title_part1')}, <br className="hidden md:block" />
           {t('hero.title_part2')}. <br />
           <span className="text-transparent bg-clip-text bg-gradient-to-r from-[#68B49B] via-emerald-300 to-[#68B49B]">
@@ -96,13 +97,13 @@ export const HeroSection = ({ setPage }) => {
         {/* Sottotitolo */}
         {/* Mobile: testo più piccolo e margini calibrati */}
         <div className="max-w-2xl mb-4 md:mb-12 px-2">
-          <p className="text-sm sm:text-lg md:text-xl text-gray-200 leading-relaxed font-medium drop-shadow-md">
+          <p className={`${MOBILE_FONT} text-[16px] leading-[24px] font-normal sm:text-lg md:text-xl text-gray-200 drop-shadow-md`}>
             {t('hero.subtitle_line1')} {t('hero.subtitle_line2', { commission: '8%' })}
           </p>
 
           {/* Footer del sottotitolo (es. "Iscrizione gratuita") */}
           <div className="mt-2 md:mt-4 pt-2 md:pt-0 border-t border-white/10 md:border-none w-full md:w-auto">
-            <span className="text-white/90 text-[10px] md:text-sm uppercase tracking-widest font-bold">
+            <span className={`${MOBILE_FONT} text-[12px] leading-[16px] font-normal text-white/90 uppercase tracking-widest md:text-sm md:font-bold`}>
               {t('hero.subtitle_footer')}
             </span>
           </div>

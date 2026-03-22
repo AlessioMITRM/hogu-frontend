@@ -5,6 +5,7 @@ import {
     ChevronLeft, ChevronRight, ArrowRight
 } from 'lucide-react';
 import { HOGU_COLORS, HOGU_THEME } from '../../../config/theme.js';
+const MOBILE_FONT = "font-['SF_Pro_Text',_Roboto,_Inter,_system-ui,_sans-serif]";
 
 
 const ACCENT_COLOR = '#E6F5F0';
@@ -161,10 +162,10 @@ export const ExclusiveServicesCarousel = ({ setPage }) => {
             <div className="max-w-7xl mx-auto px-4">
                 {/* Titolo e Descrizione */}
                 <div className="text-center mb-3 md:mb-12 relative z-10">
-                    <h2 className={`text-lg md:text-4xl font-bold mb-1 md:mb-4 ${HOGU_THEME.text} leading-tight`}>
+                    <h2 className={`${MOBILE_FONT} text-[22px] leading-[28px] font-semibold mb-1 md:mb-4 ${HOGU_THEME.text} md:text-4xl md:font-bold md:leading-tight`}>
                         {t('carousel.main_title')}
                     </h2>
-                    <p className={`max-w-2xl mx-auto text-[11px] md:text-lg ${HOGU_THEME.subtleText} leading-relaxed px-4`}>
+                    <p className={`${MOBILE_FONT} text-[14px] leading-[20px] font-normal max-w-2xl mx-auto ${HOGU_THEME.subtleText} px-4 md:text-lg md:leading-relaxed`}>
                         {t('carousel.main_description')}
                     </p>
                 </div>
@@ -218,20 +219,20 @@ export const ExclusiveServicesCarousel = ({ setPage }) => {
                                             <service.icon size={22} color={HOGU_COLORS.primary} className="transition-transform duration-500 group-hover/card:rotate-3" />
                                         </div>
 
-                                        <h3 className={`text-base md:text-2xl font-bold mb-1 md:mb-3 ${HOGU_THEME.text} tracking-tight group-hover/card:text-[${CTA_COLOR}] transition-colors duration-300`}>
+                                        <h3 className={`${MOBILE_FONT} text-[18px] leading-[24px] font-semibold mb-1 md:mb-3 ${HOGU_THEME.text} tracking-tight group-hover/card:text-[${CTA_COLOR}] transition-colors duration-300 md:text-2xl md:font-bold`}>
                                             {t(service.typeKey)}
                                         </h3>
-                                        <p className={`${HOGU_THEME.subtleText} text-xs md:text-base leading-relaxed font-medium opacity-80 group-hover/card:opacity-100 transition-opacity`}>
+                                        <p className={`${HOGU_THEME.subtleText} ${MOBILE_FONT} text-[14px] leading-[20px] font-normal md:text-base leading-relaxed opacity-80 group-hover/card:opacity-100 transition-opacity`}>
                                             {t(service.descKey)}
                                         </p>
                                     </div>
 
                                     <div className="relative z-10 mt-4 md:mt-6 h-6 flex items-end justify-center overflow-hidden">
                                         <span className={`
-                                      text-[${HOGU_COLORS.primary}] font-bold text-sm uppercase tracking-widest
-                                      transform translate-y-8 group-hover/card:translate-y-0
-                                      transition-transform duration-500 ease-out flex items-center gap-2
-                                  `}>
+                                          text-[${HOGU_COLORS.primary}] ${MOBILE_FONT} text-[16px] leading-[20px] font-semibold uppercase tracking-widest md:text-sm md:font-bold
+                                          transform translate-y-8 group-hover/card:translate-y-0
+                                          transition-transform duration-500 ease-out flex items-center gap-2
+                                      `}>
                                             {t('carousel.discover')} <ArrowRight size={16} strokeWidth={3} />
                                         </span>
                                         <div className={`

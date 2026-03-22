@@ -3,6 +3,7 @@ import { useTranslation } from 'react-i18next';
 import { Search, CalendarCheck, HeartHandshake } from 'lucide-react';
 
 import { HOGU_THEME } from '../../../config/theme.js';
+const MOBILE_FONT = "font-['SF_Pro_Text',_Roboto,_Inter,_system-ui,_sans-serif]";
 
 
 export const HowItWorksSection = () => {
@@ -111,7 +112,7 @@ export const HowItWorksSection = () => {
       onMouseLeave={() => { if (window.innerWidth >= 768) setIsHovered(false); }}
     >
       <div className="px-4 mb-3 md:mb-16 text-center">
-        <h2 className={`text-lg md:text-4xl font-bold text-center mb-1 md:mb-4 ${HOGU_THEME.text}`}>
+        <h2 className={`${MOBILE_FONT} text-[22px] leading-[28px] font-semibold text-center mb-1 md:mb-4 ${HOGU_THEME.text} md:text-4xl md:font-bold`}>
           {t('how_it_works.main_title')}
         </h2>
 
@@ -192,12 +193,12 @@ export const HowItWorksSection = () => {
               </div>
 
               {/* Contenuto */}
-              <h4 className={`relative z-10 text-base md:text-2xl font-bold mb-1 md:mb-3 text-[#1A202C]`}>
+              <h4 className={`${MOBILE_FONT} text-[18px] leading-[24px] font-semibold mb-1 md:mb-3 text-[#1A202C] relative z-10 md:text-2xl md:font-bold`}>
                 {t(item.titleKey)}
               </h4>
 
               <p className={`
-                relative z-10 text-gray-500 text-xs md:text-base leading-relaxed font-medium
+                relative z-10 text-gray-500 ${MOBILE_FONT} text-[14px] leading-[20px] font-normal md:text-base leading-relaxed md:font-medium
                 transition-opacity duration-500
                 ${isActive ? 'opacity-100' : 'opacity-80'}
               `}>

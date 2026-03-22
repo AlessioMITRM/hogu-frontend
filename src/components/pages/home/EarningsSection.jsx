@@ -2,6 +2,7 @@ import React from 'react';
 import { useTranslation } from 'react-i18next';
 import { HOGU_THEME } from '../../../config/theme.js';
 import { EarningComparisonCard } from './HomeComponents.jsx';
+const MOBILE_FONT = "font-['SF_Pro_Text',_Roboto,_Inter,_system-ui,_sans-serif]";
 
 export const EarningsSection = () => {
   const { t } = useTranslation("home");
@@ -32,10 +33,10 @@ export const EarningsSection = () => {
 
   return (
     <section className="mt-14 md:mt-20">
-      <h2 className={`text-lg md:text-4xl font-bold text-center mb-1 md:mb-4 ${HOGU_THEME.text}`}>
+      <h2 className={`${MOBILE_FONT} text-[22px] leading-[28px] font-semibold text-center mb-1 md:mb-4 ${HOGU_THEME.text} md:text-4xl md:font-bold`}>
         {t('earnings.main_title')}
       </h2>
-      <p className={`text-[11px] md:text-lg text-center mb-3 md:mb-10 max-w-2xl mx-auto px-4 ${HOGU_THEME.subtleText}`}>
+      <p className={`${MOBILE_FONT} text-[14px] leading-[20px] font-normal text-center mb-3 md:mb-10 max-w-2xl mx-auto px-4 ${HOGU_THEME.subtleText} md:text-lg md:leading-relaxed`}>
         {t('earnings.main_description')}
       </p>
 

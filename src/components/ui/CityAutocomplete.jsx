@@ -2,6 +2,7 @@ import React, { useState, useEffect, useRef, useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 import { processLocations, getLocationData } from '../../utils/locationUtils';
 import { HOGU_COLORS } from '../../config/theme';
+const MOBILE_FONT = "font-['SF_Pro_Text',_Roboto,_Inter,_system-ui,_sans-serif]";
 
 export const CityAutocomplete = ({ label, value, onChange, icon: Icon, placeholder = "Cerca città...", className = "", labelClassName = "", inputContainerClassName = "", inputClassName = "" }) => {
   const { i18n } = useTranslation();
@@ -67,7 +68,7 @@ export const CityAutocomplete = ({ label, value, onChange, icon: Icon, placehold
   return (
     <div className={`flex flex-col gap-3 relative ${className}`} ref={wrapperRef}>
         {label && (
-            <label className={`flex items-center gap-2 text-[10px] md:text-xs font-bold uppercase tracking-wide text-[${HOGU_COLORS.subtleText}] ml-1 ${labelClassName}`}>
+            <label className={`flex items-center gap-2 ${MOBILE_FONT} text-[12px] leading-[16px] font-normal md:text-xs md:font-bold uppercase tracking-wide text-[${HOGU_COLORS.subtleText}] ml-1 ${labelClassName}`}>
                  {Icon && <Icon size={14} className="text-[#68B49B]" />}
                  {label}
             </label>
@@ -79,7 +80,7 @@ export const CityAutocomplete = ({ label, value, onChange, icon: Icon, placehold
           onChange={handleInputChange}
           onFocus={() => inputValue.length > 1 && setShow(true)}
           placeholder={placeholder}
-          className={`w-full h-full px-3 bg-transparent border-none focus:ring-0 text-lg font-medium text-gray-800 placeholder:text-gray-400 outline-none ${inputClassName}`}
+          className={`w-full h-full px-3 bg-transparent border-none focus:ring-0 ${MOBILE_FONT} text-[16px] leading-[24px] font-semibold md:text-lg md:font-medium text-gray-800 placeholder:text-gray-400 outline-none ${inputClassName}`}
           autoComplete="off"
         />
         {show && suggestions.length > 0 && (

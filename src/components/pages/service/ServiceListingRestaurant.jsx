@@ -18,6 +18,9 @@ import ErrorModal from '../../ui/ErrorModal.jsx';
 import SafeImage from '../../ui/SafeImage.jsx';
 
 
+const MOBILE_FONT = "font-['SF_Pro_Text',_Roboto,_'Inter',_system-ui,_sans-serif]";
+
+
 const breadcrumbsItems = [
     { labelKey: 'breadcrumbs.home', href: '/' },
     { labelKey: 'breadcrumbs.restaurant', href: '/service/restaurant' }
@@ -67,8 +70,8 @@ const slugify = (text) => {
 function PrimaryButton({ children, onClick, className = '', disabled = false, type = 'button', style = {} }) {
     return (
         <button type={type} onClick={onClick} disabled={disabled} style={style}
-            className={`bg-[#68B49B] text-white ${HOGU_THEME.fontFamily}
-        px-5 py-2.5 lg:px-8 lg:py-4 text-sm lg:text-lg font-bold rounded-2xl transition-all duration-300 ease-out
+            className={`bg-[#68B49B] text-white ${HOGU_THEME.fontFamily} ${MOBILE_FONT}
+        px-5 py-2.5 lg:px-8 lg:py-4 text-[16px] leading-[20px] font-semibold md:text-sm md:font-bold lg:text-lg rounded-2xl transition-all duration-300 ease-out
         shadow-[0_8px_20px_-6px_rgba(104,180,155,0.5)] hover:shadow-[0_12px_25px_-8px_rgba(104,180,155,0.7)]
         hover:-translate-y-0.5 active:translate-y-0
         disabled:opacity-50 disabled:cursor-not-allowed disabled:shadow-none flex items-center justify-center gap-2 ${className}`}>
@@ -79,7 +82,7 @@ function PrimaryButton({ children, onClick, className = '', disabled = false, ty
 
 const SearchInputContainer = ({ label, icon: Icon, children, className = '' }) => (
     <div className={`flex flex-col gap-1 lg:gap-3 flex-1 min-w-0 relative z-10 ${className}`}>
-        <label className={`flex items-center gap-1.5 text-[9px] md:text-xs font-bold uppercase tracking-wide text-[${HOGU_COLORS.subtleText}] ml-1`}>
+        <label className={`flex items-center gap-1.5 ${MOBILE_FONT} text-[12px] leading-[16px] font-normal md:text-xs md:font-bold uppercase tracking-wide text-[${HOGU_COLORS.subtleText}] ml-1`}>
             <Icon size={12} className={`text-[${HOGU_COLORS.primary}]`} />
             {label}
         </label>
@@ -131,10 +134,10 @@ const RestaurantResultCard = ({ service, onClick }) => {
                 <div className="flex justify-between items-start mb-2 md:mb-1">
                     <div className="w-full">
                         <div className="flex justify-between items-start">
-                            <h2 className={`text-base md:text-2xl font-bold ${HOGU_THEME.text} group-hover:text-[#68B49B] transition-colors uppercase leading-tight`}>{service.name}</h2>
+                            <h2 className={`${MOBILE_FONT} text-[22px] leading-[28px] font-semibold md:text-base md:text-2xl md:font-bold ${HOGU_THEME.text} group-hover:text-[#68B49B] transition-colors uppercase leading-tight`}>{service.name}</h2>
                         </div>
                         <div className="flex items-center gap-2 mt-1 mb-0 md:mb-4">
-                            <p className={`text-[11px] md:text-sm flex items-center gap-1 ${HOGU_THEME.subtleText}`}>
+                            <p className={`${MOBILE_FONT} text-[14px] leading-[20px] font-normal md:text-[11px] md:text-sm flex items-center gap-1 ${HOGU_THEME.subtleText}`}>
                                 <MapPin size={12} className="text-[#68B49B]" /> {service.location}
                             </p>
                         </div>
@@ -144,18 +147,18 @@ const RestaurantResultCard = ({ service, onClick }) => {
                 <div className="md:hidden border-t border-gray-200 my-1.5" />
 
                 <div className={`mt-1 mb-1 md:my-2 pl-1 ${isExpanded ? 'block' : 'hidden md:block'}`}>
-                    <p className="text-gray-500 text-xs md:text-sm leading-relaxed mb-4 line-clamp-2">
+                    <p className={`${MOBILE_FONT} text-[14px] leading-[20px] font-normal text-gray-500 md:text-xs md:text-sm md:leading-relaxed mb-4 line-clamp-2`}>
                         {service.description}
                     </p>
 
                     {/* Prezzo Medio visibile solo se espanso su mobile, sempre su desktop */}
                     <div className="mt-2 md:hidden">
-                        <p className="text-xs text-gray-400 font-medium uppercase tracking-wider mb-1">
+                        <p className={`${MOBILE_FONT} text-[12px] leading-[16px] font-normal text-gray-400 mb-1`}>
                             {t('restaurant_listing.card.avg_price_label', 'Prezzo Medio')}
                         </p>
                         <div className="flex items-baseline gap-1">
-                            <span className="text-xl font-extrabold text-gray-800">€ {service.averagePrice}</span>
-                            <span className="text-xs text-gray-500">,00</span>
+                            <span className={`${MOBILE_FONT} text-[22px] leading-[28px] font-bold text-gray-800`}>€ {service.averagePrice}</span>
+                            <span className={`${MOBILE_FONT} text-[14px] leading-[20px] font-normal text-gray-500`}>,00</span>
                         </div>
                     </div>
                 </div>
@@ -169,7 +172,7 @@ const RestaurantResultCard = ({ service, onClick }) => {
                             e.stopPropagation();
                             setIsExpanded(!isExpanded);
                         }}
-                        className="flex items-center gap-1 text-[11px] font-bold text-[#68B49B] uppercase tracking-wide bg-gray-50 px-3 py-1.5 rounded-full hover:bg-gray-100 transition-colors"
+                        className={`flex items-center gap-1 ${MOBILE_FONT} text-[16px] leading-[20px] font-semibold text-[#68B49B] bg-gray-50 px-3 py-1.5 rounded-full hover:bg-gray-100 transition-colors`}
                     >
                         {isExpanded ? (
                             <>
@@ -424,7 +427,7 @@ export const ServiceListingRestaurant = () => {
                             key={number}
                             onClick={() => handlePageChange(number)}
                             disabled={loading}
-                            className={`w-10 h-10 rounded-full font-bold text-sm transition-all ${currentPage === number ? 'bg-[#68B49B] text-white shadow-lg shadow-[#68B49B]/30' : 'text-gray-600 hover:bg-gray-100'}`}
+                            className={`w-10 h-10 rounded-full font-semibold ${MOBILE_FONT} text-[16px] leading-[20px] transition-all md:font-bold md:text-sm ${currentPage === number ? 'bg-[#68B49B] text-white shadow-lg shadow-[#68B49B]/30' : 'text-gray-600 hover:bg-gray-100'}`}
                         >
                             {number}
                         </button>
@@ -471,8 +474,8 @@ export const ServiceListingRestaurant = () => {
                                     icon={MapPin}
                                     placeholder={t('restaurant_listing.search.location_placeholder', "Cerca città...")}
                                     className="w-full z-[100]"
-                                    labelClassName={`!text-[${HOGU_COLORS.subtleText}] !text-[9px]`}
-                                    inputClassName="text-left text-sm"
+                                    labelClassName={`!text-[${HOGU_COLORS.subtleText}] ${MOBILE_FONT} !text-[12px] !leading-[16px] !font-normal md:!text-[9px] md:!font-bold md:uppercase`}
+                                    inputClassName={`${MOBILE_FONT} text-left text-[16px] leading-[24px] font-normal md:text-sm`}
                                 />
                             </div>
 
@@ -484,7 +487,7 @@ export const ServiceListingRestaurant = () => {
                                     value={search.cuisine}
                                     onChange={handleInputChange}
                                     placeholder={t('restaurant_listing.search.cuisine_placeholder')}
-                                    className="w-full h-full px-2 bg-transparent border-none focus:ring-0 text-sm font-medium text-gray-800 outline-none placeholder:text-gray-400"
+                                    className={`w-full h-full px-2 bg-transparent border-none focus:ring-0 ${MOBILE_FONT} text-[16px] leading-[24px] font-normal text-gray-800 outline-none placeholder:text-gray-400 md:text-sm md:font-medium`}
                                 />
                             </SearchInputContainer>
 
@@ -496,7 +499,7 @@ export const ServiceListingRestaurant = () => {
                                     min={new Date().toISOString().split("T")[0]}
                                     value={search.date}
                                     onChange={handleInputChange}
-                                    className="w-full h-full px-2 bg-transparent border-none focus:ring-0 text-sm font-medium text-gray-700 outline-none cursor-pointer"
+                                    className={`w-full h-full px-2 bg-transparent border-none focus:ring-0 ${MOBILE_FONT} text-[16px] leading-[24px] font-normal text-gray-700 outline-none cursor-pointer md:text-sm md:font-medium`}
                                 />
                             </SearchInputContainer>
 
@@ -507,7 +510,7 @@ export const ServiceListingRestaurant = () => {
                                         name="time"
                                         value={search.time}
                                         onChange={handleInputChange}
-                                        className="w-full h-full pl-2 pr-7 bg-transparent border-none focus:ring-0 text-sm font-medium text-gray-700 outline-none cursor-pointer appearance-none"
+                                        className={`w-full h-full pl-2 pr-7 bg-transparent border-none focus:ring-0 ${MOBILE_FONT} text-[16px] leading-[24px] font-normal text-gray-700 outline-none cursor-pointer appearance-none md:text-sm md:font-medium`}
                                     >
                                         <option value="">{t('restaurant_listing.search.all_times', 'Tutti')}</option>
                                         {timeSlots.map(slot => {
@@ -623,9 +626,9 @@ export const ServiceListingRestaurant = () => {
                 {hasSearched && (
                     <div className="mt-6 md:mt-12 relative z-10" id="restaurant-results-section">
                         <div className="flex items-center justify-between mb-4 md:mb-8">
-                            <h2 className={`text-lg md:text-2xl font-bold text-[${HOGU_COLORS.dark}]`}>
+                            <h2 className={`${MOBILE_FONT} text-[22px] leading-[28px] font-semibold md:text-lg md:text-2xl md:font-bold text-[${HOGU_COLORS.dark}]`}>
                                 {services.length > 0 ? (
-                                    <>{services.length} {resultsFoundText} <span className="text-sm font-normal text-gray-400 ml-2">({t('restaurant_listing.results.page_of', { current: currentPage, total: totalPages }) || `Pagina ${currentPage} di ${totalPages}`})</span></>
+                                    <>{services.length} {resultsFoundText} <span className={`${MOBILE_FONT} text-[14px] leading-[20px] font-normal md:text-sm md:font-normal text-gray-400 ml-2`}>({t('restaurant_listing.results.page_of', { current: currentPage, total: totalPages }) || `Pagina ${currentPage} di ${totalPages}`})</span></>
                                 ) : (
                                     t('restaurant_listing.results.no_results_title')
                                 )}
@@ -635,7 +638,7 @@ export const ServiceListingRestaurant = () => {
                         {services.length === 0 ? (
                             <div className="text-center py-10 md:py-20 bg-white rounded-2xl md:rounded-3xl border border-gray-100">
                                 <Utensils size={40} className="text-gray-300 mx-auto mb-4" />
-                                <h3 className="text-lg font-bold text-gray-700">{t('restaurant_listing.results.no_restaurants')}</h3>
+                                <h3 className={`${MOBILE_FONT} text-[18px] leading-[24px] font-semibold text-gray-700 md:text-lg md:font-bold`}>{t('restaurant_listing.results.no_restaurants')}</h3>
                             </div>
                         ) : (
                             <>

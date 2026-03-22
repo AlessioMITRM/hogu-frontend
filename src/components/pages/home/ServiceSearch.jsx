@@ -8,6 +8,7 @@ import {
     ArrowRight, ChevronLeft, ChevronDown, Plane, Train
 } from 'lucide-react';
 import { CityAutocomplete } from '../../ui/CityAutocomplete.jsx';
+const MOBILE_FONT = "font-['SF_Pro_Text',_Roboto,_Inter,_system-ui,_sans-serif]";
 
 const PRESET_LOCATIONS = [
     { label: "Fiumicino (FCO)", city: "Fiumicino", address: "Aeroporto Leonardo da Vinci", type: "airport" },
@@ -130,10 +131,11 @@ const TimeSlotSelect = ({ value, onChange, date, className = '' }) => {
 
 
 
-const PrimaryButton = ({ children, type = 'button', className = '' }) => (
+const PrimaryButton = ({ children, type = 'button', className = '', onClick }) => (
     <button
         type={type}
-        className={`bg-[#68B49B] text-white ${HOGU_THEME.fontFamily} px-6 py-3 lg:px-8 lg:py-4 text-lg font-bold rounded-2xl transition-all duration-300 ease-out shadow-[0_8px_20px_-6px_rgba(104,180,155,0.5)] hover:shadow-[0_12px_25px_-8px_rgba(104,180,155,0.7)] hover:-translate-y-0.5 active:translate-y-0 flex items-center justify-center gap-2 ${className}`}
+        onClick={onClick}
+        className={`bg-[#68B49B] text-white ${HOGU_THEME.fontFamily} ${MOBILE_FONT} px-6 py-3 lg:px-8 lg:py-4 text-[16px] leading-[20px] font-semibold lg:text-lg lg:font-bold rounded-2xl transition-all duration-300 ease-out shadow-[0_8px_20px_-6px_rgba(104,180,155,0.5)] hover:shadow-[0_12px_25px_-8px_rgba(104,180,155,0.7)] hover:-translate-y-0.5 active:translate-y-0 flex items-center justify-center gap-2 ${className}`}
     >
         {children}
     </button>
@@ -155,9 +157,9 @@ function MobileScheduleModal({ lugDateFrom, lugTimeFrom, lugDateTo, lugTimeTo, s
         <>
             <div className="w-full h-full px-2 text-left flex items-center justify-between cursor-pointer" onClick={() => setIsOpen(true)}>
                 <div className="flex items-center justify-between w-full">
-                    <span className="font-bold text-[11px] text-gray-800 truncate flex-1 text-left leading-tight">{formatDateTime(lugDateFrom, lugTimeFrom)}</span>
+                    <span className={`${MOBILE_FONT} text-[16px] leading-[24px] font-semibold text-gray-800 truncate flex-1 text-left`}>{formatDateTime(lugDateFrom, lugTimeFrom)}</span>
                     <ArrowRight size={12} className="text-gray-400 mx-1 flex-shrink-0" />
-                    <span className="font-bold text-[11px] text-gray-800 truncate flex-1 text-right leading-tight">{formatDateTime(lugDateTo, lugTimeTo)}</span>
+                    <span className={`${MOBILE_FONT} text-[16px] leading-[24px] font-semibold text-gray-800 truncate flex-1 text-right`}>{formatDateTime(lugDateTo, lugTimeTo)}</span>
                 </div>
                 <ChevronDown size={14} className="text-gray-400 flex-shrink-0 ml-1" />
             </div>
@@ -168,17 +170,17 @@ function MobileScheduleModal({ lugDateFrom, lugTimeFrom, lugDateTo, lugTimeTo, s
                         <button onClick={() => setIsOpen(false)} className="p-2 -ml-2 rounded-full hover:bg-gray-100 transition-colors" type="button">
                             <ChevronLeft size={24} className="text-gray-700" />
                         </button>
-                        <h3 className="text-lg font-bold text-gray-800">Seleziona Orari</h3>
+                        <h3 className={`${MOBILE_FONT} text-[22px] leading-[28px] font-semibold text-gray-800`}>Seleziona Orari</h3>
                     </div>
 
                     <div className="p-4 flex flex-col gap-4 overflow-y-auto flex-1">
                         <div className="bg-white p-5 rounded-3xl shadow-sm border border-gray-100">
-                            <h4 className="font-bold text-[#68B49B] flex items-center gap-2 mb-3 text-sm uppercase tracking-wide">
+                            <h4 className={`${MOBILE_FONT} text-[12px] leading-[16px] font-normal text-[#68B49B] flex items-center gap-2 mb-3 uppercase tracking-wide`}>
                                 <Calendar size={18} /> Deposito
                             </h4>
                             <div className="grid grid-cols-2 gap-3">
                                 <div className="flex flex-col gap-1.5">
-                                    <label className={`text-[10px] font-bold uppercase tracking-wide text-[${HOGU_COLORS.subtleText}] ml-1`}>Data</label>
+                                    <label className={`${MOBILE_FONT} text-[12px] leading-[16px] font-normal uppercase tracking-wide text-[#64748B] ml-1`}>Data</label>
                                     <div className="relative">
                                         <input type="date" className="w-full h-[56px] px-3 bg-gray-50 rounded-2xl border-transparent focus:bg-white focus:border-[#68B49B] focus:ring-4 focus:ring-[#68B49B]/10 outline-none font-bold text-gray-700 transition-all text-sm appearance-none"
                                             value={lugDateFrom} min={today}
@@ -187,9 +189,9 @@ function MobileScheduleModal({ lugDateFrom, lugTimeFrom, lugDateTo, lugTimeTo, s
                                     </div>
                                 </div>
                                 <div className="flex flex-col gap-1.5">
-                                    <label className={`text-[10px] font-bold uppercase tracking-wide text-[${HOGU_COLORS.subtleText}] ml-1`}>Ora</label>
+                                    <label className={`${MOBILE_FONT} text-[12px] leading-[16px] font-normal uppercase tracking-wide text-[#64748B] ml-1`}>Ora</label>
                                     <div className="relative">
-                                        <input type="time" className="w-full h-[56px] px-3 bg-gray-50 rounded-2xl border-transparent focus:bg-white focus:border-[#68B49B] focus:ring-4 focus:ring-[#68B49B]/10 outline-none font-bold text-gray-700 transition-all text-sm appearance-none"
+                                        <input type="time" className={`w-full h-[56px] px-3 bg-gray-50 rounded-2xl border-transparent focus:bg-white focus:border-[#68B49B] focus:ring-4 focus:ring-[#68B49B]/10 outline-none ${MOBILE_FONT} text-[16px] leading-[24px] font-semibold text-gray-700 transition-all appearance-none`}
                                             value={lugTimeFrom} onChange={(e) => setLugTimeFrom(e.target.value)} />
                                         <Clock className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 pointer-events-none" size={18} />
                                     </div>
@@ -204,12 +206,12 @@ function MobileScheduleModal({ lugDateFrom, lugTimeFrom, lugDateTo, lugTimeTo, s
                         </div>
 
                         <div className="bg-white p-5 rounded-3xl shadow-sm border border-gray-100">
-                            <h4 className="font-bold text-[#68B49B] flex items-center gap-2 mb-3 text-sm uppercase tracking-wide">
+                            <h4 className={`${MOBILE_FONT} text-[12px] leading-[16px] font-normal text-[#68B49B] flex items-center gap-2 mb-3 uppercase tracking-wide`}>
                                 <Clock size={18} /> Ritiro
                             </h4>
                             <div className="grid grid-cols-2 gap-3">
                                 <div className="flex flex-col gap-1.5">
-                                    <label className={`text-[10px] font-bold uppercase tracking-wide text-[${HOGU_COLORS.subtleText}] ml-1`}>Data</label>
+                                    <label className={`${MOBILE_FONT} text-[12px] leading-[16px] font-normal uppercase tracking-wide text-[#64748B] ml-1`}>Data</label>
                                     <div className="relative">
                                         <input type="date" className="w-full h-[56px] px-3 bg-gray-50 rounded-2xl border-transparent focus:bg-white focus:border-[#68B49B] focus:ring-4 focus:ring-[#68B49B]/10 outline-none font-bold text-gray-700 transition-all text-sm appearance-none"
                                             value={lugDateTo} min={lugDateFrom || today}
@@ -218,9 +220,9 @@ function MobileScheduleModal({ lugDateFrom, lugTimeFrom, lugDateTo, lugTimeTo, s
                                     </div>
                                 </div>
                                 <div className="flex flex-col gap-1.5">
-                                    <label className={`text-[10px] font-bold uppercase tracking-wide text-[${HOGU_COLORS.subtleText}] ml-1`}>Ora</label>
+                                    <label className={`${MOBILE_FONT} text-[12px] leading-[16px] font-normal uppercase tracking-wide text-[#64748B] ml-1`}>Ora</label>
                                     <div className="relative">
-                                        <input type="time" className="w-full h-[56px] px-3 bg-gray-50 rounded-2xl border-transparent focus:bg-white focus:border-[#68B49B] focus:ring-4 focus:ring-[#68B49B]/10 outline-none font-bold text-gray-700 transition-all text-sm appearance-none"
+                                        <input type="time" className={`w-full h-[56px] px-3 bg-gray-50 rounded-2xl border-transparent focus:bg-white focus:border-[#68B49B] focus:ring-4 focus:ring-[#68B49B]/10 outline-none ${MOBILE_FONT} text-[16px] leading-[24px] font-semibold text-gray-700 transition-all appearance-none`}
                                             value={lugTimeTo} onChange={(e) => setLugTimeTo(e.target.value)} />
                                         <Clock className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 pointer-events-none" size={18} />
                                     </div>
@@ -255,11 +257,11 @@ function MobileBagsModal({ luggageCounts, updateLuggage }) {
     return (
         <>
             <div className="w-full h-full px-2 text-left flex items-center justify-between cursor-pointer" onClick={() => setIsOpen(true)}>
-                <span className="text-xs font-bold text-gray-800">{totalBags > 0 ? `${totalBags} Bagagli` : 'Seleziona'}</span>
+                <span className={`${MOBILE_FONT} text-[16px] leading-[24px] font-semibold text-gray-800`}>{totalBags > 0 ? `${totalBags} Bagagli` : 'Seleziona'}</span>
                 <div className="flex items-center gap-1">
                     <div className="flex gap-1 overflow-hidden justify-end">
                         {sizes.map(s => luggageCounts[s.id] > 0 && (
-                            <span key={s.id} className="text-[9px] bg-gray-100 px-1 py-0.5 rounded text-gray-500 font-medium whitespace-nowrap">{luggageCounts[s.id]}x{s.label.split(' ')[0]}</span>
+                            <span key={s.id} className={`${MOBILE_FONT} text-[12px] leading-[16px] font-normal bg-gray-100 px-1 py-0.5 rounded text-gray-500 whitespace-nowrap`}>{luggageCounts[s.id]}x{s.label.split(' ')[0]}</span>
                         ))}
                     </div>
                     <ChevronDown size={14} className="text-gray-400 flex-shrink-0" />
@@ -272,7 +274,7 @@ function MobileBagsModal({ luggageCounts, updateLuggage }) {
                         <button onClick={() => setIsOpen(false)} className="p-2 -ml-2 rounded-full hover:bg-gray-100" type="button">
                             <ChevronLeft size={24} className="text-gray-700" />
                         </button>
-                        <h3 className="text-lg font-bold text-gray-800">Seleziona Bagagli</h3>
+                        <h3 className={`${MOBILE_FONT} text-[22px] leading-[28px] font-semibold text-gray-800`}>Seleziona Bagagli</h3>
                     </div>
 
                     <div className="p-6 flex flex-col bg-white">
@@ -288,8 +290,8 @@ function MobileBagsModal({ luggageCounts, updateLuggage }) {
                                             <Luggage size={iconSize} />
                                         </div>
                                         <div>
-                                            <p className="font-bold text-gray-800 text-base">{s.label}</p>
-                                            <p className="text-xs text-gray-500 font-medium">{s.desc}</p>
+                                            <p className={`${MOBILE_FONT} text-[16px] leading-[24px] font-semibold text-gray-800`}>{s.label}</p>
+                                            <p className={`${MOBILE_FONT} text-[12px] leading-[16px] font-normal text-gray-500`}>{s.desc}</p>
                                         </div>
                                     </div>
                                     <div className="flex items-center gap-4">
@@ -297,7 +299,7 @@ function MobileBagsModal({ luggageCounts, updateLuggage }) {
                                             className="w-10 h-10 rounded-full border border-gray-200 text-gray-500 flex items-center justify-center transition-colors disabled:opacity-30">
                                             <Minus size={18} strokeWidth={3} />
                                         </button>
-                                        <span className="text-lg font-black text-gray-800 w-5 text-center">{count}</span>
+                                        <span className={`${MOBILE_FONT} text-[18px] leading-[24px] font-black text-gray-800 w-5 text-center`}>{count}</span>
                                         <button type="button" onClick={() => updateLuggage(s.id, 1)}
                                             className="w-10 h-10 rounded-full bg-[#68B49B] text-white flex items-center justify-center transition-transform active:scale-90 shadow-md">
                                             <Plus size={18} strokeWidth={3} />
@@ -347,10 +349,10 @@ function MobileLocationSelector({ label, icon: Icon, city, address, onSelect, pl
         <>
             <div className="w-full h-full px-2 text-left flex items-center justify-between cursor-pointer" onClick={() => setIsOpen(true)}>
                 <div className="flex flex-col overflow-hidden w-full pr-2">
-                    <span className={`text-xs font-bold truncate ${city ? 'text-gray-800' : 'text-gray-400'}`}>
+                    <span className={`${MOBILE_FONT} text-[16px] leading-[24px] font-semibold truncate ${city ? 'text-gray-800' : 'text-gray-400'}`}>
                         {city || placeholder}
                     </span>
-                    {address && <span className="text-[9px] text-gray-500 truncate leading-tight">{address}</span>}
+                    {address && <span className={`${MOBILE_FONT} text-[12px] leading-[16px] font-normal text-gray-500 truncate`}>{address}</span>}
                 </div>
                 <ChevronDown size={14} className="text-gray-400 flex-shrink-0" />
             </div>
@@ -361,7 +363,7 @@ function MobileLocationSelector({ label, icon: Icon, city, address, onSelect, pl
                         <button onClick={() => setIsOpen(false)} className="p-2 -ml-2 rounded-full hover:bg-gray-100" type="button">
                             <ChevronLeft size={24} className="text-gray-700" />
                         </button>
-                        <h3 className="text-lg font-bold text-gray-800">Seleziona {label}</h3>
+                        <h3 className={`${MOBILE_FONT} text-[22px] leading-[28px] font-semibold text-gray-800`}>Seleziona {label}</h3>
                     </div>
 
                     <div className="flex-1 overflow-y-auto p-4 flex flex-col gap-6 safe-area-bottom">
@@ -375,7 +377,7 @@ function MobileLocationSelector({ label, icon: Icon, city, address, onSelect, pl
                                 className="z-[50]"
                             />
                             <div className="flex flex-col gap-2">
-                                <label className="flex items-center gap-2 text-xs font-bold uppercase tracking-wide text-gray-400 ml-1">
+                                <label className={`flex items-center gap-2 ${MOBILE_FONT} text-[12px] leading-[16px] font-normal uppercase tracking-wide text-gray-400 ml-1`}>
                                     <Navigation size={14} className="text-[#68B49B]" /> Indirizzo
                                 </label>
                                 <input
@@ -389,7 +391,7 @@ function MobileLocationSelector({ label, icon: Icon, city, address, onSelect, pl
                         </div>
 
                         <div>
-                            <p className="text-xs font-bold text-gray-400 uppercase tracking-wide mb-3">Suggeriti</p>
+                            <p className={`${MOBILE_FONT} text-[12px] leading-[16px] font-normal text-gray-400 uppercase tracking-wide mb-3`}>Suggeriti</p>
                             <div className="grid grid-cols-2 gap-3">
                                 {PRESET_LOCATIONS.map((p, i) => (
                                     <button
@@ -400,9 +402,9 @@ function MobileLocationSelector({ label, icon: Icon, city, address, onSelect, pl
                                     >
                                         <div className="flex items-center gap-2 mb-1">
                                             {p.type === 'airport' ? <Plane size={14} className="text-blue-500" /> : <Train size={14} className="text-orange-500" />}
-                                            <span className="text-xs font-bold text-gray-800">{p.label}</span>
+                                            <span className={`${MOBILE_FONT} text-[14px] leading-[20px] font-semibold text-gray-800`}>{p.label}</span>
                                         </div>
-                                        <span className="text-[10px] text-gray-500 truncate w-full">{p.city}</span>
+                                        <span className={`${MOBILE_FONT} text-[12px] leading-[16px] font-normal text-gray-500 truncate w-full`}>{p.city}</span>
                                     </button>
                                 ))}
                             </div>
@@ -431,7 +433,7 @@ function MobilePassengersModal({ value, onChange }) {
     return (
         <>
             <div className="w-full h-full px-2 text-left flex items-center justify-between cursor-pointer" onClick={() => setIsOpen(true)}>
-                <span className="text-xs font-bold text-gray-800">{value} {value === 1 ? 'Passeggero' : 'Passeggeri'}</span>
+                <span className={`${MOBILE_FONT} text-[16px] leading-[24px] font-semibold text-gray-800`}>{value} {value === 1 ? 'Passeggero' : 'Passeggeri'}</span>
                 <ChevronDown size={14} className="text-gray-400 flex-shrink-0" />
             </div>
 
@@ -441,21 +443,21 @@ function MobilePassengersModal({ value, onChange }) {
                         <button onClick={() => setIsOpen(false)} className="p-2 -ml-2 rounded-full hover:bg-gray-100" type="button">
                             <ChevronLeft size={24} className="text-gray-700" />
                         </button>
-                        <h3 className="text-lg font-bold text-gray-800">Numero Passeggeri</h3>
+                        <h3 className={`${MOBILE_FONT} text-[22px] leading-[28px] font-semibold text-gray-800`}>Numero Passeggeri</h3>
                     </div>
 
                     <div className="p-8 flex flex-col items-center justify-center flex-1">
                         <div className="w-24 h-24 bg-[#68B49B]/10 rounded-full flex items-center justify-center mb-6">
                             <Users size={40} className="text-[#68B49B]" />
                         </div>
-                        <p className="text-gray-500 font-medium mb-8 text-center">Quante persone viaggiano?</p>
+                        <p className={`${MOBILE_FONT} text-[14px] leading-[20px] font-normal text-gray-500 mb-8 text-center`}>Quante persone viaggiano?</p>
 
                         <div className="flex items-center gap-8">
                             <button type="button" onClick={handleDecrement} disabled={value <= 1}
                                 className="w-14 h-14 rounded-full border-2 border-gray-100 text-gray-400 flex items-center justify-center transition-all active:scale-90 disabled:opacity-30">
                                 <Minus size={24} strokeWidth={3} />
                             </button>
-                            <span className="text-5xl font-black text-gray-800 w-16 text-center">{value}</span>
+                            <span className={`${MOBILE_FONT} text-[48px] leading-[56px] font-black text-gray-800 w-16 text-center`}>{value}</span>
                             <button type="button" onClick={handleIncrement} disabled={value >= 16}
                                 className="w-14 h-14 rounded-full bg-[#68B49B] text-white flex items-center justify-center transition-all active:scale-90 shadow-lg shadow-emerald-500/20">
                                 <Plus size={24} strokeWidth={3} />
@@ -478,7 +480,7 @@ function MobilePassengersModal({ value, onChange }) {
 const SearchInputContainer = ({ label, icon: Icon, children, className = '', required = false }) => (
 
     <div className={`flex flex-col gap-1 lg:gap-2 ${className}`}>
-        <label className={`flex items-center gap-1.5 text-[9px] lg:text-xs font-bold uppercase tracking-wide text-[${HOGU_COLORS.subtleText}] ml-1`}>
+        <label className={`flex items-center gap-1.5 ${MOBILE_FONT} text-[12px] leading-[16px] font-normal uppercase tracking-wide md:text-sm md:font-bold text-[#64748B] ml-1`}>
             {Icon && <Icon size={12} className={`text-[${HOGU_COLORS.primary}] lg:size-[14px]`} />}
             {label} {required && <span className="text-red-500">*</span>}
         </label>
@@ -640,11 +642,11 @@ export const ServiceSearch = () => {
                         />
                         <div className="grid grid-cols-2 gap-2 lg:flex lg:gap-3 w-full lg:flex-[2.4]">
                             <SearchInputContainer label="Cucina" icon={Utensils} className="w-full">
-                                <input type="text" placeholder="Es. Pesce..." className="w-full h-full px-2 lg:px-3 bg-transparent border-none focus:ring-0 text-sm font-medium outline-none placeholder:text-gray-400"
+                                <input type="text" placeholder="Es. Pesce..." className={`w-full h-full px-2 lg:px-3 bg-transparent border-none focus:ring-0 ${MOBILE_FONT} text-[16px] leading-[24px] font-semibold lg:text-sm lg:font-medium outline-none placeholder:text-gray-400`}
                                     value={restCuisine} onChange={(e) => setRestCuisine(e.target.value)} />
                             </SearchInputContainer>
                             <SearchInputContainer label="Data" icon={Calendar} className="w-full">
-                                <input type="date" min={today} className="w-full h-full px-2 bg-transparent border-none outline-none text-sm font-medium text-gray-600"
+                                <input type="date" min={today} className={`w-full h-full px-2 bg-transparent border-none outline-none ${MOBILE_FONT} text-[16px] leading-[24px] font-semibold lg:text-sm lg:font-medium text-gray-600`}
                                     value={restDate} onChange={(e) => {
                                         const newDate = e.target.value;
                                         setRestDate(newDate);
@@ -658,7 +660,7 @@ export const ServiceSearch = () => {
                                 <span className="text-[9px] font-bold uppercase tracking-wide opacity-0 select-none ml-1">_</span>
                                 <PrimaryButton type="submit" className="w-full h-[42px] lg:h-[64px] !rounded-xl lg:!rounded-2xl !px-4 lg:!px-8 shadow-lg shadow-emerald-500/20">
                                     <Search size={16} strokeWidth={2.5} />
-                                    <span className="lg:hidden text-xs font-bold uppercase tracking-wider">Cerca</span>
+                                    <span className={`lg:hidden ${MOBILE_FONT} text-[12px] leading-[16px] font-semibold uppercase tracking-wider`}>Cerca</span>
                                 </PrimaryButton>
                             </div>
                         </div>
@@ -675,22 +677,22 @@ export const ServiceSearch = () => {
                         />
                         <div className="grid grid-cols-2 gap-2 lg:flex lg:gap-3 w-full lg:flex-[2.7]">
                             <SearchInputContainer label="Check-in" icon={Calendar} className="w-full">
-                                <input type="date" min={today} className="w-full h-full px-2 bg-transparent border-none outline-none text-sm font-medium text-gray-600"
+                                <input type="date" min={today} className={`w-full h-full px-2 bg-transparent border-none outline-none ${MOBILE_FONT} text-[16px] leading-[24px] font-semibold lg:text-sm lg:font-medium text-gray-600`}
                                     value={bnbCheckIn} onChange={(e) => setBnbCheckIn(e.target.value)} />
                             </SearchInputContainer>
                             <SearchInputContainer label="Check-out" icon={Calendar} className="w-full">
-                                <input type="date" min={bnbCheckIn || today} className="w-full h-full px-2 bg-transparent border-none outline-none text-sm font-medium text-gray-600"
+                                <input type="date" min={bnbCheckIn || today} className={`w-full h-full px-2 bg-transparent border-none outline-none ${MOBILE_FONT} text-[16px] leading-[24px] font-semibold lg:text-sm lg:font-medium text-gray-600`}
                                     value={bnbCheckOut} onChange={(e) => setBnbCheckOut(e.target.value)} />
                             </SearchInputContainer>
                             <SearchInputContainer label="Ospiti" icon={Users} className="w-full">
-                                <input type="number" min="1" placeholder="2 Ospiti" className="w-full h-full px-3 bg-transparent border-none focus:ring-0 text-sm font-medium outline-none placeholder:text-gray-400"
+                                <input type="number" min="1" placeholder="2 Ospiti" className={`w-full h-full px-3 bg-transparent border-none focus:ring-0 ${MOBILE_FONT} text-[16px] leading-[24px] font-semibold lg:text-sm lg:font-medium outline-none placeholder:text-gray-400`}
                                     value={bnbGuests} onChange={(e) => setBnbGuests(e.target.value)} />
                             </SearchInputContainer>
                             <div className="flex flex-col gap-1">
                                 <span className="text-[9px] font-bold uppercase tracking-wide opacity-0 select-none ml-1">_</span>
                                 <PrimaryButton type="submit" className="w-full h-[42px] lg:h-[64px] !rounded-xl lg:!rounded-2xl !px-4 lg:!px-8 shadow-lg shadow-emerald-500/20">
                                     <Search size={16} strokeWidth={2.5} />
-                                    <span className="lg:hidden text-xs font-bold uppercase tracking-wider">Cerca</span>
+                                    <span className={`lg:hidden ${MOBILE_FONT} text-[12px] leading-[16px] font-semibold uppercase tracking-wider`}>Cerca</span>
                                 </PrimaryButton>
                             </div>
                         </div>
@@ -706,7 +708,7 @@ export const ServiceSearch = () => {
                             {/* Desktop & Mobile Grid Logic */}
                             <div className="grid grid-cols-2 gap-2 lg:flex lg:flex-row lg:gap-3 w-full">
                                 <SearchInputContainer label="Tipo Evento" icon={Ticket} className="w-full">
-                                    <select className="w-full h-full px-2 lg:px-3 bg-transparent border-none outline-none text-sm font-medium appearance-none cursor-pointer text-gray-700"
+                                    <select className={`w-full h-full px-2 lg:px-3 bg-transparent border-none outline-none ${MOBILE_FONT} text-[16px] leading-[24px] font-semibold lg:text-sm lg:font-medium appearance-none cursor-pointer text-gray-700`}
                                         value={clubType} onChange={(e) => setClubType(e.target.value)}>
                                         <option value="">Tutti</option>
                                         <option value="DJ Set">DJ Set</option>
@@ -715,7 +717,7 @@ export const ServiceSearch = () => {
                                     </select>
                                 </SearchInputContainer>
                                 <SearchInputContainer label="Data" icon={Calendar} className="w-full">
-                                    <input type="date" min={today} className="w-full h-full px-2 bg-transparent border-none outline-none text-sm font-medium text-gray-600"
+                                    <input type="date" min={today} className={`w-full h-full px-2 bg-transparent border-none outline-none ${MOBILE_FONT} text-[16px] leading-[24px] font-semibold lg:text-sm lg:font-medium text-gray-600`}
                                         value={clubDate} onChange={(e) => setClubDate(e.target.value)} />
                                 </SearchInputContainer>
 
@@ -725,7 +727,7 @@ export const ServiceSearch = () => {
                                         <GlassWater size={12} className={`text-[${HOGU_COLORS.primary}]`} /> Tavolo
                                     </label>
                                     <div className={`h-[42px] lg:h-[64px] rounded-xl lg:rounded-2xl border cursor-pointer transition-all duration-300 flex items-center justify-between px-3 shadow-sm ${reserveTable ? `bg-[#F0FDF9] border-[#68B49B] ring-1 ring-[#68B49B]` : 'bg-gray-50 border-gray-200 hover:border-[#68B49B]'}`} onClick={() => setReserveTable(!reserveTable)}>
-                                        <span className={`text-xs font-bold ${reserveTable ? 'text-[#33594C]' : 'text-gray-500'}`}>{reserveTable ? 'Sì, Tavolo' : 'No, Lista'}</span>
+                                        <span className={`${MOBILE_FONT} text-[16px] leading-[24px] font-semibold ${reserveTable ? 'text-[#33594C]' : 'text-gray-500'} lg:text-xs lg:font-bold`}>{reserveTable ? 'Sì, Tavolo' : 'No, Lista'}</span>
                                         <div className={`w-5 h-5 rounded-full flex items-center justify-center transition-all border ${reserveTable ? 'bg-[#68B49B] border-[#68B49B] text-white' : 'bg-gray-200 border-gray-300 text-transparent'}`}>
                                             {reserveTable ? <Star size={10} fill="currentColor" /> : <Check size={10} strokeWidth={3} />}
                                         </div>
@@ -737,7 +739,7 @@ export const ServiceSearch = () => {
                                     <span className="text-[9px] font-bold uppercase tracking-wide opacity-0 select-none ml-1">_</span>
                                     <PrimaryButton type="submit" className="w-full h-[42px] !rounded-xl !px-4 shadow-lg shadow-emerald-500/20">
                                         <Search size={16} strokeWidth={2.5} />
-                                        <span className="text-xs font-bold uppercase tracking-wider">Cerca</span>
+                                        <span className={`${MOBILE_FONT} text-[12px] leading-[16px] font-semibold uppercase tracking-wider`}>Cerca</span>
                                     </PrimaryButton>
                                 </div>
                             </div>
@@ -762,8 +764,7 @@ export const ServiceSearch = () => {
                             {/* Città */}
                             <div className="z-[100]">
                                 <CityAutocomplete label="Dove lasci i bagagli?" icon={MapPin} placeholder="Città deposito" className="w-full z-[100]"
-                                    value={location} onChange={setLocation} inputClassName="text-sm"
-                                    labelClassName={`!text-[${HOGU_COLORS.subtleText}] !text-[9px]`} />
+                                    value={location} onChange={setLocation} />
                             </div>
                             {/* Grid 2 col: Schedule modal + Bags modal */}
                             <div className="grid grid-cols-2 gap-2">
@@ -780,8 +781,8 @@ export const ServiceSearch = () => {
                                     <MobileBagsModal luggageCounts={luggageCounts} updateLuggage={updateLuggage} />
                                 </SearchInputContainer>
                             </div>
-                            {/* Cerca full-width */}
-                            <PrimaryButton type="submit" className="w-full h-[42px] !rounded-xl !text-sm !py-0">
+                             {/* Cerca full-width */}
+                            <PrimaryButton type="submit" className={`w-full h-[42px] !rounded-xl ${MOBILE_FONT} text-[16px] leading-[20px] font-semibold !py-0`}>
                                 <Search size={16} />
                                 Cerca
                             </PrimaryButton>
@@ -846,17 +847,17 @@ export const ServiceSearch = () => {
                             <div className="grid grid-cols-2 gap-2">
                                 <SearchInputContainer label="Data e Ora" icon={Calendar} className="w-full">
                                     <div className="flex w-full h-full items-center justify-between px-2 gap-1 overflow-hidden">
-                                        <input type="date" min={today} className="bg-transparent border-none outline-none font-bold text-[10px] text-gray-800 w-[65px] h-full"
+                                        <input type="date" min={today} className={`bg-transparent border-none outline-none ${MOBILE_FONT} text-[14px] leading-[20px] font-semibold text-gray-800 w-[80px] h-full`}
                                             value={nccDate} onChange={(e) => { const d = e.target.value; setNccDate(d); setNccTime(getDefaultTime(d)); }} />
                                         <div className="w-px h-4 bg-gray-200 shrink-0"></div>
-                                        <div className="flex-1 min-w-0"><TimeSlotSelect value={nccTime} date={nccDate} onChange={(e) => setNccTime(e.target.value)} className="!text-[10px] !px-1" /></div>
+                                        <div className="flex-1 min-w-0"><TimeSlotSelect value={nccTime} date={nccDate} onChange={(e) => setNccTime(e.target.value)} className="!text-[14px] !px-1" /></div>
                                     </div>
                                 </SearchInputContainer>
                                 <SearchInputContainer label="Passeggeri" icon={Users} className="w-full">
                                     <MobilePassengersModal value={nccPassengers} onChange={setNccPassengers} />
                                 </SearchInputContainer>
                             </div>
-                            <PrimaryButton type="submit" className="w-full h-[42px] !rounded-xl !text-sm !py-0">
+                            <PrimaryButton type="submit" className={`w-full h-[42px] !rounded-xl ${MOBILE_FONT} text-[16px] leading-[20px] font-semibold !py-0`}>
                                 <Search size={16} />
                                 Cerca
                             </PrimaryButton>
@@ -867,18 +868,18 @@ export const ServiceSearch = () => {
                             <div className="grid grid-cols-2 lg:flex lg:flex-row gap-2 lg:gap-4 w-full relative z-30">
                                 <CityAutocomplete label="Partenza" icon={MapPin} placeholder="Es. Milano" className="w-full flex-1" value={nccFromCity} onChange={setNccFromCity} required inputClassName="text-sm lg:text-lg" />
                                 <SearchInputContainer label="Indirizzo Partenza" icon={Navigation} className="w-full lg:flex-[1.5]">
-                                    <input type="text" placeholder="Via, Civico o Aeroporto" className="w-full h-full px-2 lg:px-3 bg-transparent border-none focus:ring-0 text-sm font-medium outline-none placeholder:text-gray-400" value={nccFromAddress} onChange={(e) => setNccFromAddress(e.target.value)} />
+                                    <input type="text" placeholder="Via, Civico o Aeroporto" className={`w-full h-full px-2 lg:px-3 bg-transparent border-none focus:ring-0 ${MOBILE_FONT} text-[16px] leading-[24px] font-semibold lg:text-sm lg:font-medium outline-none placeholder:text-gray-400`} value={nccFromAddress} onChange={(e) => setNccFromAddress(e.target.value)} />
                                 </SearchInputContainer>
                             </div>
                             <div className="grid grid-cols-2 lg:flex lg:flex-row gap-2 lg:gap-4 w-full relative z-20">
                                 <CityAutocomplete label="Destinazione" icon={MapPin} placeholder="Es. Roma" className="w-full flex-1" value={nccToCity} onChange={setNccToCity} required />
                                 <SearchInputContainer label="Indirizzo Destinazione" icon={Navigation} className="w-full lg:flex-[1.5]">
-                                    <input type="text" placeholder="Via, Civico o Aeroporto" className="w-full h-full px-2 lg:px-3 bg-transparent border-none focus:ring-0 text-sm font-medium outline-none placeholder:text-gray-400" value={nccToAddress} onChange={(e) => setNccToAddress(e.target.value)} />
+                                    <input type="text" placeholder="Via, Civico o Aeroporto" className={`w-full h-full px-2 lg:px-3 bg-transparent border-none focus:ring-0 ${MOBILE_FONT} text-[16px] leading-[24px] font-semibold lg:text-sm lg:font-medium outline-none placeholder:text-gray-400`} value={nccToAddress} onChange={(e) => setNccToAddress(e.target.value)} />
                                 </SearchInputContainer>
                             </div>
                             <div className="grid grid-cols-2 lg:flex lg:flex-row gap-2 lg:gap-4 items-end w-full">
                                 <SearchInputContainer label="Data" icon={Calendar} className="w-full">
-                                    <input type="date" min={today} className="w-full h-full px-2 lg:px-3 bg-transparent border-none outline-none text-sm font-medium text-gray-600 min-w-0"
+                                    <input type="date" min={today} className={`w-full h-full px-2 lg:px-3 bg-transparent border-none outline-none ${MOBILE_FONT} text-[16px] leading-[24px] font-semibold lg:text-sm lg:font-medium text-gray-600 min-w-0`}
                                         value={nccDate} onChange={(e) => {
                                             const newDate = e.target.value;
                                             setNccDate(newDate);
@@ -889,7 +890,7 @@ export const ServiceSearch = () => {
                                     <TimeSlotSelect value={nccTime} date={nccDate} onChange={(e) => setNccTime(e.target.value)} />
                                 </SearchInputContainer>
                                 <SearchInputContainer label="Passeggeri" icon={Users} className="w-full lg:max-w-[150px]">
-                                    <input type="number" min="1" className="w-full h-full px-2 lg:px-3 bg-transparent border-none outline-none text-sm font-medium text-center text-gray-700" value={nccPassengers} onChange={(e) => setNccPassengers(e.target.value)} />
+                                    <input type="number" min="1" className={`w-full h-full px-2 lg:px-3 bg-transparent border-none outline-none ${MOBILE_FONT} text-[16px] leading-[24px] font-semibold lg:text-sm lg:font-medium text-center text-gray-700`} value={nccPassengers} onChange={(e) => setNccPassengers(e.target.value)} />
                                 </SearchInputContainer>
                                 <div className="flex flex-col gap-1">
                                     <span className="text-[9px] font-bold uppercase tracking-wide opacity-0 select-none ml-1">_</span>
@@ -905,9 +906,9 @@ export const ServiceSearch = () => {
     };
 
     return (
-        <div className={`max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 -mt-32 sm:-mt-20 relative z-30 ${HOGU_THEME.fontFamily}`}>
+        <div className={`max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 -mt-24 sm:-mt-20 relative z-30 ${HOGU_THEME.fontFamily}`}>
             {/* TABS CONTAINER UNIFICATO */}
-            <div className="bg-white/10 backdrop-blur-md border border-white/20 p-1 lg:p-1.5 rounded-2xl md:rounded-t-3xl md:rounded-b-none mb-2 md:mb-0 shadow-lg md:shadow-none inline-flex md:block w-full overflow-hidden">
+            <div className="bg-white/10 backdrop-blur-md border border-white/20 p-1 lg:p-1.5 rounded-2xl md:rounded-t-3xl md:rounded-b-none mb-4 md:mb-0 shadow-lg md:shadow-none inline-flex md:block w-full overflow-hidden">
                 <div className="flex overflow-x-auto md:overflow-visible md:grid md:grid-cols-5 gap-1.5 md:gap-0 items-center w-full scrollbar-hide snap-x px-0.5 md:px-0">
                     {serviceCategories.map((cat) => {
                         const isActive = activeTab === cat.name;
@@ -915,7 +916,7 @@ export const ServiceSearch = () => {
                             <button key={cat.id} onClick={() => setActiveTab(cat.name)}
                                 className={`
                             relative flex flex-row items-center justify-center gap-1.5 py-2 lg:py-4 px-3 lg:px-3 flex-shrink-0 md:w-full snap-start
-                            font-bold text-xs lg:text-sm tracking-wide transition-all duration-300 rounded-xl md:rounded-none md:rounded-t-2xl
+                            ${MOBILE_FONT} text-[16px] leading-[24px] font-semibold tracking-wide md:text-xs lg:text-sm transition-all duration-300 rounded-xl md:rounded-none md:rounded-t-2xl
                             ${isActive
                                         ? 'bg-white text-[#68B49B] shadow-md md:shadow-none'
                                         : 'text-white/90 hover:bg-white/10'

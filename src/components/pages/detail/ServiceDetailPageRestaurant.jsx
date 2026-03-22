@@ -805,7 +805,7 @@ export const ServiceDetailPageRestaurant = ({ id, dateFrom, timeFrom, totalPerso
                 initialPersons={totalPersons}
             />
 
-            {urgencyCount > 0 && <LiveViewersFloatingBadge count={urgencyCount} className="!bottom-24 md:!bottom-6" />}
+            {urgencyCount > 0 && <LiveViewersFloatingBadge count={urgencyCount} />}
         </div>
     );
 };

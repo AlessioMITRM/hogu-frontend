@@ -1109,6 +1109,7 @@ export const AdminDashboard = ({ onNavigate }) => {
       setSuccessMessage("Stato prenotazione aggiornato!");
       setShowSuccess(true);
       fetchBookings(); // Refresh list
+      fetchData(); // Refresh KPIs (revenue)
     } catch (error) {
       console.error("Update status failed:", error);
       setErrorMessage(error.message || "Errore durante l'aggiornamento dello stato.");
@@ -1131,6 +1132,7 @@ export const AdminDashboard = ({ onNavigate }) => {
       // Refresh list based on active tab
       if (activeTab === 'accounts') fetchCustomers();
       if (activeTab === 'providers') fetchPartners();
+      fetchData(); // Refresh KPIs (user counts)
     } catch (error) {
       console.error("Update user status failed:", error);
       setErrorMessage(error.message || "Errore durante l'aggiornamento dello stato utente.");
@@ -1200,7 +1202,8 @@ export const AdminDashboard = ({ onNavigate }) => {
       await adminService.approveVerification(id);
       setSuccessMessage("Verifica approvata con successo!");
       setShowSuccess(true);
-      await fetchData(); // Refresh list
+      await fetchData(); // Refresh pending list and KPIs
+      fetchPartners(); // Refresh full partner list
     } catch (error) {
       console.error("Approve failed:", error);
       setErrorMessage(error.message || "Errore durante l'approvazione.");
@@ -1224,7 +1227,8 @@ export const AdminDashboard = ({ onNavigate }) => {
 
       setSuccessMessage("Provider eliminato permanentemente insieme a tutti i suoi dati (Hard Delete).");
       setShowSuccess(true);
-      await fetchData(); // Refresh list
+      await fetchData(); // Refresh pending list and KPIs
+      fetchPartners(); // Refresh full partner list
     } catch (error) {
       console.error("Reject failed:", error);
       setErrorMessage(error.message || "Errore durante l'eliminazione del provider.");

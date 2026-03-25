@@ -432,7 +432,7 @@ const BebDashboard = () => {
             setIsLoading(false);
         }
     };
-    const handleValidateCheckin = () => { navigate('/validator?type=beb'); };
+    const handleValidateCheckin = () => { navigate('/provider/qr-validator?type=beb'); };
 
     const isDefaultInfo = providerInfo?.name === "Registrazione in corso..." || providerInfo?.description === "Descrizione del servizio in aggiornamento.";
 
@@ -510,7 +510,7 @@ const BebDashboard = () => {
                     <div className="hidden lg:flex flex-col gap-4 h-full">
                         {/* A. Card SCANNER Desktop */}
                         <div
-                            onClick={() => navigate('/validator?type=beb')}
+                            onClick={() => navigate('/provider/qr-validator?type=beb')}
                             className={`flex-1 min-h-[140px] bg-gradient-to-br from-[${HOGU_COLORS.dark}] to-slate-800 rounded-[2rem] p-6 text-white relative overflow-hidden group cursor-pointer shadow-xl shadow-slate-900/10 hover:shadow-2xl hover:-translate-y-1 transition-all flex flex-col justify-center`}
                         >
                             <div className="absolute -right-6 -top-6 text-white/5 group-hover:text-white/10 transition-colors pointer-events-none">
@@ -549,7 +549,7 @@ const BebDashboard = () => {
 
                 {/* 0c. Azioni Rapide SOLO MOBILE */}
                 <div className="grid grid-cols-2 gap-3 lg:hidden mb-6 mt-4 md:mt-0">
-                    <button onClick={() => navigate('/validator?type=beb')} className="bg-[#1a1a1a] text-white p-3 rounded-xl flex flex_col items-center justify_center gap-2 shadow-lg">
+                    <button onClick={() => navigate('/provider/qr-validator?type=beb')} className="bg-[#1a1a1a] text-white p-3 rounded-xl flex flex-col items-center justify-center gap-2 shadow-lg">
                         <QrCode size={20} />
                         <span className="text-xs font-bold">Scanner</span>
                     </button>

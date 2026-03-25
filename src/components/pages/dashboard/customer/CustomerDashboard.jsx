@@ -86,15 +86,15 @@ const StatusBadge = ({ status }) => {
   );
 };
 
-const ServiceIcon = ({ type }) => {
+const ServiceIcon = ({ type, size = 14 }) => {
   switch (type) {
-    case 'Ristorante': return <Utensils size={14} />;
-    case 'Club': return <Music size={14} />;
-    case 'NCC': return <Car size={14} />;
-    case 'Luggage': return <Package size={14} />;
-    case 'B&B': return <Bed size={14} />;
-    case 'Barber': return <User size={14} />;
-    default: return <Briefcase size={14} />;
+    case 'RESTAURANT': return <Utensils size={size} />;
+    case 'CLUB': return <Music size={size} />;
+    case 'NCC': return <Car size={size} />;
+    case 'LUGGAGE': return <Package size={size} />;
+    case 'BNB': return <Bed size={size} />;
+    case 'BARBER': return <User size={size} />;
+    default: return <Briefcase size={size} />;
   }
 };
 
@@ -114,70 +114,75 @@ const StatCard = ({ title, value, icon: Icon, colorClass }) => (
 const PriceChangeRequestCard = ({ booking, onAccept, onReject }) => {
   const { t } = useTranslation('dashboard');
   return (
-  <div className="bg-blue-50/50 rounded-3xl p-6 border border-blue-100 shadow-lg shadow-blue-100/50 mb-8 animate-in slide-in-from-top-4 fade-in duration-500">
-    <div className="flex flex-col md:flex-row gap-6">
-      {/* Left: Info */}
-      <div className="flex-1">
-        <div className="flex items-center gap-3 mb-4">
-          <div className="p-2.5 bg-blue-100 text-blue-600 rounded-xl">
-            <RefreshCw size={24} className="animate-spin-slow" />
+    <div className="bg-blue-50/50 rounded-3xl p-6 border border-blue-100 shadow-lg shadow-blue-100/50 mb-8 animate-in slide-in-from-top-4 fade-in duration-500 relative overflow-hidden">
+      <div className="flex flex-col md:flex-row gap-6">
+        {/* Left: Info */}
+        <div className="flex-1">
+          <div className="flex items-center gap-3 mb-4">
+            <div className="p-2.5 bg-blue-100 text-blue-600 rounded-xl">
+              <RefreshCw size={24} className="animate-spin-slow" />
+            </div>
+            <div>
+              <h3 className="text-xl font-bold text-[#1A202C]">{t('price_change.title')}</h3>
+              <p className="text-sm text-slate-500">{t('price_change.desc')}</p>
+            </div>
           </div>
-          <div>
-            <h3 className="text-xl font-bold text-[#1A202C]">{t('price_change.title')}</h3>
-            <p className="text-sm text-slate-500">{t('price_change.desc')}</p>
-          </div>
-        </div>
 
-        <div className="bg-white p-4 rounded-2xl border border-blue-100 mb-4">
-          <div className="flex items-center justify-between mb-3">
-            <div className="flex items-center gap-3">
-              <SafeImage src={booking.image} className="w-10 h-10 rounded-lg object-cover" alt="" />
-              <div>
-                <p className="font-bold text-[#1A202C]">{booking.service}</p>
-                <p className="text-xs text-slate-400">{booking.date} • {booking.time}</p>
+          <div className="bg-white p-4 rounded-2xl border border-blue-100 mb-4">
+            <div className="flex items-center justify-between mb-3">
+              <div className="flex items-center gap-3">
+                <div className="relative">
+                  <SafeImage src={booking.image} className="w-10 h-10 rounded-lg object-cover" alt="" />
+                  <div className="absolute -top-1.5 -right-1.5 bg-white p-1 rounded-md border border-blue-100 shadow-sm">
+                    <ServiceIcon type={booking.type} size={12} />
+                  </div>
+                </div>
+                <div>
+                  <p className="font-bold text-[#1A202C]">{booking.service}</p>
+                  <p className="text-xs text-slate-400">{booking.date} • {booking.time}</p>
+                </div>
+              </div>
+            </div>
+
+            {booking.providerNote && (
+              <div className="bg-slate-50 p-3 rounded-xl text-sm text-slate-600 italic border-l-4 border-blue-300 mb-3">
+                "{booking.providerNote}"
+              </div>
+            )}
+
+            <div className="flex items-center justify-between bg-blue-50/50 p-3 rounded-xl">
+              <div className="flex flex-col">
+                <span className="text-[10px] font-bold text-slate-400 uppercase">{t('price_change.old_price')}</span>
+                <span className="text-lg font-bold text-slate-400 line-through decoration-slate-400/50">€ {formatPrice(booking.oldPrice, t('language_tag', { defaultValue: 'it-IT' }))}</span>
+              </div>
+              <div className="flex items-center text-blue-300">
+                <ChevronRight size={24} />
+              </div>
+              <div className="flex flex-col text-right">
+                <span className="text-[10px] font-bold text-blue-600 uppercase">{t('price_change.new_price')}</span>
+                <span className="text-2xl font-extrabold text-[#1A202C]">€ {formatPrice(booking.price, t('language_tag', { defaultValue: 'it-IT' }))}</span>
               </div>
             </div>
           </div>
+        </div>
 
-          {booking.providerNote && (
-            <div className="bg-slate-50 p-3 rounded-xl text-sm text-slate-600 italic border-l-4 border-blue-300 mb-3">
-              "{booking.providerNote}"
-            </div>
-          )}
-
-          <div className="flex items-center justify-between bg-blue-50/50 p-3 rounded-xl">
-            <div className="flex flex-col">
-              <span className="text-[10px] font-bold text-slate-400 uppercase">{t('price_change.old_price')}</span>
-              <span className="text-lg font-bold text-slate-400 line-through decoration-slate-400/50">€ {formatPrice(booking.oldPrice, t('language_tag', { defaultValue: 'it-IT' }))}</span>
-            </div>
-            <div className="flex items-center text-blue-300">
-              <ChevronRight size={24} />
-            </div>
-            <div className="flex flex-col text-right">
-              <span className="text-[10px] font-bold text-blue-600 uppercase">{t('price_change.new_price')}</span>
-              <span className="text-2xl font-extrabold text-[#1A202C]">€ {formatPrice(booking.price, t('language_tag', { defaultValue: 'it-IT' }))}</span>
-            </div>
-          </div>
+        {/* Right: Actions */}
+        <div className="md:w-1/3 flex flex-col justify-center gap-3">
+          <button
+            onClick={() => onAccept(booking.id)}
+            className="w-full py-4 bg-[#1A202C] text-white rounded-xl font-bold hover:bg-black transition-all shadow-xl shadow-slate-900/10 flex items-center justify-center gap-2"
+          >
+            <CheckCircle size={20} /> {t('price_change.accept')}
+          </button>
+          <button
+            onClick={() => onReject(booking.id)}
+            className="w-full py-4 bg-white text-rose-600 border border-rose-100 rounded-xl font-bold hover:bg-rose-50 transition-all flex items-center justify-center gap-2"
+          >
+            <XCircle size={20} /> {t('price_change.reject')}
+          </button>
         </div>
       </div>
-
-      {/* Right: Actions */}
-      <div className="md:w-1/3 flex flex-col justify-center gap-3">
-        <button
-          onClick={() => onAccept(booking.id)}
-          className="w-full py-4 bg-[#1A202C] text-white rounded-xl font-bold hover:bg-black transition-all shadow-xl shadow-slate-900/10 flex items-center justify-center gap-2"
-        >
-          <CheckCircle size={20} /> {t('price_change.accept')}
-        </button>
-        <button
-          onClick={() => onReject(booking.id)}
-          className="w-full py-4 bg-white text-rose-600 border border-rose-100 rounded-xl font-bold hover:bg-rose-50 transition-all flex items-center justify-center gap-2"
-        >
-          <XCircle size={20} /> {t('price_change.reject')}
-        </button>
-      </div>
     </div>
-  </div>
   );
 };
 
@@ -198,7 +203,7 @@ const BookingCard = ({ booking, onOpenComplaint, onOpenQr, onOpenDetail }) => {
   }, []);
 
   return (
-    <div className="group bg-white rounded-3xl p-5 border border-slate-100 shadow-[0_2px_15px_-3px_rgba(0,0,0,0.05)] hover:shadow-[0_8px_25px_-5px_rgba(104,180,155,0.15)] hover:border-[#68B49B]/30 transition-all duration-300 flex flex-col h-full relative">
+    <div className="group bg-white rounded-3xl p-5 border border-slate-100 shadow-[0_2px_15px_-3px_rgba(0,0,0,0.05)] hover:shadow-[0_8px_25px_-5px_rgba(104,180,155,0.15)] hover:border-[#68B49B]/30 transition-all duration-300 flex flex-col h-full relative overflow-hidden">
 
       {/* Header Immagine & Titolo */}
       <div className="flex gap-4 mb-4">
@@ -241,8 +246,8 @@ const BookingCard = ({ booking, onOpenComplaint, onOpenQr, onOpenDetail }) => {
         <div className="font-extrabold text-[#1A202C] text-lg">€ {formatPrice(booking.price, t('language_tag', { defaultValue: 'it-IT' }))}</div>
 
         <div className="flex gap-2 relative">
-          {/* TICKET QR BUTTON (Solo se confermato) */}
-          {booking.status === 'confirmed' && (
+          {/* TICKET QR BUTTON */}
+          {(booking.status === 'confirmed' || booking.status === 'completed') && (
             <button
               onClick={() => onOpenQr(booking)}
               className="flex items-center justify-center gap-1.5 bg-[#68B49B]/10 text-[#33594C] px-3 py-2 rounded-xl text-xs font-bold hover:bg-[#68B49B] hover:text-white transition-all shadow-sm"
@@ -299,31 +304,32 @@ const BookingCard = ({ booking, onOpenComplaint, onOpenQr, onOpenDetail }) => {
 const TodayBookingCard = ({ booking, onOpenQr, onOpenDetail }) => {
   const { t } = useTranslation('dashboard');
   return (
-  <div className="bg-gradient-to-br from-[#1A202C] to-slate-800 rounded-[2rem] p-6 text-white shadow-xl shadow-slate-900/20 relative overflow-hidden flex flex-col justify-between h-full min-h-[220px]">
-    {/* Background decorative */}
-    <div className="absolute top-0 right-0 p-8 opacity-10"><QrCode size={120} /></div>
+    <div className="bg-gradient-to-br from-[#1A202C] to-slate-800 rounded-[2rem] p-6 text-white shadow-xl shadow-slate-900/20 relative overflow-hidden flex flex-col justify-between h-full min-h-[220px]">
 
-    <div className="relative z-10 cursor-pointer" onClick={() => onOpenDetail(booking)}>
-      <div className="inline-flex items-center gap-2 bg-white/10 backdrop-blur-md px-3 py-1 rounded-lg text-xs font-bold mb-4 border border-white/20">
-        <Calendar size={14} /> {t('booking_card.today')} • {booking.date}
-      </div>
-      <h3 className="text-2xl font-extrabold mb-1 leading-tight hover:text-[#68B49B] transition-colors">{booking.service}</h3>
-      <p className="text-slate-300 text-sm mb-4">{booking.address}</p>
+      <div className="relative z-10 cursor-pointer" onClick={() => onOpenDetail(booking)}>
+        <div className="inline-flex items-center gap-2 bg-white/10 backdrop-blur-md px-3 py-1 rounded-lg text-xs font-bold mb-4 border border-white/20">
+          <Calendar size={14} /> {t('booking_card.today')} • {booking.date}
+        </div>
+        <h3 className="text-2xl font-extrabold mb-1 leading-tight hover:text-[#68B49B] transition-colors">{booking.service}</h3>
+        <p className="text-slate-300 text-sm mb-4">{booking.address}</p>
 
-      <div className="flex items-center gap-4 text-sm font-bold">
-        <span className="flex items-center gap-1.5"><Clock size={16} className="text-[#68B49B]" /> {booking.time}</span>
-        <span className="w-1 h-1 bg-slate-500 rounded-full"></span>
-        <span>{booking.type}</span>
+        <div className="flex items-center gap-4 text-sm font-bold">
+          <div className="bg-white/10 p-1.5 rounded-lg border border-white/20">
+            <ServiceIcon type={booking.type} size={16} />
+          </div>
+          <span className="flex items-center gap-1.5"><Clock size={16} className="text-[#68B49B]" /> {booking.time}</span>
+          <span className="w-1 h-1 bg-slate-500 rounded-full"></span>
+          <span>{booking.type}</span>
+        </div>
       </div>
+
+      <button
+        onClick={() => onOpenQr(booking)}
+        className="relative z-10 mt-6 w-full bg-[#68B49B] hover:bg-[#569c85] text-white py-3.5 rounded-xl font-bold shadow-lg shadow-[#68B49B]/30 flex items-center justify-center gap-2 transition-all transform hover:scale-105"
+      >
+        <ScanLine size={18} /> {t('booking_card.show_ticket')}
+      </button>
     </div>
-
-    <button
-      onClick={() => onOpenQr(booking)}
-      className="relative z-10 mt-6 w-full bg-[#68B49B] hover:bg-[#569c85] text-white py-3.5 rounded-xl font-bold shadow-lg shadow-[#68B49B]/30 flex items-center justify-center gap-2 transition-all transform hover:scale-105"
-    >
-      <ScanLine size={18} /> {t('booking_card.show_ticket')}
-    </button>
-  </div>
   );
 };
 
@@ -495,8 +501,8 @@ const BookingDetailModal = ({ isOpen, onClose, booking }) => {
 
           {/* Footer Actions */}
           <div className="flex flex-col gap-3">
-            {booking.status === 'confirmed' ? (
-              <button className="flex items-center justify-center gap-2 py-3 bg-[#1A202C] text-white rounded-xl font-bold hover:bg-black transition-colors">
+            {(booking.status === 'confirmed' || booking.status === 'completed') ? (
+              <button onClick={() => onOpenQr(booking)} className="flex items-center justify-center gap-2 py-3 bg-[#1A202C] text-white rounded-xl font-bold hover:bg-black transition-colors">
                 <Ticket size={18} /> {t('detail_modal.view_ticket')}
               </button>
             ) : (

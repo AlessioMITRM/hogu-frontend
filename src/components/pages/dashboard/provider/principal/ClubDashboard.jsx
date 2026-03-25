@@ -1269,7 +1269,7 @@ const ClubDashboard = () => {
                     </div>
 
                     <div className="grid grid-cols-2 gap-3 lg:hidden">
-                        <button onClick={() => navigate('/validator?type=club')} className="bg-[#1a1a1a] text-white p-3 rounded-xl flex flex-col items-center justify-center gap-2 shadow-lg">
+                        <button onClick={() => navigate('/provider/qr-validator?type=club')} className="bg-[#1a1a1a] text-white p-3 rounded-xl flex flex-col items-center justify-center gap-2 shadow-lg">
                             <ScanLine size={20} />
                             <span className="text-xs font-bold">Scanner</span>
                         </button>

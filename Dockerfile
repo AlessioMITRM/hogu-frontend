@@ -26,10 +26,15 @@ RUN echo 'server { \
     listen 80; \
     auth_basic "Collaudo HOGU - Accesso Riservato"; \
     auth_basic_user_file /etc/nginx/.htpasswd; \
+    client_max_body_size 30M; \
     location / { \
         root /usr/share/nginx/html; \
         index index.html; \
         try_files $uri $uri/ /index.html; \
+    } \
+    location /files/ { \
+        auth_basic off; \
+        root /usr/share/nginx/html; \
     } \
     location /api/ { \
         auth_basic off; \
@@ -38,6 +43,7 @@ RUN echo 'server { \
         proxy_set_header X-Real-IP $remote_addr; \
     } \
 }' > /etc/nginx/conf.d/default.conf
+
 
 EXPOSE 80
 CMD ["nginx", "-g", "daemon off;"]
